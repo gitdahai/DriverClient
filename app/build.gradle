@@ -1,0 +1,47 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 20
+    buildToolsVersion "19.1.0"
+
+    defaultConfig {
+        applicationId "cn.hollo.www"
+        minSdkVersion 15
+        targetSdkVersion 20
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("shuttle.keystore")
+            storePassword "cn.hollo.shuttle"
+            keyAlias "shuttle.keystore"
+            keyPassword "cn.hollo.shuttle"
+        }
+
+        debug {
+            //SHA1=02:8F:3E:71:02:B2:6D:46:02:06:42:B5:D1:AA:EE:63:1F:E5:5A:8D
+            storeFile file("shuttle.keystore")
+            storePassword "cn.hollo.shuttle"
+            keyAlias "shuttle.keystore"
+            keyPassword "cn.hollo.shuttle"
+        }
+    }
+
+    buildTypes {
+        release {
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
