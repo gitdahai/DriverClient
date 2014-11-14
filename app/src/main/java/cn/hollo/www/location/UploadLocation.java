@@ -1,7 +1,6 @@
 package cn.hollo.www.location;
 
 import com.amap.api.location.AMapLocation;
-
 import cn.hollo.www.xmpp.ISubscribe;
 import cn.hollo.www.xmpp.XMPPManager;
 
