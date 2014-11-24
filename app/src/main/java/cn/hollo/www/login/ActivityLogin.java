@@ -1,5 +1,6 @@
 package cn.hollo.www.login;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,7 +11,9 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 
 import cn.hollo.www.ActivityBase;
+import cn.hollo.www.LoginConfig;
 import cn.hollo.www.R;
+import cn.hollo.www.features.ActivityFeatures;
 
 /*******************************************************************
  * Created by orson on 14-11-13.
@@ -42,8 +45,7 @@ public class ActivityLogin extends ActivityBase {
         rememberPasswordCheckBox.setOnCheckedChangeListener(listener);
 
         //首先禁用登录按钮
-        loginButton.setEnabled(false);
-
+        //loginButton.setEnabled(false);
         //读取用户登录的配置
         loginConfig = LoginConfig.getLoginConfig(this);
         //设置登录帐号
@@ -56,6 +58,9 @@ public class ActivityLogin extends ActivityBase {
         rememberPasswordCheckBox.setChecked(loginConfig.isRememberPassword);
         //设置自动登录的状态
         autoLoginCheckBox.setChecked(loginConfig.isAutoLogin);
+        //判断是否需要自动登录
+        if (loginConfig.isAutoLogin && loginNameEdit.length() > 0 && loginPasswordEdit.length() > 0)
+             onLogin();
     }
 
     /*****************************************************************
@@ -88,7 +93,10 @@ public class ActivityLogin extends ActivityBase {
      * 登录事件被触发
      */
     private void onLogin(){
-
+        Intent intent = new Intent(this, ActivityFeatures.class);
+        intent.putExtra("Features", ActivityFeatures.Features.TaskList);
+        startActivity(intent);
+        this.finish();
     }
 
     /**

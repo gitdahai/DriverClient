@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/features"
+        android:title="更多"
+        android:showAsAction="always" >
+        <menu>
+            <item
+                android:title="修改密码"
+                android:showAsAction="always"
+                android:id="@+id/actionModifyPassword"/>
+            <item
+                android:title="退出登录"
+                android:showAsAction="always"
+                android:id="@+id/actionLogout"/>
+        </menu>
+    </item>
+</menu>

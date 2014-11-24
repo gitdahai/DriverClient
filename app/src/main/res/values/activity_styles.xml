@@ -6,15 +6,25 @@
     </style>
 
     <!--应用整体样式风格-->
-    <style name="application_theme" parent="android:Theme.Light">
-        <item name="android:windowNoTitle">true</item>
+    <style name="application_theme">
         <item name="android:windowFullscreen">true</item>
+        <item name="android:actionBarTabTextStyle">@style/MyActionBarTabTextStyle</item>
+        <item name="android:actionBarTabStyle">@style/MyActionBarTabStyle</item>
+        <item name="android:textSize">18dp</item>
     </style>
 
     <!--Activity样式-->
     <style name="activity_theme" parent="application_theme">
-
+        <item name="android:windowNoTitle">true</item>
     </style>
 
+    <style name="MyActionBarTabStyle" parent="android:Theme.Holo.Light.DarkActionBar">
+        <item name="android:background">#ff545454</item>
+        <item name="android:actionBarSize">48dp</item>
+    </style>
 
+    <style name="MyActionBarTabTextStyle" parent="android:Widget.Holo.Light.ActionBar.TabText">
+        <item name="android:textColor">#ff545454</item>
+        <item name="android:textSize">18dp</item>
+    </style>
 </resources>
