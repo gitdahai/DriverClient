@@ -1,12 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
+    android:gravity="center"
     android:orientation="vertical">
-    <TextView
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="撒方式是"
-        />
+        android:src="@drawable/ic_hollo_img"/>
+    <!--登录名称-->
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:id="@+id/loginNameEdit"
+        android:singleLine="true"
+        android:hint="输入帐号"
+        android:background="@drawable/shape_edit_text_background"/>
+    <!--登录密码-->
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:id="@+id/loginPasswordEdit"
+        android:singleLine="true"
+        android:inputType="textPassword"
+        android:hint="输入密码"
+        android:background="@drawable/shape_edit_text_background"/>
+
+    <!--记住密码和自动登录-->
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
+        <!--记住密码-->
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rememberPasswordCheckBox"
+            android:text="记住密码"/>
+        <!--自动登录-->
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:id="@+id/autoLoginCheckBox"
+            android:text="自动登录"/>
+    </LinearLayout>
+
+    <!--登录按钮-->
+    <Button
+        android:layout_width="300dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="32dp"
+        android:id="@+id/loginButton"
+        style="@style/ButtonBlue"
+        android:text="登 录"/>
 </LinearLayout>
+
+

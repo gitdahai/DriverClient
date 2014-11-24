@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--蓝色按钮，点击后为灰色-->
+    <style name="ButtonBlue" parent="android:Widget.Holo.Light.Button">
+        <item name="android:background">@drawable/button_background_selector_blue</item>
+        <item name="android:textSize">18dp</item>
+        <item name="android:textColor">@color/color_white</item>
+        <item name="android:padding">8dp</item>
+    </style>
+</resources>
