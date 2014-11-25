@@ -12,6 +12,7 @@ import cn.hollo.www.LoginConfig;
 import cn.hollo.www.R;
 import cn.hollo.www.features.fragments.FragmentForgotPassword;
 import cn.hollo.www.features.fragments.FragmentTaskList;
+import cn.hollo.www.features.fragments.FragmentWorkDetail;
 import cn.hollo.www.login.ActivityLogin;
 import cn.hollo.www.utils.DialogModifyPassword;
 
@@ -31,8 +32,9 @@ public class ActivityFeatures extends ActivityBase {
 
         //过滤功能
         switch (feature){
-            case Features.TaskList:  loadFragment(FragmentTaskList.newInstance());    break;
-            case Features.ForgotPassword:  loadFragment(FragmentForgotPassword.newInstance());    break;
+            case Features.TaskList:         loadFragment(FragmentTaskList.newInstance());       break;
+            case Features.ForgotPassword:   loadFragment(FragmentForgotPassword.newInstance()); break;
+            case Features.WorkDetail:       loadFragment(FragmentWorkDetail.newInstance());     break;
             default:
         }
     }
@@ -58,7 +60,11 @@ public class ActivityFeatures extends ActivityBase {
      * @param fragment
      */
     private void loadFragment(FragmentBase fragment){
+        Intent intent = this.getIntent();
+        Bundle mBundle = intent.getExtras();
+
         this.fragment = fragment;
+        this.fragment.setArguments(mBundle);
         FragmentTransaction tf = this.getFragmentManager().beginTransaction();
         tf.replace(R.id.featuresContainer, fragment);
         tf.commit();
@@ -91,5 +97,6 @@ public class ActivityFeatures extends ActivityBase {
         int None = 0;
         int TaskList = 1;           //任务列表
         int ForgotPassword = 2;     //忘记密码
+        int WorkDetail = 3;         //工作任务详情
     }
 }

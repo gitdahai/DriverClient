@@ -5,10 +5,10 @@
   response          {"login_name"="xxxxx", "user_id"="xxxxxx"}
 
 2.修改密码:
-  /user/new_password   PUT
-  request params   {"user_id"="xxxxxx", "new_password"="xxxxxx"}
+  /users/<user_id>/new_password   PUT
+  request params   {old_password"="xxxxxx", "new_password"="xxxxxx"}
   response         ok=200, fail=400 {"code"=1000, "message"="修改失败的原因"}
 
 3.获取用户任务列表:
    /work_tasks/unfinished/<user_id>      GET
-   response    200=[{"task_id"="任务id", "voiture_number"="车辆编号", "voiture_type"="车辆类型", "date"="日期和时间", "departure_station"="起点站名称", "destination_station"="到达站点名称"}]
+   response    200=[{"task_id"="任务id", "voiture_number"="车辆编号", "voiture_type"="车辆类型", "timestamp"="时间戳", "departure_station"="起点站名称", "destination_station"="到达站点名称"}]

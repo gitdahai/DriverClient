@@ -15,10 +15,9 @@ public class HttpStringRequest extends StringRequest{
      * @param params
      */
     public HttpStringRequest(HttpRequestParams params) {
-        super(params.getMethod(), params.getUrl(), new ResponseListener(params.getListener()), new ErrorListener(params.getListener()));
+        super(params.getMethod(), HttpConstant.domain + params.getUrl(), new ResponseListener(params.getListener()), new ErrorListener(params.getListener()));
         this.params = params;
     }
-
 
     @Override
     public String getBodyContentType() {

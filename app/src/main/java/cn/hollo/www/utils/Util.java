@@ -10,6 +10,8 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Map;
 import java.util.Set;
 
@@ -77,5 +79,17 @@ public class Util {
      */
     public static void showMsg(Context context, String msg){
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * 根据时间戳，生成一个由日期和时间组成的字符串
+     * @param time
+     * @return
+     */
+    public static String createDateTime(long time){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(time);
+        SimpleDateFormat sFormat = new SimpleDateFormat("MM-dd hh:mm");
+        return sFormat.format(c);
     }
 }

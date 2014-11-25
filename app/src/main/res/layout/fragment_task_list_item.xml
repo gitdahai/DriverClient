@@ -24,7 +24,7 @@
         <TextView
             android:layout_width="100dp"
             android:layout_height="30dp"
-            android:id="@+id/voitureTypeName"
+            android:id="@+id/voitureTypeNameText"
             android:textSize="18dp"
             android:text="摆渡车"
             android:textColor="@color/color_white"
