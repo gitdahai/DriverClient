@@ -5,6 +5,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by orson on 14-11-24.
@@ -41,5 +48,34 @@ public class Util {
         dialog.show();
 
         return dialog;
+    }
+
+    /**
+     * 转换成json字符串
+     * @param values
+     * @return
+     */
+    public static String convertJsonString(Map<String, String> values){
+        Set<Map.Entry<String, String>> entrys = values.entrySet();
+        JSONObject jObj = new JSONObject();
+
+        try {
+            for (Map.Entry<String, String> entry : entrys){
+                jObj.put(entry.getKey(), entry.getValue());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return jObj.toString();
+    };
+
+    /**
+     * 显示消息
+     * @param context
+     * @param msg
+     */
+    public static void showMsg(Context context, String msg){
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 }

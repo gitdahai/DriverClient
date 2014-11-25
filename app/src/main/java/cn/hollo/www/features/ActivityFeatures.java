@@ -10,6 +10,8 @@ import cn.hollo.www.ActivityBase;
 import cn.hollo.www.FragmentBase;
 import cn.hollo.www.LoginConfig;
 import cn.hollo.www.R;
+import cn.hollo.www.features.fragments.FragmentForgotPassword;
+import cn.hollo.www.features.fragments.FragmentTaskList;
 import cn.hollo.www.login.ActivityLogin;
 import cn.hollo.www.utils.DialogModifyPassword;
 
@@ -30,6 +32,7 @@ public class ActivityFeatures extends ActivityBase {
         //过滤功能
         switch (feature){
             case Features.TaskList:  loadFragment(FragmentTaskList.newInstance());    break;
+            case Features.ForgotPassword:  loadFragment(FragmentForgotPassword.newInstance());    break;
             default:
         }
     }
@@ -86,6 +89,7 @@ public class ActivityFeatures extends ActivityBase {
      */
     public interface Features{
         int None = 0;
-        int TaskList = 1;
+        int TaskList = 1;           //任务列表
+        int ForgotPassword = 2;     //忘记密码
     }
 }

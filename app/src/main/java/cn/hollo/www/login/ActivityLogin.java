@@ -13,7 +13,12 @@ import android.widget.EditText;
 import cn.hollo.www.ActivityBase;
 import cn.hollo.www.LoginConfig;
 import cn.hollo.www.R;
+import cn.hollo.www.UserInfo;
 import cn.hollo.www.features.ActivityFeatures;
+import cn.hollo.www.https.HttpManager;
+import cn.hollo.www.https.HttpStringRequest;
+import cn.hollo.www.https.OnRequestListener;
+import cn.hollo.www.utils.Util;
 
 /*******************************************************************
  * Created by orson on 14-11-13.
@@ -25,6 +30,7 @@ public class ActivityLogin extends ActivityBase {
     private CheckBox rememberPasswordCheckBox;  //记住密码
     private CheckBox autoLoginCheckBox;         //自动登录
     private Button   loginButton;               //登录按钮
+    private Listener listener;
     private LoginConfig loginConfig;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +43,7 @@ public class ActivityLogin extends ActivityBase {
         autoLoginCheckBox = (CheckBox)findViewById(R.id.autoLoginCheckBox);
         rememberPasswordCheckBox = (CheckBox)findViewById(R.id.rememberPasswordCheckBox);
 
-        Listener listener = new Listener();
+        listener = new Listener();
         loginNameEdit.addTextChangedListener(listener);
         loginPasswordEdit.addTextChangedListener(listener);
         loginButton.setOnClickListener(listener);
@@ -93,10 +99,28 @@ public class ActivityLogin extends ActivityBase {
      * 登录事件被触发
      */
     private void onLogin(){
-        Intent intent = new Intent(this, ActivityFeatures.class);
-        intent.putExtra("Features", ActivityFeatures.Features.TaskList);
-        startActivity(intent);
-        this.finish();
+        if (loginNameEdit.getText().length() == 0){
+            Util.showMsg(this, "请输入用户名!");
+            return;
+        }
+
+        if (loginPasswordEdit.getText().length() == 0){
+            Util.showMsg(this, "请输入密码!");
+            return;
+        }
+
+        //读取参数
+        loginConfig.loginName = loginNameEdit.getText().toString().trim();
+        loginConfig.loginPassword = loginPasswordEdit.getText().toString().trim();
+        //设置请求参数
+        RequestLogin login = new RequestLogin();
+        login.login_name = loginConfig.loginName;
+        login.password = loginConfig.loginPassword;
+        login.lisntener = listener;
+        //发送请求
+        HttpStringRequest request = new HttpStringRequest(login);
+        HttpManager httpManager = HttpManager.getInstance();
+        httpManager.addRequest(request);
     }
 
     /**
@@ -119,7 +143,11 @@ public class ActivityLogin extends ActivityBase {
     /***************************************************************
      * 事件监听器类
      */
-    private class Listener implements CompoundButton.OnCheckedChangeListener, View.OnClickListener , TextWatcher {
+    private class Listener implements CompoundButton.OnCheckedChangeListener, View.OnClickListener ,TextWatcher, OnRequestListener {
+        public void onClick(View v) {onLogin();}
+        public void afterTextChanged(Editable s) {}
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        public void onTextChanged(CharSequence s, int start, int before, int count) {onEditTextChanged(s);}
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             switch(buttonView.getId()){
                 case R.id.autoLoginCheckBox:        onAutoLoginChecked(isChecked);       break;
@@ -127,11 +155,16 @@ public class ActivityLogin extends ActivityBase {
             }
         }
 
-        public void onClick(View v) {onLogin();}
-        public void afterTextChanged(Editable s) {}
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            onEditTextChanged(s);
+        public void onResponse(int code, String response) {
+            if (code == 200){
+                UserInfo userInfo = UserInfo.getInstance(ActivityLogin.this);
+                ParserJson.parserUserInfo(response, userInfo);
+
+                Intent intent = new Intent(ActivityLogin.this, ActivityFeatures.class);
+                intent.putExtra("Features", ActivityFeatures.Features.TaskList);
+                startActivity(intent);
+                finish();
+            }
         }
     }
 }
