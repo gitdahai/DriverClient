@@ -6,8 +6,8 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/taskListView"
-        android:padding="16dp">
+        android:dividerHeight="8dp"
+        android:id="@+id/taskListView">
 
     </ListView>
 </LinearLayout>

@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.view.View;
 import android.widget.Toast;
 
@@ -54,6 +55,35 @@ public class Util {
     }
 
     /**
+     * 创建一个默认
+     * @param context
+     * @param title
+     * @param message
+     * @param negative
+     * @param positive
+     * @param neutral
+     * @param listner
+     * @return
+     */
+    public static Dialog creteDefaultDialog(Context context, String title, String message, String negative, String positive, String neutral, DialogInterface.OnClickListener listner){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(title);
+        builder.setMessage(message);
+
+        if (negative != null)
+            builder.setPositiveButton(negative, listner);
+
+        if (positive != null)
+            builder.setNegativeButton(positive, listner);
+
+        if (neutral != null)
+            builder.setNeutralButton(neutral, listner);
+
+        Dialog dialog = builder.create();
+        dialog.show();
+        return dialog;
+    }
+    /**
      * 转换成json字符串
      * @param values
      * @return
@@ -90,9 +120,10 @@ public class Util {
     public static String createDateTime(long time){
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(time);
-        SimpleDateFormat sFormat = new SimpleDateFormat("MM-dd hh:mm");
-        return sFormat.format(c);
+        SimpleDateFormat sFormat = new SimpleDateFormat("MM-dd  hh:mm");
+        return sFormat.format(c.getTime());
     }
+
 
     /**
      *
@@ -121,5 +152,16 @@ public class Util {
         // 设置ProgressDialog 是否可以按退回按键取消
         dialog.setCancelable(true);
         return dialog;
+    }
+
+    /**
+     * 加载字体
+     * @param context
+     * @param fontPath
+     * @return
+     */
+    public static Typeface loadTypeface(Context context, String fontPath){
+        Typeface tf = Typeface.createFromAsset(context.getAssets(), fontPath);
+        return tf;
     }
 }

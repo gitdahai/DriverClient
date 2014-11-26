@@ -1,6 +1,7 @@
 package cn.hollo.www.features.fragments;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +31,8 @@ import cn.hollo.www.utils.Util;
  * 工作任务列表
  */
 public class FragmentTaskList extends FragmentBase {
+    private Typeface typeface;
+
     public static FragmentTaskList newInstance(){
         return new FragmentTaskList();
     }
@@ -37,6 +40,7 @@ public class FragmentTaskList extends FragmentBase {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_task_list, null);
+        typeface = Util.loadTypeface(getActivity(), "fonts/ImpactMTStd.otf");
         new TaskList(view);
         return view;
     }
@@ -92,7 +96,7 @@ public class FragmentTaskList extends FragmentBase {
             mBoudle.putSerializable("Attach", task);
             intent.putExtras(mBoudle);
             startActivity(intent);
-            getActivity().finish();
+            //getActivity().finish();
         }
     }
 
@@ -134,7 +138,6 @@ public class FragmentTaskList extends FragmentBase {
         private TextView taskDateTimeText;
         private TextView departureStationText;
         private TextView destinationStationText;
-        private WorkTask data;
 
         private ItemHolder(View view){
             voitureNumberText = (TextView)view.findViewById(R.id.voitureNumberText);
@@ -142,6 +145,8 @@ public class FragmentTaskList extends FragmentBase {
             taskDateTimeText = (TextView)view.findViewById(R.id.taskDateTimeText);
             departureStationText = (TextView)view.findViewById(R.id.departureStationText);
             destinationStationText = (TextView)view.findViewById(R.id.destinationStationText);
+
+            taskDateTimeText.setTypeface(typeface);
         }
 
         private void showData(WorkTask data){

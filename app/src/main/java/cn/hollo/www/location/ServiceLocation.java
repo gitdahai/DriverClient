@@ -7,6 +7,7 @@ import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
@@ -25,6 +26,24 @@ import java.util.Set;
 public class ServiceLocation extends Service {
     private LocationProxy locationProxy;
     private LocationBinder binder;
+
+    /**
+     * 启动位置服务
+     * @param context
+     */
+    public static void startService(Context context){
+        Intent intent = new Intent(context, ServiceLocation.class);
+        context.startService(intent);
+    }
+
+    /**
+     * 停止位置服务
+     * @param context
+     */
+    public static void stopService(Context context){
+        Intent intent = new Intent(context, ServiceLocation.class);
+        context.stopService(intent);
+    }
 
     @Override
     public void onCreate() {
@@ -95,6 +114,7 @@ public class ServiceLocation extends Service {
      * 定位服务代理类
      */
     private class LocationProxy implements AMapLocationListener {
+        private final String TAG = "Location";
         private Map<String, OnLocationListener> listenerMap;
         private LocationManagerProxy mLocationManagerProxy;
         private boolean isUpdate;
@@ -166,6 +186,8 @@ public class ServiceLocation extends Service {
                     l.onLocationChanged(aMapLocation);
                 }
             }
+
+            Log.d(TAG, "===============================Latitude==" + aMapLocation.getLatitude() + "  Longitude===" + aMapLocation.getLongitude());
         }
 
         @Override
@@ -173,7 +195,7 @@ public class ServiceLocation extends Service {
         @Override
         public void onStatusChanged(String s, int i, Bundle bundle) {}
         @Override
-        public void onProviderEnabled(String s) { }
+        public void onProviderEnabled(String s) {}
         @Override
         public void onProviderDisabled(String s) {}
     }

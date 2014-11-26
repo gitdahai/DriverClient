@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="app_name">DriverClient</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">哈罗司机</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_activity_bus_client">ActivityBusClient</string>
     <string name="title_activity_activity_shuttle_client">ActivityShuttleClient</string>

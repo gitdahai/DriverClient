@@ -20,6 +20,7 @@
             android:id="@+id/loginNameEdit"
             android:singleLine="true"
             android:hint="输入帐号"
+            android:inputType="phone"
             android:background="@drawable/shape_edit_text_background"/>
         <!--登录密码-->
         <EditText
@@ -63,14 +64,6 @@
             style="@style/ButtonBlue"
             android:text="登 录"/>
     </LinearLayout>
-
-    <!--进度条-->
-    <ProgressBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:id="@+id/progressBar"
-        android:visibility="gone"/>
 </FrameLayout>
 
 

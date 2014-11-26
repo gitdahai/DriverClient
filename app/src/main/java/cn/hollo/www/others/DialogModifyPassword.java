@@ -141,7 +141,7 @@ public class DialogModifyPassword implements DialogInterface.OnClickListener, On
     public void onResponse(int code, String response) {
         if (progressDialog != null && progressDialog.isShowing())
             progressDialog.dismiss();
-        
+
         //关闭对话框
         closeDialog();
 
