@@ -5,5 +5,5 @@ package cn.hollo.www.https;
  */
 public class HttpConstant {
     //服务器域名或者地址
-    public static final String domain = "";
+    public static final String domain = "http://211.151.0.150:8090";
 }

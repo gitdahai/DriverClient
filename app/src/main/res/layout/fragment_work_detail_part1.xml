@@ -4,6 +4,14 @@
     android:layout_height="match_parent"
     android:layout_weight="1"
     android:orientation="vertical">
+    <!--开始按钮-->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:id="@+id/startButton"
+        android:text="开始任务"
+        style="@style/ButtonBlue"/>
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -14,7 +14,7 @@ import cn.hollo.www.features.fragments.FragmentForgotPassword;
 import cn.hollo.www.features.fragments.FragmentTaskList;
 import cn.hollo.www.features.fragments.FragmentWorkDetail;
 import cn.hollo.www.login.ActivityLogin;
-import cn.hollo.www.utils.DialogModifyPassword;
+import cn.hollo.www.others.DialogModifyPassword;
 
 /**
  * Created by orson on 14-11-24.

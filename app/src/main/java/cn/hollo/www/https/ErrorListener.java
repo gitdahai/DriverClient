@@ -15,9 +15,13 @@ class ErrorListener implements Response.ErrorListener {
         int code = -1;
         String msg = null;
 
-        if (volleyError != null && volleyError.networkResponse != null){
-            code = volleyError.networkResponse.statusCode;
-            msg = new String(volleyError.networkResponse.data);
+        if (volleyError != null){
+            if (volleyError.networkResponse != null){
+                code = volleyError.networkResponse.statusCode;
+                msg = new String(volleyError.networkResponse.data);
+            }
+            else
+                msg =  volleyError.getMessage();
         }
 
         try{
