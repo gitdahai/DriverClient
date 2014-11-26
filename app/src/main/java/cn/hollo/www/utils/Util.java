@@ -2,6 +2,7 @@ package cn.hollo.www.utils;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
@@ -91,5 +92,34 @@ public class Util {
         c.setTimeInMillis(time);
         SimpleDateFormat sFormat = new SimpleDateFormat("MM-dd hh:mm");
         return sFormat.format(c);
+    }
+
+    /**
+     *
+     * @param context
+     * @param title
+     * @param msg
+     * @return
+     */
+    public static ProgressDialog createProgressDialog(Context context, String title, String msg){
+        ProgressDialog dialog = new ProgressDialog(context);
+        // 设置进度条风格，风格为圆形，旋转的
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
+        // 设置ProgressDialog 标题
+        dialog.setTitle(title);
+
+        // 设置ProgressDialog 提示信息
+        dialog.setMessage(msg);
+
+        // 设置ProgressDialog 标题图标
+        //dialog.setIcon(R.drawable.img1);
+
+        // 设置ProgressDialog 的进度条是否不明确
+        dialog.setIndeterminate(false);
+
+        // 设置ProgressDialog 是否可以按退回按键取消
+        dialog.setCancelable(true);
+        return dialog;
     }
 }

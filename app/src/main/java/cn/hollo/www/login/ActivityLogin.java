@@ -1,5 +1,6 @@
 package cn.hollo.www.login;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -15,7 +16,10 @@ import cn.hollo.www.LoginConfig;
 import cn.hollo.www.R;
 import cn.hollo.www.UserInfo;
 import cn.hollo.www.features.ActivityFeatures;
+import cn.hollo.www.https.HttpManager;
+import cn.hollo.www.https.HttpStringRequest;
 import cn.hollo.www.https.OnRequestListener;
+import cn.hollo.www.utils.Util;
 
 /*******************************************************************
  * Created by orson on 14-11-13.
@@ -29,6 +33,7 @@ public class ActivityLogin extends ActivityBase {
     private Button   loginButton;               //登录按钮
     private Listener listener;
     private LoginConfig loginConfig;
+    private ProgressDialog progressDialog;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,12 +101,12 @@ public class ActivityLogin extends ActivityBase {
      * 登录事件被触发
      */
     private void onLogin(){
-        Intent intent = new Intent(ActivityLogin.this, ActivityFeatures.class);
+        /*Intent intent = new Intent(ActivityLogin.this, ActivityFeatures.class);
         intent.putExtra("Features", ActivityFeatures.Features.TaskList);
         startActivity(intent);
-        finish();
+        finish();*/
 
-        /*if (loginNameEdit.getText().length() == 0){
+        if (loginNameEdit.getText().length() == 0){
             Util.showMsg(this, "请输入用户名!");
             return;
         }
@@ -122,7 +127,13 @@ public class ActivityLogin extends ActivityBase {
         //发送请求
         HttpStringRequest request = new HttpStringRequest(login);
         HttpManager httpManager = HttpManager.getInstance();
-        httpManager.addRequest(request);*/
+        httpManager.addRequest(request);
+
+        //显示提示框
+        if (progressDialog == null)
+            progressDialog = Util.createProgressDialog(this, "提示", "登录中...");
+
+        progressDialog.show();
     }
 
     /**
@@ -158,6 +169,9 @@ public class ActivityLogin extends ActivityBase {
         }
 
         public void onResponse(int code, String response) {
+            if (progressDialog != null && progressDialog.isShowing())
+                progressDialog.dismiss();
+
             if (code == 200){
                 UserInfo userInfo = UserInfo.getInstance(ActivityLogin.this);
                 ParserJson.parserUserInfo(response, userInfo);

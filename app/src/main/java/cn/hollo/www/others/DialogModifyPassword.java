@@ -1,11 +1,11 @@
 package cn.hollo.www.others;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 
 import java.lang.reflect.Field;
 
@@ -25,9 +25,9 @@ public class DialogModifyPassword implements DialogInterface.OnClickListener, On
     private EditText oldPasswordEditText;
     private EditText newPasswordEditText;
     private EditText newPasswordAgainEditText;
-    private ProgressBar progressBar;
     private View     dialogView;
     private Dialog   dialog;
+    private ProgressDialog progressDialog;
 
     public DialogModifyPassword(Context context){
         this.context = context;
@@ -40,7 +40,6 @@ public class DialogModifyPassword implements DialogInterface.OnClickListener, On
         oldPasswordEditText = (EditText)dialogView.findViewById(R.id.oldPasswordEditText);
         newPasswordEditText = (EditText)dialogView.findViewById(R.id.newPasswordEditText);
         newPasswordAgainEditText = (EditText)dialogView.findViewById(R.id.newPasswordAgainEditText);
-        progressBar = (ProgressBar)dialogView.findViewById(R.id.progressBar);
     }
 
     /**
@@ -106,8 +105,11 @@ public class DialogModifyPassword implements DialogInterface.OnClickListener, On
         HttpStringRequest request = new HttpStringRequest(param);
         HttpManager httpManager = HttpManager.getInstance();
         httpManager.addRequest(request);
-        //显示进度条
-        progressBar.setVisibility(View.VISIBLE);
+
+        if (progressDialog == null)
+            progressDialog = Util.createProgressDialog(context, "提示", "正在重置密码...");
+
+        progressDialog.show();
     }
 
     /**
@@ -137,13 +139,13 @@ public class DialogModifyPassword implements DialogInterface.OnClickListener, On
 
     @Override
     public void onResponse(int code, String response) {
-        //隐藏进度条
-        progressBar.setVisibility(View.GONE);
+        if (progressDialog != null && progressDialog.isShowing())
+            progressDialog.dismiss();
+        
         //关闭对话框
         closeDialog();
 
         if (code == 200)
             Util.showMsg(context, "修改密码成功!");
-
     }
 }
