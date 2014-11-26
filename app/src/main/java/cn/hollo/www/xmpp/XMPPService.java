@@ -1,6 +1,7 @@
 package cn.hollo.www.xmpp;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -21,6 +22,26 @@ public class XMPPService extends Service {
     private XmppBinder           mBinder;
     private XMPPManager          xmppManager;
     private MessageFilterManager filterManager;
+
+    /**
+     * 开启服务
+     * @param context
+     */
+    public static void startService(Context context, String name, String password){
+        Intent intent = new Intent(context, XMPPService.class);
+        intent.putExtra(XMPP_LOGIN_NAME, name);
+        intent.putExtra(XMPP_LOGIN_PASSWORD, password);
+        context.startService(intent);
+    }
+
+    /**
+     * 停止服务
+     * @param context
+     */
+    public static void stopService(Context context){
+        Intent intent = new Intent(context, XMPPService.class);
+        context.stopService(intent);
+    }
 
     @Override
     public void onCreate() {
@@ -91,7 +112,6 @@ public class XMPPService extends Service {
         public XMPPManager getXMPPManager(){
             return xmppManager;
         };
-
         public MessageFilterManager getMessageFilterManager(){
             return filterManager;
         };

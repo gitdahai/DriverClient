@@ -14,7 +14,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.hollo.www.FragmentBase;
+import cn.hollo.www.features.FragmentBase;
 import cn.hollo.www.R;
 import cn.hollo.www.UserInfo;
 import cn.hollo.www.features.ActivityFeatures;

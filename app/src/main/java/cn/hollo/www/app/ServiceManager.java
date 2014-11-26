@@ -4,6 +4,7 @@ import android.content.Context;
 
 import cn.hollo.www.https.HttpManager;
 import cn.hollo.www.location.ServiceLocation;
+import cn.hollo.www.xmpp.XMPPService;
 
 /**
  * Created by orson on 14-11-26.
@@ -50,5 +51,21 @@ public class ServiceManager {
      */
     public void stopLocationService(Context context){
         ServiceLocation.stopService(context);
+    }
+
+    /**
+     * 启动xmpp服务
+     * @param context
+     */
+    public void startXmppService(Context context){
+        XMPPService.startService(context, null, null);
+    }
+
+    /**
+     * 停止xmpp服务
+     * @param context
+     */
+    public void stopXmppService(Context context){
+        XMPPService.stopService(context);
     }
 }

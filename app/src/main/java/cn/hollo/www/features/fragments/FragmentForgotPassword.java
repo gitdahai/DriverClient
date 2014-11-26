@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import cn.hollo.www.FragmentBase;
+import cn.hollo.www.features.FragmentBase;
 import cn.hollo.www.R;
 
 /**

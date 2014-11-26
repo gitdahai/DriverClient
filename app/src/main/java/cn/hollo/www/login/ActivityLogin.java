@@ -1,5 +1,6 @@
 package cn.hollo.www.login;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +12,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
-import cn.hollo.www.ActivityBase;
 import cn.hollo.www.LoginConfig;
 import cn.hollo.www.R;
 import cn.hollo.www.UserInfo;
@@ -26,7 +26,7 @@ import cn.hollo.www.utils.Util;
  * Created by orson on 14-11-13.
  * 用户登录
  */
-public class ActivityLogin extends ActivityBase {
+public class ActivityLogin extends Activity{
     private EditText loginNameEdit;             //登录帐号
     private EditText loginPasswordEdit;         //登录密码
     private CheckBox rememberPasswordCheckBox;  //记住密码
@@ -188,6 +188,7 @@ public class ActivityLogin extends ActivityBase {
                 //启动服务
                 ServiceManager SM = ServiceManager.getInstance();
                 SM.startLocationService(ActivityLogin.this);
+                SM.startXmppService(ActivityLogin.this);
             }
         }
     }

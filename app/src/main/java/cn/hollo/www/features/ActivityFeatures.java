@@ -6,10 +6,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import cn.hollo.www.ActivityBase;
-import cn.hollo.www.FragmentBase;
 import cn.hollo.www.LoginConfig;
 import cn.hollo.www.R;
+import cn.hollo.www.app.ServiceManager;
 import cn.hollo.www.features.fragments.FragmentForgotPassword;
 import cn.hollo.www.features.fragments.FragmentTaskList;
 import cn.hollo.www.features.fragments.FragmentWorkDetail;
@@ -86,8 +85,15 @@ public class ActivityFeatures extends ActivityBase {
         config.loginPassword = null;
         LoginConfig.saveLoginConfig(this, config);
 
+        //停止服务
+        ServiceManager SM = ServiceManager.getInstance();
+        SM.stopLocationService(this);
+        SM.stopXmppService(this);
+
+        //重新开启登录
         Intent intent = new Intent(this, ActivityLogin.class);
         startActivity(intent);
+        this.finish();
     }
 
     /*************************************************************

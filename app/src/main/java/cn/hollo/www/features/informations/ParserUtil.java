@@ -21,6 +21,9 @@ public class ParserUtil {
         Type listType = new TypeToken<ArrayList <WorkTask>>(){}.getType();
         Gson gson = new Gson();
         ArrayList list = gson.fromJson(json, listType);
+        list.addAll(list);
+        list.addAll(list);
+        list.addAll(list);
         return list;
     }
 
