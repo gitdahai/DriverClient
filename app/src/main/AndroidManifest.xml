@@ -46,6 +46,12 @@
             android:name="com.amap.api.v2.apikey"
             android:value="889ed5668478ce98870967a5c94a110f" />
 
+        <!---============xmpp服务==============================-->
+        <service
+            android:name=".xmpp.XMPPService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
     <!-- 定位需要的权限 -->

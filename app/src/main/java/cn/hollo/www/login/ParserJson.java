@@ -21,11 +21,13 @@ public class ParserJson {
         try {
             JSONObject jObj = new JSONObject(jsonString);
 
-            if (jObj.has("login_name") && !jObj.isNull("login_name"))
-                userInfo.setLoginName(jObj.getString("login_name"));
-
+            //用户的id
             if (jObj.has("user_id") && !jObj.isNull("user_id"))
                 userInfo.setUserId(jObj.getString("user_id"));
+
+            //用户的openfir的登录密码
+            if (jObj.has("openfire_key") && !jObj.isNull("openfire_key"))
+                userInfo.setUserPassword(jObj.getString("openfire_key"));
 
         } catch (JSONException e) {
             e.printStackTrace();

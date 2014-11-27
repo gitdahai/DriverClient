@@ -162,7 +162,9 @@ public class XMPPManager {
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (XMPPException e) {
-                    e.printStackTrace();
+                    e.printStackTrace();    break;
+                } catch(Exception e){
+                    e.printStackTrace();    break;
                 }
 
                 try {

@@ -1,7 +1,15 @@
 package cn.hollo.www.app;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.hollo.www.UserInfo;
 import cn.hollo.www.https.HttpManager;
 import cn.hollo.www.location.ServiceLocation;
 import cn.hollo.www.xmpp.XMPPService;
@@ -12,7 +20,15 @@ import cn.hollo.www.xmpp.XMPPService;
  */
 public class ServiceManager {
     private static ServiceManager instance;
-    private ServiceManager(){};
+    private ServiceLocation.LocationBinder  locationBinder; //位置服务Binder对象
+    private XMPPService.XmppBinder          xmppBinder;     //xmpp服务的Binder对象
+    private List<OnLocaBinder> locaBinders;
+    private List<OnXmppBinder> xmppBinders;
+
+    private ServiceManager(){
+        locaBinders = new ArrayList<OnLocaBinder>();
+        xmppBinders = new ArrayList<OnXmppBinder>();
+    };
 
     public static ServiceManager getInstance(){
         if (instance == null)
@@ -20,6 +36,35 @@ public class ServiceManager {
 
         return instance;
     }
+
+    /**
+     * 获取位置服务的Binder
+     * @param olb
+     */
+    public void getLocationBinder(OnLocaBinder olb){
+        if (olb == null)
+            return;
+
+        if (locationBinder != null)
+            olb.onBinder(locationBinder);
+        else
+            locaBinders.add(olb);
+    }
+
+    /**
+     * 获取xmpp的Binder
+     * @param oxb
+     */
+    public void getXmppBinder(OnXmppBinder oxb){
+        if (oxb == null)
+            return ;
+
+        if (xmppBinder != null)
+            oxb.onBinder(xmppBinder);
+        else
+            xmppBinders.add(oxb);
+    }
+
 
     /**
      * 创建http
@@ -38,34 +83,100 @@ public class ServiceManager {
     }
 
     /**
-     * 启动位置服务
+     * 启动服务
+     * 目前调用的位置在：用户登录成功后
      * @param context
      */
-    public void startLocationService(Context context){
-        ServiceLocation.startService(context);
+    public void startService(Context context){
+        Context ctx = context.getApplicationContext();
+
+        UserInfo userInfo = UserInfo.getInstance(context);
+        if (userInfo.getUserId() == null || userInfo.getUserPassword() == null){
+            try {
+                throw new Exception("start_service error:找不到当前用户信息!");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            //启动位置服务
+            ServiceLocation.startService(ctx);
+            //启动xmpp服务
+            //XMPPService.startService(ctx, userInfo.getUserId(), userInfo.getUserPassword());
+
+            //绑定位置服务
+            Intent locationIntent = new Intent(context, ServiceLocation.class);
+            ctx.bindService(locationIntent, locaConnection, Context.BIND_AUTO_CREATE);
+
+            //绑定xmpp服务
+            //Intent xmppIntent = new Intent(context, XMPPService.class);
+            //ctx.bindService(xmppIntent, xmppConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
     /**
-     * 停止位置服务
+     * 停止服务:
+     * 目前停止的位置在：１退出应用时，　２在退出帐号时
      * @param context
      */
-    public void stopLocationService(Context context){
-        ServiceLocation.stopService(context);
+    public void stopService(Context context){
+        Context ctx = context.getApplicationContext();
+
+        ctx.unbindService(locaConnection);
+        //ctx.unbindService(xmppConnection);
+
+        //停止位置服务
+        ServiceLocation.stopService(ctx);
+        //停止xmpp服务
+        //XMPPService.stopService(ctx);
     }
 
-    /**
-     * 启动xmpp服务
-     * @param context
+    /************************************************
+     *  绑定服务返回后结果
      */
-    public void startXmppService(Context context){
-        XMPPService.startService(context, null, null);
+    private ServiceConnection locaConnection = new ServiceConnection(){
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            locationBinder = (ServiceLocation.LocationBinder)service;
+
+            for (OnLocaBinder olb :locaBinders)
+                olb.onBinder(locationBinder);
+
+            locaBinders.clear();
+        }
+
+        public void onServiceDisconnected(ComponentName name) {
+            locationBinder = null;
+        }
+    };
+
+    /**************************************************
+     * xmpp服务绑定成功
+     */
+    private ServiceConnection xmppConnection = new ServiceConnection(){
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            xmppBinder = (XMPPService.XmppBinder)service;
+
+            for (OnXmppBinder oxb : xmppBinders)
+                oxb.onBinder(xmppBinder);
+
+            xmppBinders.clear();
+        }
+
+        public void onServiceDisconnected(ComponentName name) {
+            xmppBinder  = null;
+        }
+    };
+    /***********************************************
+     * 获取位置服务的Binder
+     */
+    public interface OnLocaBinder{
+        public void onBinder(ServiceLocation.LocationBinder binder);
     }
 
-    /**
-     * 停止xmpp服务
-     * @param context
+    /***********************************************
+     *  获取xmpp服务的Binder
      */
-    public void stopXmppService(Context context){
-        XMPPService.stopService(context);
+    public interface OnXmppBinder{
+        public void onBinder(XMPPService.XmppBinder binder);
     }
 }

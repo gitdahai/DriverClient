@@ -7,4 +7,12 @@
         <item name="android:textColor">@color/color_white</item>
         <item name="android:padding">8dp</item>
     </style>
+
+    <!--圆形按钮-->
+    <style name="ButtonOvalBlue" parent="android:Widget.Holo.Light.Button">
+        <item name="android:background">@drawable/button_background_oval_blue</item>
+        <item name="android:textSize">18dp</item>
+        <item name="android:textColor">@color/color_white</item>
+        <item name="android:padding">8dp</item>
+    </style>
 </resources>

@@ -14,7 +14,7 @@ public class RequestWorkTasksParam implements HttpRequestParams {
     public String user_id;
 
     public int getMethod() {return Request.Method.GET;}
-    public String getUrl() {return "/work_tasks/unfinished/" + user_id;}
+    public String getUrl() {return "/users/" + user_id + "/work_tasks/unfinished" ;}
     public byte[] getBody() {return new byte[0];}
     public String getContentType() {return "";}
     public OnRequestListener getListener() {return lisntener;}

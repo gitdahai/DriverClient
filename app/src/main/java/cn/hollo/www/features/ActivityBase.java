@@ -25,8 +25,7 @@ public class ActivityBase extends Activity {
                 if (which == DialogInterface.BUTTON_NEGATIVE){
                     ActivityBase.this.finish();
                     ServiceManager SM = ServiceManager.getInstance();
-                    SM.stopLocationService(ActivityBase.this);
-                    SM.stopXmppService(ActivityBase.this);
+                    SM.stopService(ActivityBase.this);
                 }
             }
         });

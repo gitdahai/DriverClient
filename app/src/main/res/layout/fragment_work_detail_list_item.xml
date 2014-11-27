@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+    <!--到达按钮-->
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:id="@+id/arriveButton"
+        style="@style/ButtonOvalBlue"
+        android:enabled="false"
+        android:text="到达"/>
+
+    <!--到达时间-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:gravity="center_horizontal">
+        <!--到达时间-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:id="@+id/arriveTime"
+            android:textColor="@color/color_white"
+            android:textSize="18dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:singleLine="true"
+            android:text="到达时间"
+            android:textColor="@color/color_white"
+            android:textSize="18dp"/>
+    </LinearLayout>
+
+    <!--分割线-->
+    <View
+        android:layout_width="1px"
+        android:layout_height="match_parent"
+        android:background="@color/color_white"/>
+
+    <!--到达站点-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:orientation="vertical">
+        <!--站点名称-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="火龙管a口"
+            android:textColor="@color/color_white"
+            android:id="@+id/arriveStationText"
+            android:textSize="20dp"/>
+        <!--上下车人数-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:singleLine="true"
+            android:textColor="@color/color_white"
+            android:text="上车:10人　　下车:2人"
+            android:id="@+id/populationText"
+            android:textSize="18dp"/>
+    </LinearLayout>
+</LinearLayout>

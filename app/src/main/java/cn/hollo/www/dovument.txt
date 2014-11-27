@@ -10,16 +10,5 @@
   response         ok=200, fail=400 {"code"=1000, "message"="修改失败的原因"}
 
 3.获取用户任务列表:
-   /work_tasks/unfinished/<user_id>      GET
-   response    200=[{"task_id"="任务id", "voiture_number"="车辆编号", "voiture_type"="车辆类型", "timestamp"="时间戳", "departure_station"="起点站名称", "destination_station"="到达站点名称"}]
-
-4.任务详情
-  /work_task_detail/task_id     GET
-  reponse
-        {
-            [
-                {"station"="站点",
-                 "time"=111111,
-                 ""}
-            ]
-        }
+   /users/<user_id>/work_tasks/unfinished      GET
+   response    200=[{"task_id"="任务id", "voiture_number"="车辆编号", "voiture_type"="车辆类型", "date"="日期和时间", "departure_station"="起点站名称", "destination_station"="到达站点名称"}]

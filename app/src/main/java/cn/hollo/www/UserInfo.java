@@ -9,14 +9,15 @@ import android.content.SharedPreferences;
  */
 public class UserInfo {
     private static UserInfo instance;
-    private String loginName;
     private String userId;
+    private String userPassword;
+
     private SharedPreferences spf;
 
     private UserInfo(Context context){
         spf = context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        loginName = spf.getString("LoginName", null);
         userId    = spf.getString("UserId", null);
+        userPassword = spf.getString("UserPassword", null);
     }
 
     public static UserInfo getInstance(Context context){
@@ -27,16 +28,17 @@ public class UserInfo {
     };
 
     public String getUserId() {return userId;}
-    public String getLoginName() {return loginName;}
+    public String getUserPassword(){return userPassword;}
 
-    public void setLoginName(String loginName) {
-        this.loginName = loginName;
-        saveField("LoginName", loginName);
-    }
 
     public void setUserId(String userId) {
         this.userId = userId;
         saveField("UserId", userId);
+    }
+
+    public void setUserPassword(String password){
+        this.userPassword = password;
+        saveField("UserPassword", password);
     }
 
     /**

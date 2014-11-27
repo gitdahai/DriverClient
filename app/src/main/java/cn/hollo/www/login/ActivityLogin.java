@@ -187,8 +187,7 @@ public class ActivityLogin extends Activity{
 
                 //启动服务
                 ServiceManager SM = ServiceManager.getInstance();
-                SM.startLocationService(ActivityLogin.this);
-                SM.startXmppService(ActivityLogin.this);
+                SM.startService(ActivityLogin.this);
             }
         }
     }

@@ -87,8 +87,7 @@ public class ActivityFeatures extends ActivityBase {
 
         //停止服务
         ServiceManager SM = ServiceManager.getInstance();
-        SM.stopLocationService(this);
-        SM.stopXmppService(this);
+        SM.stopService(this);
 
         //重新开启登录
         Intent intent = new Intent(this, ActivityLogin.class);

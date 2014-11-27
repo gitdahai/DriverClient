@@ -7,7 +7,6 @@ import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
@@ -187,7 +186,7 @@ public class ServiceLocation extends Service {
                 }
             }
 
-            Log.d(TAG, "===============================Latitude==" + aMapLocation.getLatitude() + "  Longitude===" + aMapLocation.getLongitude());
+            //Log.d(TAG, "===============================Latitude==" + aMapLocation.getLatitude() + "  Longitude===" + aMapLocation.getLongitude());
         }
 
         @Override
