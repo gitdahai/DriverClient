@@ -164,4 +164,16 @@ public class Util {
         Typeface tf = Typeface.createFromAsset(context.getAssets(), fontPath);
         return tf;
     }
+
+    /**
+     * 转换成时间字符串
+     * @param time
+     * @return
+     */
+    public static String getTimeString(long time){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(time);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+        return dateFormat.format(c.getTime());
+    }
 }

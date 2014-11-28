@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginLeft="2dp"
     android:layout_weight="0.75"
     android:orientation="vertical">
     <!--高德地图-->
@@ -10,31 +11,4 @@
         android:layout_height="match_parent"
         android:id="@+id/workDetailMapView">
     </com.amap.api.maps.MapView>
-
-    <!--模式切换-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        android:gravity="center">
-        <!--地图模式按钮-->
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="60dp"
-            android:background="@drawable/shape_background_blue"
-            android:text="地图模式"
-            android:textSize="20dp"
-            android:gravity="center"
-            android:textColor="@color/color_white"/>
-        <!--图标模式按钮-->
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="60dp"
-            android:background="@drawable/shape_background_white"
-            android:text="图标模式"
-            android:textSize="20dp"
-            android:gravity="center"
-            android:textColor="@color/color_black"/>
-    </LinearLayout>
 </FrameLayout>

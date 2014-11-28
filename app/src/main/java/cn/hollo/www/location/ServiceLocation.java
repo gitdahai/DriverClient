@@ -136,7 +136,6 @@ public class ServiceLocation extends Service {
             其中如果间隔时间为-1，则定位只定一次
             */
             mLocationManagerProxy.requestLocationData(LocationProviderProxy.AMapNetwork, 5 * 1000, 15, this);
-
             //进行混合定位
             //mLocationManagerProxy.setGpsEnable(false);
 
@@ -151,7 +150,7 @@ public class ServiceLocation extends Service {
         private void stopLocation() {
             if (mLocationManagerProxy != null) {
                 mLocationManagerProxy.removeUpdates(this);
-                mLocationManagerProxy.destory();
+                mLocationManagerProxy.destroy();
             }
             mLocationManagerProxy = null;
             isUpdate = false;
@@ -185,8 +184,6 @@ public class ServiceLocation extends Service {
                     l.onLocationChanged(aMapLocation);
                 }
             }
-
-            //Log.d(TAG, "===============================Latitude==" + aMapLocation.getLatitude() + "  Longitude===" + aMapLocation.getLongitude());
         }
 
         @Override

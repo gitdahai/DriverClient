@@ -1,6 +1,7 @@
 package cn.hollo.www.features.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import cn.hollo.www.R;
 import cn.hollo.www.features.informations.WorkTaskDetail;
+import cn.hollo.www.utils.Util;
 
 /**
  * Created by orson on 14-11-27.
@@ -19,7 +21,7 @@ import cn.hollo.www.features.informations.WorkTaskDetail;
 public class AdapterWorkDetail extends BaseAdapter {
     private Context context;
     private List<WorkTaskDetail.Station> stations;
-
+    private Typeface typeface;
     /**
      *
      * @param context
@@ -28,6 +30,7 @@ public class AdapterWorkDetail extends BaseAdapter {
     public AdapterWorkDetail(Context context, List<WorkTaskDetail.Station> stations){
         this.context = context;
         this.stations = stations;
+        typeface = Util.loadTypeface(context, "fonts/ImpactMTStd.otf");
     }
 
     public int getCount() {return stations.size();}
@@ -44,7 +47,7 @@ public class AdapterWorkDetail extends BaseAdapter {
         else
             holer = (ItemHolder)convertView.getTag();
 
-        holer.setWorkTaskDetail(stations.get(position));
+        holer.setWorkTaskDetail(position, stations.get(position));
         return convertView;
     }
 
@@ -63,10 +66,19 @@ public class AdapterWorkDetail extends BaseAdapter {
             arriveButton = (Button)view.findViewById(R.id.arriveButton);
             populationText = (TextView)view.findViewById(R.id.populationText);
             arriveStationText = (TextView)view.findViewById(R.id.arriveStationText);
+
+            arriveTime.setTypeface(typeface);
         }
 
-        private void setWorkTaskDetail(WorkTaskDetail.Station station){
+        private void setWorkTaskDetail(int position, WorkTaskDetail.Station station){
             this.station = station;
+
+            arriveStationText.setText(station.name);
+            int onSize = station.on_users.size();
+            int offSize = station.off_users.size();
+            populationText.setText("上车: " + onSize + "人  下车: " + offSize + "人");
+            String timeString = Util.getTimeString(station.arrived_at);
+            arriveTime.setText(timeString);
         }
     }
 }

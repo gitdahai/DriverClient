@@ -27,6 +27,12 @@ android {
             keyPassword "cn.hollo.shuttle"
         }
     }
+
+    /*packagingOptions {
+        exclude 'assets/ap1.data'
+        exclude 'assets/location_unselected.png'
+    }*/
+
     buildTypes {
         release {
             runProguard false
@@ -45,3 +51,4 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+

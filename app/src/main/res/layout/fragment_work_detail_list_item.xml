@@ -28,8 +28,8 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:id="@+id/arriveTime"
-            android:textColor="@color/color_white"
-            android:textSize="18dp"/>
+            android:textColor="@color/color_orange"
+            android:textSize="22dp"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -38,7 +38,7 @@
             android:singleLine="true"
             android:text="到达时间"
             android:textColor="@color/color_white"
-            android:textSize="18dp"/>
+            android:textSize="16dp"/>
     </LinearLayout>
 
     <!--分割线-->
@@ -59,9 +59,9 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:text="火龙管a口"
-            android:textColor="@color/color_white"
+            android:textColor="@color/color_orange"
             android:id="@+id/arriveStationText"
-            android:textSize="20dp"/>
+            android:textSize="22dp"/>
         <!--上下车人数-->
         <TextView
             android:layout_width="wrap_content"
@@ -71,6 +71,6 @@
             android:textColor="@color/color_white"
             android:text="上车:10人　　下车:2人"
             android:id="@+id/populationText"
-            android:textSize="18dp"/>
+            android:textSize="16dp"/>
     </LinearLayout>
 </LinearLayout>
