@@ -3,6 +3,7 @@
     <color name="color_white">#ffffff</color>
     <color name="color_black">#000000</color>
     <color name="color_gray">#ffc2c0c0</color>
+    <color name="color_red">#ffff0000</color>
     <color name="color_orange">#ffff8800</color>
     <color name="color_trans">#00000000</color>
     <color name="color_gray_1001">#ffa4a4a4</color>

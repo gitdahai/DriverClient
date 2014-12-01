@@ -9,6 +9,7 @@ import java.util.List;
  */
 public class WorkTaskDetail {
     public String path_id;
+    public String task_id;      //唯一的任务id
     public List<Station>  stations = new ArrayList<Station>();
 
     /**************************************************

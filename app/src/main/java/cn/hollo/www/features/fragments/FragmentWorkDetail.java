@@ -2,6 +2,7 @@ package cn.hollo.www.features.fragments;
 
 import android.app.ActionBar;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -12,15 +13,19 @@ import android.widget.ListView;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.maps.model.Polyline;
+import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.maps.overlay.DrivingRouteOverlay;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.route.DrivePath;
@@ -51,21 +56,38 @@ import cn.hollo.www.utils.Util;
  * 工作单的详情
  */
 public class FragmentWorkDetail extends FragmentBase{
+    /*********************************************************
+     * 任务的状态
+     */
+    public interface TaskExcuteState{
+        //状态为“未开始”
+        public static final int TASK_STATE_NONE = -1;
+        //状态为"进行中"
+        public static final int TASK_STATE_EXCUTE = 1;
+        //状态为"结束"
+        public static final int TASK_STATE_FINISH = 2;
+    }
+
     private WorkDetailList workDetailList;
     private WorkDetailMap  workDetailMap;
+    private Resources resources;
 
     public static FragmentWorkDetail newInstance(){
         return new FragmentWorkDetail();
     }
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActionBar actionBar = this.getActivity().getActionBar();
         actionBar.setTitle("任务详情");
         actionBar.setDisplayHomeAsUpEnabled(true);
         this.setHasOptionsMenu(true);
+
+        resources = getResources();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_work_detail, null);
         workDetailMap  = new WorkDetailMap(view);
         workDetailMap.onCreate(savedInstanceState);
@@ -88,6 +110,11 @@ public class FragmentWorkDetail extends FragmentBase{
         workDetailMap.onPause();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
     public void onDestroy() {
         super.onDestroy();
         workDetailMap.onDestroy();
@@ -106,12 +133,16 @@ public class FragmentWorkDetail extends FragmentBase{
     /***************************************************
      *  任务单详情列表
      */
-    private class WorkDetailList implements OnRequestListener, View.OnClickListener {
+    private class WorkDetailList implements OnRequestListener, View.OnClickListener, AdapterWorkDetail.OnStateListener {
         private WorkTaskDetail workTaskDetails;
         private WorkDetailMap  workDetailMap;
         private ListView       detailListView;
         private AdapterWorkDetail adapter;
         private Button         startDoTaskButton;   //任务开始按钮
+
+        private String task_id;
+        private int taskExcuteState;
+        private int executionIndex;
 
         private WorkDetailList(View view, WorkDetailMap  workDetailMap){
             this.workDetailMap = workDetailMap;
@@ -120,6 +151,12 @@ public class FragmentWorkDetail extends FragmentBase{
             startDoTaskButton = (Button)view.findViewById(R.id.startDoTaskButton);
             startDoTaskButton.setOnClickListener(this);
             startDoTaskButton.setEnabled(false);
+
+            //读取任务执行的状态
+            TaskExecutionInfo taskExecutionInfo = TaskExecutionInfo.getInstance(getActivity());
+            task_id = taskExecutionInfo.getTaskId();
+            executionIndex = taskExecutionInfo.getExecutionIndex();
+            taskExcuteState = taskExecutionInfo.getTaskExcuteState();
         }
 
         /**
@@ -128,6 +165,7 @@ public class FragmentWorkDetail extends FragmentBase{
          */
         private void flushListView(WorkTaskDetail workTaskDetails){
             adapter = new AdapterWorkDetail(getActivity(), workTaskDetails.stations);
+            adapter.setOnStateListener(this);
             detailListView.setAdapter(adapter);
         }
 
@@ -166,13 +204,18 @@ public class FragmentWorkDetail extends FragmentBase{
 
                 //刷新页面数据
                 if (workTaskDetails != null && workTaskDetails.stations.size() > 0){
-                    //启用任务按钮
-                    startDoTaskButton.setEnabled(true);
                     //刷新任务列表
                     this.flushListView(workTaskDetails);
-                    List<WorkTaskDetail.Station> stations = workTaskDetails.stations;
                     //绘制站点的marker
-                    workDetailMap.drawStationMarkers(stations);
+                    workDetailMap.drawStationMarkers(workTaskDetails.stations);
+
+                    //启用任务按钮
+                    if (task_id == null)
+                        startDoTaskButton.setEnabled(true);
+                    //如果当前任务详情的id等于记录的任务id，
+                    //则说明是已经执行过的任务，那么需要回复上一次执行的位置
+                    else if (task_id.equals(workTaskDetails.task_id))
+                        adapter.actionInit(executionIndex);
                 }
             }
         }
@@ -183,11 +226,35 @@ public class FragmentWorkDetail extends FragmentBase{
                 public void onClick(DialogInterface dialog, int which) {
                     //确认开始
                     if (DialogInterface.BUTTON_POSITIVE == which){
+                        //开始新任务的时候，首先保存新任务的id
+                        TaskExecutionInfo taskExecutionInfo = TaskExecutionInfo.getInstance(getActivity());
+                        taskExecutionInfo.putTaskId(workTaskDetails.task_id);
+                        //设置任务初始执行时的状态
                         startDoTaskButton.setEnabled(false);
-                        adapter.actionInit();
+                        adapter.actionInit(0);
                     }
                 }
             });
+        }
+
+        @Override
+        public void onActionInit(WorkTaskDetail.Station station) {
+            workDetailMap.setCurrentStation(station);
+        }
+
+        @Override
+        public void onActionArrived(WorkTaskDetail.Station station) {
+
+        }
+
+        @Override
+        public void onActionItemClick(WorkTaskDetail.Station station) {
+            workDetailMap.setCurrentStation(station);
+        }
+
+        @Override
+        public void onActionFinish(WorkTaskDetail.Station station) {
+
         }
     }
 
@@ -201,6 +268,7 @@ public class FragmentWorkDetail extends FragmentBase{
         private OnMapListener mapListener;
         private ServiceLocation.LocationBinder binder;
         private WorkTaskDetail.Station station;
+        private Polyline pLine;
 
         private WorkDetailMap(View view){
             workMapView = (MapView)view.findViewById(R.id.workDetailMapView);
@@ -224,16 +292,82 @@ public class FragmentWorkDetail extends FragmentBase{
             uiSettings.setRotateGesturesEnabled(true);
         }
 
-        /*******************************************************
-         * 刷新地图页面
+        /**
+         * 设置当前的站点
          * @param station
          */
-        private void flushMapView(WorkTaskDetail.Station station){
+        private void setCurrentStation(WorkTaskDetail.Station station){
+            if (station == null)
+                return;
+
             this.station = station;
-
-
+            LatLng startLatlng = new LatLng(station.location.lat,station.location.lng);
+            drawBusToStationLine(startLatlng, mapListener.positionLatlng);
         }
 
+        /******************************************************
+         * 绘制动态的bus和选中站点之间的线段
+         */
+        private void drawTrendsBusToStationLine(LatLng busPosLatlng){
+            if (busPosLatlng != null && station != null && station.location != null){
+                LatLng startLatlng = new LatLng(station.location.lat,station.location.lng);
+                drawBusToStationLine(startLatlng, busPosLatlng);
+            }
+        }
+
+        /******************************************************
+         * 绘制当前bus和站点之间的直线
+         * @param startLatlng
+         * @param endLatlng
+         */
+        private void drawBusToStationLine(LatLng startLatlng, LatLng endLatlng){
+            if (mapListener.positionLatlng != null){
+                if (pLine != null)
+                    pLine.remove();
+
+                PolylineOptions pOption = new PolylineOptions();
+                pOption.add(startLatlng, endLatlng);
+                pOption.width(5.0f);
+                pOption.color(resources.getColor(R.color.color_red));
+                pOption.setDottedLine(true);
+                pOption.geodesic(true);
+                pOption.visible(true);
+
+                pLine = aMap.addPolyline(pOption);
+
+                //缩放图层
+                List<LatLng> latLngs = new ArrayList<LatLng>();
+                latLngs.add(startLatlng);
+                latLngs.add(endLatlng);
+                zoomLatpngBounds(latLngs);
+            }
+        }
+
+        /****************************************************
+         * 缩放当前的图层
+         * @param latLngs
+         */
+        private void zoomLatpngBounds(List<LatLng> latLngs){
+            LatLngBounds bounds = getLatLngBounds(latLngs);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 100);
+            aMap.moveCamera(cameraUpdate);
+        }
+
+        /****************************************************
+         * 获取由经纬度构造的LatLngBounds对象
+         * @param latLngs
+         * @return
+         */
+        private LatLngBounds getLatLngBounds(List<LatLng> latLngs){
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+            for (LatLng latLng : latLngs)
+                builder.include(latLng);
+
+            LatLngBounds bounds = builder.build();
+
+            return bounds;
+        }
         /*******************************************************
          * 显示站点的标志
          * @param stations
@@ -342,6 +476,7 @@ public class FragmentWorkDetail extends FragmentBase{
 
         private WorkDetailMap workDetailMap;
         private OnLocationChangedListener onLocationChangedListener;
+        private LatLng positionLatlng;
 
         private OnMapListener(WorkDetailMap workDetailMap){
             this.workDetailMap = workDetailMap;
@@ -360,11 +495,12 @@ public class FragmentWorkDetail extends FragmentBase{
          */
         public void onLocationChanged(AMapLocation aMapLocation) {
             //通知定位位置变化
-            /*if (onLocationChangedListener != null)
-                onLocationChangedListener.onLocationChanged(aMapLocation);*/
+            if (onLocationChangedListener != null)
+                onLocationChangedListener.onLocationChanged(aMapLocation);
 
-
-            LatLng latlng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());
+            positionLatlng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());
+            //绘制动态线段
+            workDetailMap.drawTrendsBusToStationLine(positionLatlng);
         }
 
         /*************************************************

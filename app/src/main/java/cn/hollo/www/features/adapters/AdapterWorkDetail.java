@@ -22,8 +22,8 @@ public class AdapterWorkDetail extends BaseAdapter {
     private Context context;
     private List<WorkTaskDetail.Station> stations;
     private Typeface typeface;
-    private OnTaskListener listener;
-    private int indexStation = -1;
+    private OnStateListener listener;
+    private int executionIndex = -1;
 
     /**
      *
@@ -53,10 +53,10 @@ public class AdapterWorkDetail extends BaseAdapter {
         holer.setWorkTaskDetail(position, stations.get(position));
 
         //如果任务的执行索引等于当前任务列表索引，则是设置该item为关注状态
-        if (indexStation == position)
+        if (executionIndex == position)
             holer.setItemAttentionState();
         //设置该item为关注初始状态
-        else if (indexStation > stations.size())
+        else if (executionIndex > stations.size())
             holer.setItemInitState();
         //否则设置结束状态
         else
@@ -103,7 +103,7 @@ public class AdapterWorkDetail extends BaseAdapter {
          * 初始状态
          */
         private void setItemInitState(){
-            view.setEnabled(true);
+            view.setBackgroundColor(context.getResources().getColor(R.color.color_trans));
             arriveButton.setEnabled(false);
         }
 
@@ -111,7 +111,7 @@ public class AdapterWorkDetail extends BaseAdapter {
          * 关注状态
          */
         private void setItemAttentionState(){
-            view.setEnabled(false);
+            view.setBackgroundColor(context.getResources().getColor(R.color.color_gray_4d4d4d));
             arriveButton.setEnabled(true);
         }
 
@@ -119,7 +119,7 @@ public class AdapterWorkDetail extends BaseAdapter {
          * 结束状态
          */
         private void setItemFinishState(){
-            view.setEnabled(true);
+            view.setBackgroundColor(context.getResources().getColor(R.color.color_trans));
             arriveButton.setEnabled(false);
         }
 
@@ -128,23 +128,23 @@ public class AdapterWorkDetail extends BaseAdapter {
             //到达按钮事件
             if (v.getId() == R.id.arriveButton){
                 //如果当前的站点索引为最后一个，则可以确定完成了
-                if (indexStation == stations.size() - 1){
+                if (executionIndex == stations.size() - 1){
                     actionNext();
 
                     if (listener != null)
-                        listener.onActionTaskFinish(this);
+                        listener.onActionFinish(station);
                 }
                 else {
                     actionNext();
 
                     if (listener != null)
-                        listener.onActionArrived(this);
+                        listener.onActionArrived(station);
                 }
             }
             //itme试图事件
             else{
                 if (listener != null)
-                    listener.onActionItemClick(this);
+                    listener.onActionItemClick(station);
             }
         }
     }
@@ -153,46 +153,66 @@ public class AdapterWorkDetail extends BaseAdapter {
      * 设置事件监听器
      * @param l
      */
-    public void setOnTaskListener(OnTaskListener l){
+    public void setOnStateListener(OnStateListener l){
         this.listener = l;
     }
 
     /**********************************************************
      * 执行任务
      */
-    public void actionInit(){
-        indexStation = 0;
+    public void actionInit(int executionIndex){
+        this.executionIndex = executionIndex;
         this.notifyDataSetChanged();
+
+        if (listener != null){
+            if (executionIndex >= stations.size())
+                listener.onActionInit(stations.get(stations.size() - 1));
+            else if (executionIndex >= 0)
+                listener.onActionInit(stations.get(executionIndex));
+        }
     }
 
     /**********************************************************
      * 下一个
      */
     public void actionNext(){
-        indexStation++;
+        executionIndex++;
         this.notifyDataSetChanged();
+    }
+
+    /**********************************************************
+     * 返回当前的执行索引
+     * @return
+     */
+    public int getExecutionIndex(){
+        return executionIndex;
     }
 
     /**********************************************************
      * 路线的事件
      */
-    public interface OnTaskListener{
+    public interface OnStateListener{
+        /**
+         * 初始动作
+         * @param station
+         */
+        public void onActionInit(WorkTaskDetail.Station station);
         /**
          * 到达事件
-         * @param item
+         * @param station
          */
-        public void onActionArrived(ItemHolder item);
+        public void onActionArrived(WorkTaskDetail.Station station);
 
         /**
          * 列表项点击事件
-         * @param item
+         * @param station
          */
-        public void onActionItemClick(ItemHolder item);
+        public void onActionItemClick(WorkTaskDetail.Station station);
 
         /**
          * 任务完成事件
-         * @param item
+         * @param station
          */
-        public void onActionTaskFinish(ItemHolder item);
+        public void onActionFinish(WorkTaskDetail.Station station);
     }
 }

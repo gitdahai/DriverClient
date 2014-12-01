@@ -46,6 +46,10 @@ public class ParserUtil {
             if (jDetail.has("path_id") && !jDetail.isNull("path_id"))
                 detail.path_id = jDetail.getString("path_id");
 
+            //任务id
+            if (jDetail.has("task_id") && !jDetail.isNull("task_id"))
+                detail.task_id = jDetail.getString("task_id");
+
             //解析站点名称
             if (jDetail.has("stations") && !jDetail.isNull("stations")){
                 JSONArray jStations = jDetail.getJSONArray("stations");
