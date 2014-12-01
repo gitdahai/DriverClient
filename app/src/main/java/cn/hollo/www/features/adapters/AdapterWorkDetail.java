@@ -126,21 +126,9 @@ public class AdapterWorkDetail extends BaseAdapter {
         @Override
         public void onClick(View v) {
             //到达按钮事件
-            if (v.getId() == R.id.arriveButton){
-                //如果当前的站点索引为最后一个，则可以确定完成了
-                if (executionIndex == stations.size() - 1){
-                    actionNext();
+            if (v.getId() == R.id.arriveButton)
+                actionNext();
 
-                    if (listener != null)
-                        listener.onActionFinish(station);
-                }
-                else {
-                    actionNext();
-
-                    if (listener != null)
-                        listener.onActionArrived(station);
-                }
-            }
             //itme试图事件
             else{
                 if (listener != null)
@@ -178,6 +166,17 @@ public class AdapterWorkDetail extends BaseAdapter {
     public void actionNext(){
         executionIndex++;
         this.notifyDataSetChanged();
+
+        if (listener == null)
+            return;
+
+        //如果当前的站点索引为最后一个，则可以确定完成了
+        if (executionIndex >= stations.size()){
+            listener.onActionFinish(stations.get(stations.size() - 1));
+        }
+        else {
+            listener.onActionNext(stations.get(executionIndex));
+        }
     }
 
     /**********************************************************
@@ -201,7 +200,7 @@ public class AdapterWorkDetail extends BaseAdapter {
          * 到达事件
          * @param station
          */
-        public void onActionArrived(WorkTaskDetail.Station station);
+        public void onActionNext(WorkTaskDetail.Station station);
 
         /**
          * 列表项点击事件

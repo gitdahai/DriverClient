@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.maps.AMap;
@@ -240,11 +241,13 @@ public class FragmentWorkDetail extends FragmentBase{
         @Override
         public void onActionInit(WorkTaskDetail.Station station) {
             workDetailMap.setCurrentStation(station);
+            System.out.println("==========已经初始化===============");
         }
 
         @Override
-        public void onActionArrived(WorkTaskDetail.Station station) {
-
+        public void onActionNext(WorkTaskDetail.Station station) {
+            workDetailMap.setCurrentStation(station);
+            System.out.println("==========下一个===============");
         }
 
         @Override
@@ -254,7 +257,7 @@ public class FragmentWorkDetail extends FragmentBase{
 
         @Override
         public void onActionFinish(WorkTaskDetail.Station station) {
-
+            System.out.println("==========已经完成===============");
         }
     }
 
@@ -263,6 +266,9 @@ public class FragmentWorkDetail extends FragmentBase{
      */
     private class WorkDetailMap implements ServiceManager.OnLocaBinder {
         private MapView workMapView;
+        private TextView onBusPopulationText;
+        private TextView offBusPopulationText;
+
         private AMap aMap;
         private UiSettings uiSettings;
         private OnMapListener mapListener;
@@ -272,6 +278,10 @@ public class FragmentWorkDetail extends FragmentBase{
 
         private WorkDetailMap(View view){
             workMapView = (MapView)view.findViewById(R.id.workDetailMapView);
+            onBusPopulationText = (TextView)view.findViewById(R.id.onBusPopulationText);
+            offBusPopulationText = (TextView)view.findViewById(R.id.offBusPopulationText);
+            setSGPopulationText(false);
+
             mapListener = new OnMapListener(this);
             aMap = workMapView.getMap();
             aMap.setOnMapLoadedListener(mapListener);
@@ -292,6 +302,21 @@ public class FragmentWorkDetail extends FragmentBase{
             uiSettings.setRotateGesturesEnabled(true);
         }
 
+        /*************************************************
+         * 设置显示上下车人数的文本显示或者隐藏
+         * @param b
+         */
+        private void setSGPopulationText(boolean b){
+            if (b){
+                onBusPopulationText.setVisibility(View.VISIBLE);
+                offBusPopulationText.setVisibility(View.VISIBLE);
+            }
+            else{
+                onBusPopulationText.setVisibility(View.GONE);
+                offBusPopulationText.setVisibility(View.GONE);
+            }
+        }
+
         /**
          * 设置当前的站点
          * @param station
@@ -303,6 +328,13 @@ public class FragmentWorkDetail extends FragmentBase{
             this.station = station;
             LatLng startLatlng = new LatLng(station.location.lat,station.location.lng);
             drawBusToStationLine(startLatlng, mapListener.positionLatlng);
+
+            int onPopulation = station.on_users.size();
+            int offPopulation = station.off_users.size();
+
+            setSGPopulationText(true);
+            onBusPopulationText.setText("上车\n" + onPopulation + "人");
+            offBusPopulationText.setText("下车\n" + offPopulation + "人");
         }
 
         /******************************************************
