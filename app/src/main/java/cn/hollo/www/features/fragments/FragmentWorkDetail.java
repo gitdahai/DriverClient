@@ -3,6 +3,7 @@ package cn.hollo.www.features.fragments;
 import android.app.ActionBar;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -72,6 +73,7 @@ public class FragmentWorkDetail extends FragmentBase{
     private WorkDetailList workDetailList;
     private WorkDetailMap  workDetailMap;
     private Resources resources;
+    private Typeface typeface;
 
     public static FragmentWorkDetail newInstance(){
         return new FragmentWorkDetail();
@@ -84,11 +86,11 @@ public class FragmentWorkDetail extends FragmentBase{
         actionBar.setDisplayHomeAsUpEnabled(true);
         this.setHasOptionsMenu(true);
 
+        typeface = Util.loadTypeface(getActivity(), "fonts/ImpactMTStd.otf");
         resources = getResources();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_work_detail, null);
         workDetailMap  = new WorkDetailMap(view);
         workDetailMap.onCreate(savedInstanceState);
@@ -273,6 +275,7 @@ public class FragmentWorkDetail extends FragmentBase{
         private UiSettings uiSettings;
         private OnMapListener mapListener;
         private ServiceLocation.LocationBinder binder;
+
         private WorkTaskDetail.Station station;
         private Polyline pLine;
 
@@ -280,6 +283,8 @@ public class FragmentWorkDetail extends FragmentBase{
             workMapView = (MapView)view.findViewById(R.id.workDetailMapView);
             onBusPopulationText = (TextView)view.findViewById(R.id.onBusPopulationText);
             offBusPopulationText = (TextView)view.findViewById(R.id.offBusPopulationText);
+            onBusPopulationText.setTypeface(typeface);
+            offBusPopulationText.setTypeface(typeface);
             setSGPopulationText(false);
 
             mapListener = new OnMapListener(this);
