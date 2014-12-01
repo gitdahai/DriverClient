@@ -9,7 +9,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:id="@+id/startButton"
+        android:id="@+id/startDoTaskButton"
         android:text="开始任务"
         style="@style/ButtonBlue"/>
 

@@ -65,16 +65,16 @@ public class Util {
      * @param listner
      * @return
      */
-    public static Dialog creteDefaultDialog(Context context, String title, String message, String negative, String positive, String neutral, DialogInterface.OnClickListener listner){
+    public static Dialog creteDefaultDialog(Context context, String title, String message, String positive, String negative, String neutral, DialogInterface.OnClickListener listner){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
         builder.setMessage(message);
 
-        if (negative != null)
-            builder.setPositiveButton(negative, listner);
-
         if (positive != null)
-            builder.setNegativeButton(positive, listner);
+            builder.setPositiveButton(positive, listner);
+
+        if (negative != null)
+            builder.setNegativeButton(negative, listner);
 
         if (neutral != null)
             builder.setNeutralButton(neutral, listner);

@@ -1,11 +1,13 @@
 package cn.hollo.www.features.fragments;
 
 import android.app.ActionBar;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.amap.api.location.AMapLocation;
@@ -42,6 +44,7 @@ import cn.hollo.www.https.HttpManager;
 import cn.hollo.www.https.HttpStringRequest;
 import cn.hollo.www.https.OnRequestListener;
 import cn.hollo.www.location.ServiceLocation;
+import cn.hollo.www.utils.Util;
 
 /*******************************************************
  * Created by orson on 14-11-25.
@@ -66,7 +69,7 @@ public class FragmentWorkDetail extends FragmentBase{
         View view = inflater.inflate(R.layout.fragment_work_detail, null);
         workDetailMap  = new WorkDetailMap(view);
         workDetailMap.onCreate(savedInstanceState);
-        workDetailList = new WorkDetailList(view);
+        workDetailList = new WorkDetailList(view, workDetailMap);
         workDetailList.loadWorkTaskDetail(this.getArguments());
         return view;
     }
@@ -103,12 +106,20 @@ public class FragmentWorkDetail extends FragmentBase{
     /***************************************************
      *  任务单详情列表
      */
-    private class WorkDetailList implements OnRequestListener {
+    private class WorkDetailList implements OnRequestListener, View.OnClickListener {
         private WorkTaskDetail workTaskDetails;
+        private WorkDetailMap  workDetailMap;
         private ListView       detailListView;
+        private AdapterWorkDetail adapter;
+        private Button         startDoTaskButton;   //任务开始按钮
 
-        private WorkDetailList(View view){
+        private WorkDetailList(View view, WorkDetailMap  workDetailMap){
+            this.workDetailMap = workDetailMap;
+
             detailListView = (ListView)view.findViewById(R.id.workDetailListView);
+            startDoTaskButton = (Button)view.findViewById(R.id.startDoTaskButton);
+            startDoTaskButton.setOnClickListener(this);
+            startDoTaskButton.setEnabled(false);
         }
 
         /**
@@ -116,7 +127,7 @@ public class FragmentWorkDetail extends FragmentBase{
          * @param workTaskDetails
          */
         private void flushListView(WorkTaskDetail workTaskDetails){
-             AdapterWorkDetail adapter = new AdapterWorkDetail(getActivity(), workTaskDetails.stations);
+            adapter = new AdapterWorkDetail(getActivity(), workTaskDetails.stations);
             detailListView.setAdapter(adapter);
         }
 
@@ -154,30 +165,29 @@ public class FragmentWorkDetail extends FragmentBase{
                 workTaskDetails = ParserUtil.parserWorkTaskDetail(response);
 
                 //刷新页面数据
-                if (workTaskDetails != null){
+                if (workTaskDetails != null && workTaskDetails.stations.size() > 0){
+                    //启用任务按钮
+                    startDoTaskButton.setEnabled(true);
+                    //刷新任务列表
                     this.flushListView(workTaskDetails);
-
                     List<WorkTaskDetail.Station> stations = workTaskDetails.stations;
-                    WorkTaskDetail.Station station = null;
-                    LatLng startLatLng = null;
-                    LatLng endLatLng   = null;
-                    List<LatLng>  otherLatLngs = stations.size() > 2 ? new ArrayList<LatLng>() : null;
-                    int size = stations.size();
-
-                    for (int i=0; i<size; i++){
-                        station = stations.get(i);
-
-                        if (i == 0)
-                            startLatLng = new LatLng(station.location.lat, station.location.lng);
-                        else if (i == (size - 1))
-                            endLatLng = new LatLng(station.location.lat, station.location.lng);
-                        else
-                            otherLatLngs.add(new LatLng(station.location.lat, station.location.lng));
-                    }
-                    //规划路径
-                    workDetailMap.planningPathLine(startLatLng, endLatLng, otherLatLngs);
+                    //绘制站点的marker
+                    workDetailMap.drawStationMarkers(stations);
                 }
             }
+        }
+
+        @Override
+        public void onClick(View v) {
+            Util.creteDefaultDialog(getActivity(), "确认", "确认开始任务?", "确定", "取消", null, new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialog, int which) {
+                    //确认开始
+                    if (DialogInterface.BUTTON_POSITIVE == which){
+                        startDoTaskButton.setEnabled(false);
+                        adapter.actionInit();
+                    }
+                }
+            });
         }
     }
 
@@ -190,7 +200,6 @@ public class FragmentWorkDetail extends FragmentBase{
         private UiSettings uiSettings;
         private OnMapListener mapListener;
         private ServiceLocation.LocationBinder binder;
-        private Marker busMarker;       //车辆标记
         private WorkTaskDetail.Station station;
 
         private WorkDetailMap(View view){
@@ -198,6 +207,7 @@ public class FragmentWorkDetail extends FragmentBase{
             mapListener = new OnMapListener(this);
             aMap = workMapView.getMap();
             aMap.setOnMapLoadedListener(mapListener);
+            aMap.setOnInfoWindowClickListener(mapListener);
             setUpMap(aMap, mapListener);
             uiSettings = aMap.getUiSettings();
             //隐藏放大缩小按钮
@@ -221,6 +231,35 @@ public class FragmentWorkDetail extends FragmentBase{
         private void flushMapView(WorkTaskDetail.Station station){
             this.station = station;
 
+
+        }
+
+        /*******************************************************
+         * 显示站点的标志
+         * @param stations
+         */
+        private void drawStationMarkers(List<WorkTaskDetail.Station> stations){
+            int size = stations.size();
+            ArrayList<MarkerOptions> options = new ArrayList<MarkerOptions>();
+            WorkTaskDetail.Station station = null;
+            MarkerOptions option = null;
+            LatLng latLng = null;
+
+            for (int i=0; i<size; i++){
+                station = stations.get(i);
+                latLng = new LatLng(station.location.lat, station.location.lng);
+
+                if (i == 0)
+                    option = createMarkerOptions(R.drawable.ic_path_start, station.name, latLng);
+                else if (1 == size-1)
+                    option = createMarkerOptions(R.drawable.ic_path_end, station.name, latLng);
+                else
+                    option = createMarkerOptions(R.drawable.ic_path_end, station.name, latLng);
+
+                options.add(option);
+            }
+
+            List<Marker> markers = workDetailMap.aMap.addMarkers(options, true);
 
         }
 
@@ -298,6 +337,7 @@ public class FragmentWorkDetail extends FragmentBase{
      */
     private class OnMapListener extends OnRouteSearchListenerImp implements AMap.OnMapLoadedListener,
             ServiceLocation.OnLocationListener,
+            AMap.OnInfoWindowClickListener,
             LocationSource {
 
         private WorkDetailMap workDetailMap;
@@ -311,8 +351,7 @@ public class FragmentWorkDetail extends FragmentBase{
          * 地图加载完成时执行
          */
         public void onMapLoaded() {
-            //设置地图放大倍数
-            setMapViewZoom(workDetailMap.aMap);
+
         }
 
         /**
@@ -320,8 +359,9 @@ public class FragmentWorkDetail extends FragmentBase{
          * @param aMapLocation
          */
         public void onLocationChanged(AMapLocation aMapLocation) {
-            if (onLocationChangedListener != null)
-                onLocationChangedListener.onLocationChanged(aMapLocation);
+            //通知定位位置变化
+            /*if (onLocationChangedListener != null)
+                onLocationChangedListener.onLocationChanged(aMapLocation);*/
 
 
             LatLng latlng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());
@@ -334,8 +374,6 @@ public class FragmentWorkDetail extends FragmentBase{
         public void activate(LocationSource.OnLocationChangedListener listener) {
             if (onLocationChangedListener == null)
                 this.onLocationChangedListener = listener;
-
-            setMapViewZoom(workDetailMap.aMap);
         }
 
         /*************************************************
@@ -372,6 +410,11 @@ public class FragmentWorkDetail extends FragmentBase{
                 drivingRouteOverlay.zoomToSpan();
             }
         }
+
+        @Override
+        public void onInfoWindowClick(Marker marker) {
+
+        }
     }
 
     /******************************************************
@@ -389,16 +432,23 @@ public class FragmentWorkDetail extends FragmentBase{
      * @param icon
      * @return
      */
-    private MarkerOptions createMarkerOptions(int icon){
+    private MarkerOptions createMarkerOptions(int icon, String title, LatLng latlng){
         MarkerOptions options = new MarkerOptions();
         //定义marker 图标的锚点为中心点
-        options.anchor(0.5f, 0.5f);
+        options.anchor(0.5f, 1.0f);
         //设置标记是禁止拖动
         options.draggable(false);
         //添加该marker的icon
         options.icon(BitmapDescriptorFactory.fromResource(icon));
+        //当用户点击标记，在信息窗口上显示的字符串
+        options.title(title);
         //首先禁止显示
-        options.visible(false);
+        options.visible(true);
+        //设置位置参数
+        options.position(latlng);
+        //设置标记的近大远小效果，在marker初始化时使用。
+        // 当地图倾斜时，远方的标记变小，附近的标记变大
+        options.perspective(true);
         return options;
     }
 
