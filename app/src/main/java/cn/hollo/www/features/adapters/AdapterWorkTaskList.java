@@ -16,7 +16,7 @@ import cn.hollo.www.utils.Util;
  * Created by orson on 14-12-2.
  * 任务列表数据适配器
  */
-public class AdapterWorkTaskList extends CursorAdapter {
+public class AdapterWorkTaskList extends CursorAdapter{
     private Typeface typeface;
 
     /**
@@ -53,6 +53,11 @@ public class AdapterWorkTaskList extends CursorAdapter {
         }
     }
 
+    @Override
+    public Cursor swapCursor(Cursor newCursor) {
+        return newCursor;
+    }
+
     /***************************************************
      * 列表项
      */
@@ -62,6 +67,7 @@ public class AdapterWorkTaskList extends CursorAdapter {
         private TextView taskDateTimeText;
         private TextView departureStationText;
         private TextView destinationStationText;
+        private TextView taskStateText;
         public WorkTaskExpand data;
 
         private ItemHolder(View view){
@@ -70,6 +76,7 @@ public class AdapterWorkTaskList extends CursorAdapter {
             taskDateTimeText = (TextView)view.findViewById(R.id.taskDateTimeText);
             departureStationText = (TextView)view.findViewById(R.id.departureStationText);
             destinationStationText = (TextView)view.findViewById(R.id.destinationStationText);
+            taskStateText = (TextView)view.findViewById(R.id.taskStateText);
             taskDateTimeText.setTypeface(typeface);
         }
 
@@ -80,6 +87,14 @@ public class AdapterWorkTaskList extends CursorAdapter {
             departureStationText.setText(data.departure_station);
             destinationStationText.setText(data.destination_station);
             taskDateTimeText.setText(Util.createDateTime(data.time * 1000));
+
+            if (data.task_state == 0)
+                taskStateText.setText("未开启");
+            else if (data.task_state == 1)
+                taskStateText.setText("进行中...");
+            else if (data.task_state == 2)
+                taskStateText.setText("已完成");
         }
     }
+
 }

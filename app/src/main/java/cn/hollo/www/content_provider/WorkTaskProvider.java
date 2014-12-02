@@ -32,12 +32,13 @@ public class WorkTaskProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(WorkTaskOpenHelper.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
 
     @Override
     public String getType(Uri uri) {
-        return null;
+        return uri.toString();
     }
 
     @Override

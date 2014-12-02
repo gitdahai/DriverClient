@@ -43,4 +43,16 @@
             android:background="@color/color_red"
             android:text="下车10人"/>
     </LinearLayout>
+
+    <!--显示当前选择的地址-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:id="@+id/showStationText"
+        android:background="@color/color_gray_half"
+        android:textColor="@color/color_white"
+        android:singleLine="true"
+        android:gravity="center"
+        android:textSize="18dp"/>
+
 </FrameLayout>

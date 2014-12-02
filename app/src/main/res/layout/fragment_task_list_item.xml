@@ -1,85 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="24dp"
-    android:paddingBottom="24dp"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:orientation="horizontal"
-    android:gravity="center_vertical">
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <!--车辆编号-->
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="80dp"
-            android:id="@+id/voitureNumberText"
-            android:background="@drawable/shape_tv_top_rectangle_orange"
-            android:text="H001"
-            android:textSize="24dp"
-            android:textColor="@color/color_white"
-            android:gravity="center"/>
-        <!--车辆类型-->
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="30dp"
-            android:id="@+id/voitureTypeNameText"
-            android:textSize="18dp"
-            android:text="摆渡车"
-            android:textColor="@color/color_white"
-            android:gravity="center"
-            android:background="@drawable/shape_tv_bottom_rectangle_blue"/>
-    </LinearLayout>
-    <!--任务日期和时间-->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:id="@+id/taskDateTimeText"
-        android:textSize="24dp"
-        android:text="11-11 07:20"
-        android:textColor="@color/color_white"
-        android:gravity="center"/>
-    <!--分割线-->
-    <View
-        android:layout_width="1px"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@color/color_gray"/>
-    <!--任务站点名号-->
+    android:layout_height="wrap_content">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:orientation="vertical">
-        <!--起点-->
-        <TextView
-            android:layout_width="match_parent"
+        android:paddingTop="24dp"
+        android:paddingBottom="24dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/departureStationText"
+            android:orientation="vertical">
+            <!--车辆编号-->
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="80dp"
+                android:id="@+id/voitureNumberText"
+                android:background="@drawable/shape_tv_top_rectangle_orange"
+                android:text="H001"
+                android:textSize="24dp"
+                android:textColor="@color/color_white"
+                android:gravity="center"/>
+            <!--车辆类型-->
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:id="@+id/voitureTypeNameText"
+                android:textSize="18dp"
+                android:text="摆渡车"
+                android:textColor="@color/color_white"
+                android:gravity="center"
+                android:background="@drawable/shape_tv_bottom_rectangle_blue"/>
+        </LinearLayout>
+        <!--任务日期和时间-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:id="@+id/taskDateTimeText"
             android:textSize="24dp"
+            android:text="11-11 07:20"
             android:textColor="@color/color_white"
-            android:gravity="center_vertical"
-            android:drawablePadding="8dp"
-            android:drawableLeft="@drawable/ic_path_start"
-            android:text=" "/>
-        <!--终点-->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:gravity="center"/>
+        <!--分割线-->
+        <View
+            android:layout_width="1px"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
-            android:id="@+id/destinationStationText"
-            android:textSize="24dp"
-            android:drawablePadding="8dp"
-            android:gravity="center_vertical"
-            android:textColor="@color/color_white"
-            android:drawableLeft="@drawable/ic_path_end"
-            android:text=" "/>
+            android:layout_marginBottom="8dp"
+            android:background="@color/color_gray"/>
+        <!--任务站点名号-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:orientation="vertical">
+            <!--起点-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/departureStationText"
+                android:textSize="24dp"
+                android:textColor="@color/color_white"
+                android:gravity="center_vertical"
+                android:drawablePadding="8dp"
+                android:drawableLeft="@drawable/ic_path_start"
+                android:text=" "/>
+            <!--终点-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:id="@+id/destinationStationText"
+                android:textSize="24dp"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/color_white"
+                android:drawableLeft="@drawable/ic_path_end"
+                android:text=" "/>
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+
+    <!--任务的执行状态-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/taskStateText"
+        android:layout_gravity="center_vertical|right"
+        android:layout_marginRight="16dp"
+        android:textSize="24dp"
+        android:textColor="@color/color_green"/>
+</FrameLayout>
+

@@ -11,6 +11,7 @@ import android.widget.ListView;
 
 import cn.hollo.www.R;
 import cn.hollo.www.UserInfo;
+import cn.hollo.www.content_provider.WorkTaskOpenHelper;
 import cn.hollo.www.content_provider.WorkTaskProvider;
 import cn.hollo.www.features.ActivityFeatures;
 import cn.hollo.www.features.FragmentBase;
@@ -99,7 +100,9 @@ public class FragmentTaskList extends FragmentBase {
          */
         private Cursor getCursor(){
             Cursor cursor = null;
-            cursor = getActivity().getContentResolver().query(WorkTaskProvider.CONTENT_URI, null, null, null,null);
+            String selection = WorkTaskOpenHelper.TASK_STATE + "!=?";
+            String[] selectionArgs = {"2"};
+            cursor = getActivity().getContentResolver().query(WorkTaskProvider.CONTENT_URI, null, selection, selectionArgs,null);
             return cursor;
         }
     }

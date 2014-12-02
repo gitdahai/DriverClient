@@ -59,8 +59,10 @@ public class ParserUtil {
                 }
 
                 //如果没有相同的数据，则进行插入操作
-                if (count == 0)
+                if (count == 0){
                     resolver.insert(WorkTaskProvider.CONTENT_URI, workTask.getContentValues());
+                    resolver.notifyChange(WorkTaskProvider.CONTENT_URI, null);
+                }
             }
         }
     }

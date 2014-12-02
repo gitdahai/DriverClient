@@ -31,7 +31,12 @@
             android:configChanges="orientation|keyboardHidden"/>
 
 
-
+        <!--删除数据服务-->
+        <service
+            android:name=".features.ServiceData"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
 
         <!-- ==============定位服务============================ -->
         <service

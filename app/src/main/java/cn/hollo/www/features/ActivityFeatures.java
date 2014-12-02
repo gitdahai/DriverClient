@@ -39,6 +39,13 @@ public class ActivityFeatures extends ActivityBase {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, ServiceData.class);
+        startService(intent);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.getMenuInflater().inflate(R.menu.menu_features, menu);
         return true;

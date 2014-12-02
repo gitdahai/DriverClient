@@ -24,6 +24,7 @@ public class AdapterWorkDetail extends BaseAdapter {
     private Typeface typeface;
     private OnStateListener listener;
     private int executionIndex = -1;
+    private boolean isItemClick = true;
 
     /**
      *
@@ -34,6 +35,14 @@ public class AdapterWorkDetail extends BaseAdapter {
         this.context = context;
         this.stations = stations;
         typeface = Util.loadTypeface(context, "fonts/ImpactMTStd.otf");
+    }
+
+    /**
+     * 当开启任务后，item点击效果失效
+     * @param b
+     */
+    public void setItemClickable(boolean b){
+        isItemClick = b;
     }
 
     public int getCount() {return stations.size();}
@@ -131,7 +140,7 @@ public class AdapterWorkDetail extends BaseAdapter {
 
             //itme试图事件
             else{
-                if (listener != null)
+                if (isItemClick && listener != null)
                     listener.onActionItemClick(station);
             }
         }

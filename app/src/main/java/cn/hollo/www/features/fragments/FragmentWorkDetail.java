@@ -2,6 +2,7 @@ package cn.hollo.www.features.fragments;
 
 import android.app.ActionBar;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -40,12 +41,13 @@ import java.util.List;
 import cn.hollo.www.R;
 import cn.hollo.www.UserInfo;
 import cn.hollo.www.app.ServiceManager;
+import cn.hollo.www.features.ActivityFeatures;
 import cn.hollo.www.features.FragmentBase;
 import cn.hollo.www.features.OnRouteSearchListenerImp;
 import cn.hollo.www.features.adapters.AdapterWorkDetail;
 import cn.hollo.www.features.informations.ParserUtil;
-import cn.hollo.www.features.informations.WorkTask;
 import cn.hollo.www.features.informations.WorkTaskDetail;
+import cn.hollo.www.features.informations.WorkTaskExpand;
 import cn.hollo.www.features.params.RequestWorkTaskDetailParam;
 import cn.hollo.www.https.HttpManager;
 import cn.hollo.www.https.HttpStringRequest;
@@ -83,8 +85,10 @@ public class FragmentWorkDetail extends FragmentBase{
         View view = inflater.inflate(R.layout.fragment_work_detail, null);
         workDetailMap  = new WorkDetailMap(view);
         workDetailMap.onCreate(savedInstanceState);
-        workDetailList = new WorkDetailList(view, workDetailMap);
-        workDetailList.loadWorkTaskDetail(this.getArguments());
+
+        Bundle bundle = getArguments();
+        WorkTaskExpand task = (WorkTaskExpand)bundle.getSerializable("Attach");
+        workDetailList = new WorkDetailList(view, workDetailMap, task);
         return view;
     }
 
@@ -112,9 +116,17 @@ public class FragmentWorkDetail extends FragmentBase{
         workDetailMap.onDestroy();
     }
 
+    public void onBackHome(){
+        //进入任务列表
+        Intent intent = new Intent(getActivity(), ActivityFeatures.class);
+        intent.putExtra("Features", ActivityFeatures.Features.TaskList);
+        startActivity(intent);
+    }
+
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home){
             this.getActivity().finish();
+            onBackHome();
             return true;
         }
         else
@@ -130,22 +142,19 @@ public class FragmentWorkDetail extends FragmentBase{
         private ListView       detailListView;
         private AdapterWorkDetail adapter;
         private Button         startDoTaskButton;   //任务开始按钮
+        private WorkTaskExpand workTask;
 
-        private String task_id;
-        private int executionIndex;
-
-        private WorkDetailList(View view, WorkDetailMap  workDetailMap){
+        private WorkDetailList(View view, WorkDetailMap  workDetailMap, WorkTaskExpand workTask){
             this.workDetailMap = workDetailMap;
+            this.workTask = workTask;
 
             detailListView = (ListView)view.findViewById(R.id.workDetailListView);
             startDoTaskButton = (Button)view.findViewById(R.id.startDoTaskButton);
             startDoTaskButton.setOnClickListener(this);
             startDoTaskButton.setEnabled(false);
 
-            //读取任务执行的状态
-            TaskExecutionInfo taskExecutionInfo = TaskExecutionInfo.getInstance(getActivity());
-            task_id = taskExecutionInfo.getTaskId();
-            executionIndex = taskExecutionInfo.getExecutionIndex();
+            //加载新数据
+            loadWorkTaskDetail();
         }
 
         /**
@@ -161,13 +170,9 @@ public class FragmentWorkDetail extends FragmentBase{
         /**
          * 加载数据
          */
-        private void loadWorkTaskDetail(Bundle bundle){
-            if (bundle == null)
-                return;
-
-            WorkTask task = (WorkTask)bundle.getSerializable("Attach");
+        private void loadWorkTaskDetail(){
             //如果没有WorkTask，则说明传递过程中丢失，或者没有传递
-            if (task == null){
+            if (workTask == null){
                 try {
                     throw new Exception("丢失的任务数据");
                 } catch (Exception e) {e.printStackTrace();}
@@ -177,7 +182,7 @@ public class FragmentWorkDetail extends FragmentBase{
                 UserInfo userInfo = UserInfo.getInstance(getActivity());
                 RequestWorkTaskDetailParam param = new RequestWorkTaskDetailParam();
                 param.user_id = userInfo.getUserId();
-                param.task_id = task.task_id;
+                param.task_id = workTask.task_id;
                 param.listener = this;
                 //发送请求
                 HttpStringRequest request = new HttpStringRequest(param);
@@ -199,12 +204,14 @@ public class FragmentWorkDetail extends FragmentBase{
                     workDetailMap.drawStationMarkers(workTaskDetails.stations);
 
                     //启用任务按钮
-                    if (task_id == null)
+                    if (workTask.task_state == 0)
                         startDoTaskButton.setEnabled(true);
-                    //如果当前任务详情的id等于记录的任务id，
-                    //则说明是已经执行过的任务，那么需要回复上一次执行的位置
-                    else if (task_id.equals(workTaskDetails.task_id))
-                        adapter.actionInit(executionIndex);
+                    //如果是已经执行过的任务，则进行状态的设定
+                    else if (workTask.task_state == 1){
+                        adapter.setItemClickable(false);
+                        workDetailMap.hideShowStationTitle();
+                        adapter.actionInit(workTask.execute_index);
+                    }
                 }
             }
         }
@@ -215,12 +222,19 @@ public class FragmentWorkDetail extends FragmentBase{
                 public void onClick(DialogInterface dialog, int which) {
                     //确认开始
                     if (DialogInterface.BUTTON_POSITIVE == which){
-                        //开始新任务的时候，首先保存新任务的id
-                        TaskExecutionInfo taskExecutionInfo = TaskExecutionInfo.getInstance(getActivity());
-                        taskExecutionInfo.putTaskId(workTaskDetails.task_id);
+
                         //设置任务初始执行时的状态
                         startDoTaskButton.setEnabled(false);
                         adapter.actionInit(0);
+                        //禁用item点击事件
+                        adapter.setItemClickable(false);
+
+                        //设置当前任务为执行状态
+                        workTask.task_state = 1;
+                        //跟新状态
+                        workTask.update(getActivity());
+                        //隐藏显示站点的title
+                        workDetailMap.hideShowStationTitle();
                     }
                 }
             });
@@ -229,33 +243,33 @@ public class FragmentWorkDetail extends FragmentBase{
         @Override
         public void onActionInit(WorkTaskDetail.Station station) {
             workDetailMap.setCurrentStation(station);
-
-            //保存索引
-            TaskExecutionInfo taskExecutionInfo = TaskExecutionInfo.getInstance(getActivity());
-            taskExecutionInfo.putExecutionIndex(adapter.getExecutionIndex());
+            workTask.execute_index = adapter.getExecutionIndex();
+            //跟新状态
+            workTask.update(getActivity());
         }
 
         @Override
         public void onActionNext(WorkTaskDetail.Station station) {
             workDetailMap.setCurrentStation(station);
-
-            //保存索引
-            TaskExecutionInfo taskExecutionInfo = TaskExecutionInfo.getInstance(getActivity());
-            taskExecutionInfo.putExecutionIndex(adapter.getExecutionIndex());
+            workTask.execute_index = adapter.getExecutionIndex();
+            //跟新状态
+            workTask.update(getActivity());
         }
 
         @Override
         public void onActionItemClick(WorkTaskDetail.Station station) {
             workDetailMap.setCurrentStation(station);
+            workDetailMap.showSelectStation(station);
         }
 
         @Override
         public void onActionFinish(WorkTaskDetail.Station station) {
-            //当已经完成时，需要清楚所有的任务记录
-            TaskExecutionInfo taskExecutionInfo = TaskExecutionInfo.getInstance(getActivity());
-            taskExecutionInfo.putTaskId(null);
-            taskExecutionInfo.putExecutionIndex(-1);
+            //更新数据库中的状态
+            workTask.task_state = 2;
+            workTask.execute_index = adapter.getExecutionIndex();
+            workTask.update(getActivity());
             getActivity().finish();
+            onBackHome();
         }
     }
 
@@ -266,6 +280,7 @@ public class FragmentWorkDetail extends FragmentBase{
         private MapView workMapView;
         private TextView onBusPopulationText;
         private TextView offBusPopulationText;
+        private TextView showStationTitle;
 
         private AMap aMap;
         private UiSettings uiSettings;
@@ -279,6 +294,8 @@ public class FragmentWorkDetail extends FragmentBase{
             workMapView = (MapView)view.findViewById(R.id.workDetailMapView);
             onBusPopulationText = (TextView)view.findViewById(R.id.onBusPopulationText);
             offBusPopulationText = (TextView)view.findViewById(R.id.offBusPopulationText);
+            showStationTitle = (TextView)view.findViewById(R.id.showStationText);
+
             onBusPopulationText.setTypeface(typeface);
             offBusPopulationText.setTypeface(typeface);
             setSGPopulationText(false);
@@ -303,6 +320,12 @@ public class FragmentWorkDetail extends FragmentBase{
             uiSettings.setRotateGesturesEnabled(true);
         }
 
+        /**
+         * 隐藏显示站点的title
+         */
+        private void hideShowStationTitle(){
+            showStationTitle.setVisibility(View.GONE);
+        }
         /*************************************************
          * 设置显示上下车人数的文本显示或者隐藏
          * @param b
@@ -354,6 +377,13 @@ public class FragmentWorkDetail extends FragmentBase{
 
         }
 
+        /**
+         * 显示当前选中站点的名称
+         * @param station
+         */
+        private void showSelectStation(WorkTaskDetail.Station station){
+            showStationTitle.setText(station.name);
+        }
         /******************************************************
          * 绘制动态的bus和选中站点之间的线段
          */

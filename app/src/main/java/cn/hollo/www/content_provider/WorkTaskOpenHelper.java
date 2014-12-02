@@ -36,7 +36,7 @@ public class WorkTaskOpenHelper extends SQLiteOpenHelper {
     public static final int COL_INDEX_DESTINATION_STATION = 5;
     public static final int COL_INDEX_DATE_TIME           = 6;
     public static final int COL_INDEX_TASK_STATE          = 7;
-     static final int COL_INDEX_DATA_7 = 8;
+    public static final int COL_INDEX_EXECUTE_INDEX       = 8;
      static final int COL_INDEX_DATA_8 = 9;
      static final int COL_INDEX_DATA_9 = 10;
      static final int COL_INDEX_DATA_10 = 11;
@@ -56,6 +56,7 @@ public class WorkTaskOpenHelper extends SQLiteOpenHelper {
     public static final String DESTINATION_STATION  = DATA_4;       //到达站点名称
     public static final String DATE_TIME            = DATA_5;       //日期和时间
     public static final String TASK_STATE           = DATA_6;       //任务的状态
+    public static final String EXECUTE_INDEX        = DATA_7;       //任务的执行索引
 
     /**********************************************************
      * 在该构造方法中需要创建数据库
