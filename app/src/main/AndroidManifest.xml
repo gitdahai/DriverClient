@@ -51,6 +51,13 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <!--工作任务单Provider-->
+        <provider
+            android:name=".content_provider.WorkTaskProvider"
+            android:authorities="cn.hollo.www.content_provider"
+            android:multiprocess="false">
+        </provider>
     </application>
 
     <!-- 定位需要的权限 -->

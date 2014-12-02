@@ -1,5 +1,9 @@
 package cn.hollo.www.features.informations;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.Cursor;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -11,6 +15,9 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.hollo.www.content_provider.WorkTaskOpenHelper;
+import cn.hollo.www.content_provider.WorkTaskProvider;
+
 /**
  * Created by orson on 14-11-25.
  * 解析工具类
@@ -18,14 +25,44 @@ import java.util.List;
 public class ParserUtil {
     /**************************************************************
      * 解析工作任务列表
+     * @param context
      * @param json
      * @return
      */
-    public static List<WorkTask> parserWorkTasks(String json){
-        Type listType = new TypeToken<ArrayList <WorkTask>>(){}.getType();
+    public static void parserWorkTasks(Context context, String json){
+        Type listType = new TypeToken<ArrayList <WorkTaskExpand>>(){}.getType();
         Gson gson = new Gson();
-        ArrayList list = gson.fromJson(json, listType);
-        return list;
+        ArrayList<WorkTaskExpand> list = gson.fromJson(json, listType);
+
+        //进行数据库插入
+        ContentResolver resolver = context.getContentResolver();
+        String selection = WorkTaskOpenHelper.TASK_ID + "=?";
+        String[] selectionArgs = new String[1];
+        WorkTaskExpand workTask = null;
+        Cursor cursor = null;
+        int count = 0;
+
+        //如果成功解析到数据，则进行数据库擦如操作
+        if (list != null && list.size() > 0){
+            int size = list.size();
+
+            for (int i=0; i<size; i++){
+                count = 0;
+                workTask = list.get(i);
+                selectionArgs[0] = workTask.task_id;
+                cursor = resolver.query(WorkTaskProvider.CONTENT_URI, null, selection, selectionArgs, null);
+
+                //检查数据表中是否存在同样的数据
+                if (cursor != null){
+                    count = cursor.getCount();
+                    cursor.close();
+                }
+
+                //如果没有相同的数据，则进行插入操作
+                if (count == 0)
+                    resolver.insert(WorkTaskProvider.CONTENT_URI, workTask.getContentValues());
+            }
+        }
     }
 
     /*************************************************************

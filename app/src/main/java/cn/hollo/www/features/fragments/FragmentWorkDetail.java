@@ -58,17 +58,6 @@ import cn.hollo.www.utils.Util;
  * 工作单的详情
  */
 public class FragmentWorkDetail extends FragmentBase{
-    /*********************************************************
-     * 任务的状态
-     */
-    public interface TaskExcuteState{
-        //状态为“未开始”
-        public static final int TASK_STATE_NONE = -1;
-        //状态为"进行中"
-        public static final int TASK_STATE_EXCUTE = 1;
-        //状态为"结束"
-        public static final int TASK_STATE_FINISH = 2;
-    }
 
     private WorkDetailList workDetailList;
     private WorkDetailMap  workDetailMap;
@@ -130,7 +119,6 @@ public class FragmentWorkDetail extends FragmentBase{
         }
         else
             return super.onOptionsItemSelected(item);
-
     }
 
     /***************************************************
@@ -144,7 +132,6 @@ public class FragmentWorkDetail extends FragmentBase{
         private Button         startDoTaskButton;   //任务开始按钮
 
         private String task_id;
-        private int taskExcuteState;
         private int executionIndex;
 
         private WorkDetailList(View view, WorkDetailMap  workDetailMap){
@@ -159,7 +146,6 @@ public class FragmentWorkDetail extends FragmentBase{
             TaskExecutionInfo taskExecutionInfo = TaskExecutionInfo.getInstance(getActivity());
             task_id = taskExecutionInfo.getTaskId();
             executionIndex = taskExecutionInfo.getExecutionIndex();
-            taskExcuteState = taskExecutionInfo.getTaskExcuteState();
         }
 
         /**
@@ -243,13 +229,19 @@ public class FragmentWorkDetail extends FragmentBase{
         @Override
         public void onActionInit(WorkTaskDetail.Station station) {
             workDetailMap.setCurrentStation(station);
-            System.out.println("==========已经初始化===============");
+
+            //保存索引
+            TaskExecutionInfo taskExecutionInfo = TaskExecutionInfo.getInstance(getActivity());
+            taskExecutionInfo.putExecutionIndex(adapter.getExecutionIndex());
         }
 
         @Override
         public void onActionNext(WorkTaskDetail.Station station) {
             workDetailMap.setCurrentStation(station);
-            System.out.println("==========下一个===============");
+
+            //保存索引
+            TaskExecutionInfo taskExecutionInfo = TaskExecutionInfo.getInstance(getActivity());
+            taskExecutionInfo.putExecutionIndex(adapter.getExecutionIndex());
         }
 
         @Override
@@ -259,7 +251,11 @@ public class FragmentWorkDetail extends FragmentBase{
 
         @Override
         public void onActionFinish(WorkTaskDetail.Station station) {
-            System.out.println("==========已经完成===============");
+            //当已经完成时，需要清楚所有的任务记录
+            TaskExecutionInfo taskExecutionInfo = TaskExecutionInfo.getInstance(getActivity());
+            taskExecutionInfo.putTaskId(null);
+            taskExecutionInfo.putExecutionIndex(-1);
+            getActivity().finish();
         }
     }
 
@@ -331,15 +327,31 @@ public class FragmentWorkDetail extends FragmentBase{
                 return;
 
             this.station = station;
+
+            //绘制车辆和站点之间的连线
             LatLng startLatlng = new LatLng(station.location.lat,station.location.lng);
             drawBusToStationLine(startLatlng, mapListener.positionLatlng);
 
+            //计算上下车人数
             int onPopulation = station.on_users.size();
             int offPopulation = station.off_users.size();
 
-            setSGPopulationText(true);
-            onBusPopulationText.setText("上车\n" + onPopulation + "人");
-            offBusPopulationText.setText("下车\n" + offPopulation + "人");
+            //显示或者隐藏上车人数
+            if (onPopulation > 0){
+                onBusPopulationText.setVisibility(View.VISIBLE);
+                onBusPopulationText.setText("上车\n" + onPopulation + "人");
+            }
+            else
+                onBusPopulationText.setVisibility(View.GONE);
+
+            //显示或者隐藏下车人数
+            if (offPopulation > 0){
+                offBusPopulationText.setVisibility(View.VISIBLE);
+                offBusPopulationText.setText("下车\n" + offPopulation + "人");
+            }
+            else
+                offBusPopulationText.setVisibility(View.GONE);
+
         }
 
         /******************************************************

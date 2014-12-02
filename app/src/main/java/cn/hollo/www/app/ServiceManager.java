@@ -121,14 +121,18 @@ public class ServiceManager {
      */
     public void stopService(Context context){
         Context ctx = context.getApplicationContext();
+        try{
+            ctx.unbindService(locaConnection);
+            //ctx.unbindService(xmppConnection);
 
-        ctx.unbindService(locaConnection);
-        //ctx.unbindService(xmppConnection);
-
-        //停止位置服务
-        ServiceLocation.stopService(ctx);
-        //停止xmpp服务
-        //XMPPService.stopService(ctx);
+            //停止位置服务
+            ServiceLocation.stopService(ctx);
+            //停止xmpp服务
+            //XMPPService.stopService(ctx);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     /************************************************

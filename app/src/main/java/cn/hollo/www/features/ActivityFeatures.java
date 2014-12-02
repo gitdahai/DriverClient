@@ -92,7 +92,7 @@ public class ActivityFeatures extends ActivityBase {
         //重新开启登录
         Intent intent = new Intent(this, ActivityLogin.class);
         startActivity(intent);
-        this.finish();
+        closeAllActivity();
     }
 
     /*************************************************************

@@ -22,14 +22,6 @@ public class TaskExecutionInfo {
     }
 
     /**
-     * 获取当前的执行状态
-     * @return
-     */
-    public int getTaskExcuteState(){
-        return spf.getInt("TaskExcuteState", FragmentWorkDetail.TaskExcuteState.TASK_STATE_NONE);
-    }
-
-    /**
      * 获取执行索引
      * @return
      */
@@ -45,15 +37,6 @@ public class TaskExecutionInfo {
         return spf.getString("TaskId", null);
     }
 
-    /**
-     * 保存任务的执行状态
-     * @param state
-     */
-    public void putTaskExcuteState(int state){
-        SharedPreferences.Editor editor = spf.edit();
-        editor.putInt("TaskExcuteState", state);
-        editor.commit();
-    }
 
     /**
      * 保存当前的执行索引
