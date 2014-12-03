@@ -243,6 +243,11 @@ public class FragmentWorkDetail extends FragmentBase{
                         //当新的任务开始时，需要保存当前任务的乘客信息
                         PassengerManager passengerManager = PassengerManager.getInstance();
                         passengerManager.addAllPassengers(getActivity(), workTaskDetails);
+
+                        //发送消息给所有的乘客
+                        String vehicleCode = workTask.voiture_number;
+                        String message     = workTask.voiture_number + "车,开始发车";
+                        passengerManager.sendMessageToPassenger(getActivity(), vehicleCode, message);
                     }
                 }
             });
@@ -259,6 +264,12 @@ public class FragmentWorkDetail extends FragmentBase{
         @Override
         public void onActionArrive(WorkTaskDetail.Station station) {
             PassengerManager manager = PassengerManager.getInstance();
+
+            //发送消息
+            String vehicleCode = workTask.voiture_number;
+            String message     = station.name + "站已经到达了";
+            manager.sendMessageToPassenger(getActivity(), vehicleCode, message);
+
             //删除已经下车的乘客信息
             manager.deletePassengers(getActivity(), station.off_users);
         }

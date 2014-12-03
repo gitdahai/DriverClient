@@ -159,8 +159,11 @@ public class XMPPManager {
             try {
                 if (chat != null)
                     chat.sendMessage(chartMessage.getMessage());
+
+                System.out.println("===========发送消息成功============= " + chartMessage.getTo());
             } catch (SmackException.NotConnectedException e) {
                 e.printStackTrace();
+                System.out.println("===========发送消息失败============= " + chartMessage.getTo());
             }
         }
     }

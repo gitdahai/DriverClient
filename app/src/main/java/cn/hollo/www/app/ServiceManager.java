@@ -12,6 +12,7 @@ import java.util.List;
 import cn.hollo.www.UserInfo;
 import cn.hollo.www.https.HttpManager;
 import cn.hollo.www.location.ServiceLocation;
+import cn.hollo.www.thread_pool.ThreadPool;
 import cn.hollo.www.xmpp.XMPPService;
 
 /**
@@ -20,6 +21,7 @@ import cn.hollo.www.xmpp.XMPPService;
  */
 public class ServiceManager {
     private static ServiceManager instance;
+    private ThreadPool threadPool;
     private ServiceLocation.LocationBinder  locationBinder; //位置服务Binder对象
     private XMPPService.XmppBinder          xmppBinder;     //xmpp服务的Binder对象
     private List<OnLocaBinder> locaBinders;
@@ -28,6 +30,7 @@ public class ServiceManager {
     private ServiceManager(){
         locaBinders = new ArrayList<OnLocaBinder>();
         xmppBinders = new ArrayList<OnXmppBinder>();
+
     };
 
     public static ServiceManager getInstance(){
@@ -65,6 +68,13 @@ public class ServiceManager {
             xmppBinders.add(oxb);
     }
 
+    /**
+     * 返回线程池对象
+     * @return
+     */
+    public ThreadPool getThreadPool(){
+        return threadPool;
+    }
 
     /**
      * 创建http
@@ -82,12 +92,17 @@ public class ServiceManager {
         http.destroy();
     }
 
+
     /**
      * 启动服务
      * 目前调用的位置在：用户登录成功后
      * @param context
      */
     public void startService(Context context){
+        //如果线程池对象不存在，则生成一个对象
+        if (threadPool == null)
+            threadPool = ThreadPool.getInstance();
+
         Context ctx = context.getApplicationContext();
 
         UserInfo userInfo = UserInfo.getInstance(context);
@@ -120,6 +135,10 @@ public class ServiceManager {
      * @param context
      */
     public void stopService(Context context){
+        //停止线程池
+        threadPool.cancel();
+        threadPool = null;
+
         Context ctx = context.getApplicationContext();
         try{
             ctx.unbindService(locaConnection);
