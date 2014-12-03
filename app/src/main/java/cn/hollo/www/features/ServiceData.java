@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.hollo.www.UserInfo;
-import cn.hollo.www.content_provider.WorkTaskOpenHelper;
-import cn.hollo.www.content_provider.WorkTaskProvider;
+import cn.hollo.www.content_provider.OpenHelperWorkTask;
+import cn.hollo.www.content_provider.ProviderWorkTask;
 import cn.hollo.www.features.informations.WorkTaskExpand;
 import cn.hollo.www.features.params.RequestWorkTaskDeleteParam;
 import cn.hollo.www.https.HttpManager;
@@ -29,10 +29,10 @@ public class ServiceData extends Service {
         super.onCreate();
 
         wtes = new ArrayList<WorkTaskExpand>();
-        String selection = WorkTaskOpenHelper.TASK_STATE + "=?";
+        String selection = OpenHelperWorkTask.TASK_STATE + "=?";
         String[] selectionArgs = {"2"};
 
-        Cursor cursor = getContentResolver().query(WorkTaskProvider.CONTENT_URI, null, selection, selectionArgs, null);
+        Cursor cursor = getContentResolver().query(ProviderWorkTask.CONTENT_URI, null, selection, selectionArgs, null);
 
         if (cursor == null){
             this.stopSelf();
@@ -106,9 +106,9 @@ public class ServiceData extends Service {
         @Override
         public void onResponse(int code, String response) {
             if (code == 200){
-                String where = WorkTaskOpenHelper.TASK_ID + "=?";
+                String where = OpenHelperWorkTask.TASK_ID + "=?";
                 String[] selectionArgs = {wte.task_id};
-                getContentResolver().delete(WorkTaskProvider.CONTENT_URI, where, selectionArgs);
+                getContentResolver().delete(ProviderWorkTask.CONTENT_URI, where, selectionArgs);
             }
 
             execute();

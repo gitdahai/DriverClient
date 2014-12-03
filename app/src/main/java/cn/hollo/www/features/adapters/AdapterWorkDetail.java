@@ -135,8 +135,13 @@ public class AdapterWorkDetail extends BaseAdapter {
         @Override
         public void onClick(View v) {
             //到达按钮事件
-            if (v.getId() == R.id.arriveButton)
+            if (v.getId() == R.id.arriveButton){
+                //通知到达该站点的事件
+                if (listener != null)
+                    listener.onActionArrive(station);
+
                 actionNext();
+            }
 
             //itme试图事件
             else{
@@ -205,6 +210,12 @@ public class AdapterWorkDetail extends BaseAdapter {
          * @param station
          */
         public void onActionInit(WorkTaskDetail.Station station);
+
+        /**
+         * 到达站点事件
+         * @param station
+         */
+        public void onActionArrive(WorkTaskDetail.Station station);
         /**
          * 到达事件
          * @param station

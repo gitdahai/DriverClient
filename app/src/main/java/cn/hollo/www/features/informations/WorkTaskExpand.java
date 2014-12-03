@@ -4,8 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-import cn.hollo.www.content_provider.WorkTaskOpenHelper;
-import cn.hollo.www.content_provider.WorkTaskProvider;
+import cn.hollo.www.content_provider.OpenHelperWorkTask;
+import cn.hollo.www.content_provider.ProviderWorkTask;
 
 /**
  * Created by orson on 14-12-2.
@@ -21,14 +21,14 @@ public class WorkTaskExpand extends WorkTask {
      */
     public ContentValues getContentValues(){
         ContentValues values = new ContentValues();
-        values.put(WorkTaskOpenHelper.TASK_ID,              task_id);
-        values.put(WorkTaskOpenHelper.VOITURE_NUMBER,       voiture_number);
-        values.put(WorkTaskOpenHelper.VOITURE_TYPE,         voiture_type);
-        values.put(WorkTaskOpenHelper.DEPARTURE_STATION,    departure_station);
-        values.put(WorkTaskOpenHelper.DESTINATION_STATION,  destination_station);
-        values.put(WorkTaskOpenHelper.DATE_TIME,            time);
-        values.put(WorkTaskOpenHelper.TASK_STATE,           task_state);
-        values.put(WorkTaskOpenHelper.EXECUTE_INDEX,        execute_index);
+        values.put(OpenHelperWorkTask.TASK_ID,              task_id);
+        values.put(OpenHelperWorkTask.VOITURE_NUMBER,       voiture_number);
+        values.put(OpenHelperWorkTask.VOITURE_TYPE,         voiture_type);
+        values.put(OpenHelperWorkTask.DEPARTURE_STATION,    departure_station);
+        values.put(OpenHelperWorkTask.DESTINATION_STATION,  destination_station);
+        values.put(OpenHelperWorkTask.DATE_TIME,            time);
+        values.put(OpenHelperWorkTask.TASK_STATE,           task_state);
+        values.put(OpenHelperWorkTask.EXECUTE_INDEX,        execute_index);
         return values;
     }
 
@@ -39,14 +39,14 @@ public class WorkTaskExpand extends WorkTask {
      */
     public static WorkTaskExpand createWorkTaskExpand(Cursor cursor){
         WorkTaskExpand wte = new WorkTaskExpand();
-        wte.task_id = cursor.getString(WorkTaskOpenHelper.COL_INDEX_TASK_ID);
-        wte.voiture_number = cursor.getString(WorkTaskOpenHelper.COL_INDEX_VOITURE_NUMBER);
-        wte.voiture_type = cursor.getString(WorkTaskOpenHelper.COL_INDEX_VOITURE_TYPE);
-        wte.departure_station = cursor.getString(WorkTaskOpenHelper.COL_INDEX_DEPARTURE_STATION);
-        wte.destination_station = cursor.getString(WorkTaskOpenHelper.COL_INDEX_DESTINATION_STATION);
-        wte.time = cursor.getLong(WorkTaskOpenHelper.COL_INDEX_DATE_TIME);
-        wte.task_state = cursor.getInt(WorkTaskOpenHelper.COL_INDEX_TASK_STATE);
-        wte.execute_index = cursor.getInt(WorkTaskOpenHelper.COL_INDEX_EXECUTE_INDEX);
+        wte.task_id = cursor.getString(OpenHelperWorkTask.COL_INDEX_TASK_ID);
+        wte.voiture_number = cursor.getString(OpenHelperWorkTask.COL_INDEX_VOITURE_NUMBER);
+        wte.voiture_type = cursor.getString(OpenHelperWorkTask.COL_INDEX_VOITURE_TYPE);
+        wte.departure_station = cursor.getString(OpenHelperWorkTask.COL_INDEX_DEPARTURE_STATION);
+        wte.destination_station = cursor.getString(OpenHelperWorkTask.COL_INDEX_DESTINATION_STATION);
+        wte.time = cursor.getLong(OpenHelperWorkTask.COL_INDEX_DATE_TIME);
+        wte.task_state = cursor.getInt(OpenHelperWorkTask.COL_INDEX_TASK_STATE);
+        wte.execute_index = cursor.getInt(OpenHelperWorkTask.COL_INDEX_EXECUTE_INDEX);
         return wte;
     }
 
@@ -56,9 +56,9 @@ public class WorkTaskExpand extends WorkTask {
      */
     public void update(Context context){
         ContentValues values = getContentValues();
-        String selection = WorkTaskOpenHelper.TASK_ID + "=?";
+        String selection = OpenHelperWorkTask.TASK_ID + "=?";
         String[] selectionArgs = {task_id};
-        context.getContentResolver().update(WorkTaskProvider.CONTENT_URI, values, selection, selectionArgs);
+        context.getContentResolver().update(ProviderWorkTask.CONTENT_URI, values, selection, selectionArgs);
     }
 
     /**
@@ -66,8 +66,8 @@ public class WorkTaskExpand extends WorkTask {
      * @param context
      */
     public void delete(Context context){
-        String selection = WorkTaskOpenHelper.TASK_ID + "=?";
+        String selection = OpenHelperWorkTask.TASK_ID + "=?";
         String[] selectionArgs = {task_id};
-        context.getContentResolver().delete(WorkTaskProvider.CONTENT_URI, selection, selectionArgs);
+        context.getContentResolver().delete(ProviderWorkTask.CONTENT_URI, selection, selectionArgs);
     }
 }

@@ -45,6 +45,7 @@ import cn.hollo.www.features.ActivityFeatures;
 import cn.hollo.www.features.FragmentBase;
 import cn.hollo.www.features.OnRouteSearchListenerImp;
 import cn.hollo.www.features.adapters.AdapterWorkDetail;
+import cn.hollo.www.features.operation.PassengerManager;
 import cn.hollo.www.features.informations.ParserUtil;
 import cn.hollo.www.features.informations.WorkTaskDetail;
 import cn.hollo.www.features.informations.WorkTaskExpand;
@@ -218,6 +219,10 @@ public class FragmentWorkDetail extends FragmentBase{
 
         @Override
         public void onClick(View v) {
+            //如果没有任务站点数据，则“开始任务按钮不可用”
+            if (workTaskDetails.stations.size() == 0)
+                return;
+
             Util.creteDefaultDialog(getActivity(), "确认", "确认开始任务?", "确定", "取消", null, new DialogInterface.OnClickListener(){
                 public void onClick(DialogInterface dialog, int which) {
                     //确认开始
@@ -235,6 +240,9 @@ public class FragmentWorkDetail extends FragmentBase{
                         workTask.update(getActivity());
                         //隐藏显示站点的title
                         workDetailMap.hideShowStationTitle();
+                        //当新的任务开始时，需要保存当前任务的乘客信息
+                        PassengerManager passengerManager = PassengerManager.getInstance();
+                        passengerManager.addAllPassengers(getActivity(), workTaskDetails);
                     }
                 }
             });
@@ -246,6 +254,13 @@ public class FragmentWorkDetail extends FragmentBase{
             workTask.execute_index = adapter.getExecutionIndex();
             //跟新状态
             workTask.update(getActivity());
+        }
+
+        @Override
+        public void onActionArrive(WorkTaskDetail.Station station) {
+            PassengerManager manager = PassengerManager.getInstance();
+            //删除已经下车的乘客信息
+            manager.deletePassengers(getActivity(), station.off_users);
         }
 
         @Override
@@ -463,11 +478,11 @@ public class FragmentWorkDetail extends FragmentBase{
                 latLng = new LatLng(station.location.lat, station.location.lng);
 
                 if (i == 0)
-                    option = createMarkerOptions(R.drawable.ic_path_start, station.name, latLng);
-                else if (1 == size-1)
-                    option = createMarkerOptions(R.drawable.ic_path_end, station.name, latLng);
+                    option = createMarkerOptions(R.drawable.ic_station_start, station.name, latLng);
+                else if (i == size-1)
+                    option = createMarkerOptions(R.drawable.ic_station_end, station.name, latLng);
                 else
-                    option = createMarkerOptions(R.drawable.ic_path_end, station.name, latLng);
+                    option = createMarkerOptions(R.drawable.ic_station_other, station.name, latLng);
 
                 options.add(option);
             }

@@ -15,8 +15,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.hollo.www.content_provider.WorkTaskOpenHelper;
-import cn.hollo.www.content_provider.WorkTaskProvider;
+import cn.hollo.www.content_provider.OpenHelperWorkTask;
+import cn.hollo.www.content_provider.ProviderWorkTask;
 
 /**
  * Created by orson on 14-11-25.
@@ -36,7 +36,7 @@ public class ParserUtil {
 
         //进行数据库插入
         ContentResolver resolver = context.getContentResolver();
-        String selection = WorkTaskOpenHelper.TASK_ID + "=?";
+        String selection = OpenHelperWorkTask.TASK_ID + "=?";
         String[] selectionArgs = new String[1];
         WorkTaskExpand workTask = null;
         Cursor cursor = null;
@@ -50,7 +50,7 @@ public class ParserUtil {
                 count = 0;
                 workTask = list.get(i);
                 selectionArgs[0] = workTask.task_id;
-                cursor = resolver.query(WorkTaskProvider.CONTENT_URI, null, selection, selectionArgs, null);
+                cursor = resolver.query(ProviderWorkTask.CONTENT_URI, null, selection, selectionArgs, null);
 
                 //检查数据表中是否存在同样的数据
                 if (cursor != null){
@@ -60,8 +60,8 @@ public class ParserUtil {
 
                 //如果没有相同的数据，则进行插入操作
                 if (count == 0){
-                    resolver.insert(WorkTaskProvider.CONTENT_URI, workTask.getContentValues());
-                    resolver.notifyChange(WorkTaskProvider.CONTENT_URI, null);
+                    resolver.insert(ProviderWorkTask.CONTENT_URI, workTask.getContentValues());
+                    resolver.notifyChange(ProviderWorkTask.CONTENT_URI, null);
                 }
             }
         }
@@ -119,13 +119,13 @@ public class ParserUtil {
                     //解析上车用户信息
                     if (jStation.has("on_users") && !jStation.isNull("on_users")){
                         JSONArray jUsers = jStation.getJSONArray("on_users");
-                        parserUser(jUsers, station.on_users, detail);
+                        parserUser(jUsers, station.on_users, detail.task_id);
                     }
 
                     //解析下车用户信息
                     if (jStation.has("off_users") && !jStation.isNull("off_users")){
                         JSONArray jUsers = jStation.getJSONArray("off_users");
-                        parserUser(jUsers, station.off_users, detail);
+                        parserUser(jUsers, station.off_users, detail.task_id);
                     }
 
                     detail.stations.add(station);
@@ -154,14 +154,15 @@ public class ParserUtil {
      * @param jUsers
      * @param users
      */
-    private static void parserUser(JSONArray jUsers, List<WorkTaskDetail.User> users, WorkTaskDetail detail) throws JSONException {
+    private static void parserUser(JSONArray jUsers, List<Passenger> users, String task_id) throws JSONException {
         int size = jUsers.length();
         JSONObject jUser = null;
-        WorkTaskDetail.User user = null;
+        Passenger  user = null;
 
         for (int i=0; i<size; i++){
             jUser = jUsers.getJSONObject(i);
-            user  = detail.newUserInstance();
+            user  = new Passenger();
+            user.task_id = task_id;
 
             if (jUser.has("user_id") && !jUser.isNull("user_id"))
                 user.user_id = jUser.getString("user_id");
@@ -171,6 +172,9 @@ public class ParserUtil {
 
             if (jUser.has("nickname") && !jUser.isNull("nickname"))
                 user.nickname = jUser.getString("nickname");
+
+            if (jUser.has("contract_id") && !jUser.isNull("contract_id"))
+                user.contract_id = jUser.getString("contract_id");
 
             users.add(user);
         }

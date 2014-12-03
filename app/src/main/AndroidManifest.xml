@@ -59,8 +59,15 @@
 
         <!--工作任务单Provider-->
         <provider
-            android:name=".content_provider.WorkTaskProvider"
-            android:authorities="cn.hollo.www.content_provider"
+            android:name=".content_provider.ProviderWorkTask"
+            android:authorities="cn.hollo.www.content_provider.WorkTask"
+            android:multiprocess="false">
+        </provider>
+
+        <!--乘客数据-->
+        <provider
+            android:name=".content_provider.ProviderPassenger"
+            android:authorities="cn.hollo.www.content_provider.Passenger"
             android:multiprocess="false">
         </provider>
     </application>
