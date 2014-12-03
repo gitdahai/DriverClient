@@ -102,15 +102,15 @@ public class ServiceManager {
             //启动位置服务
             ServiceLocation.startService(ctx);
             //启动xmpp服务
-            //XMPPService.startService(ctx, userInfo.getUserId(), userInfo.getUserPassword());
+            XMPPService.startService(ctx, userInfo.getUserId(), userInfo.getUserPassword());
 
             //绑定位置服务
             Intent locationIntent = new Intent(context, ServiceLocation.class);
             ctx.bindService(locationIntent, locaConnection, Context.BIND_AUTO_CREATE);
 
             //绑定xmpp服务
-            //Intent xmppIntent = new Intent(context, XMPPService.class);
-            //ctx.bindService(xmppIntent, xmppConnection, Context.BIND_AUTO_CREATE);
+            Intent xmppIntent = new Intent(context, XMPPService.class);
+            ctx.bindService(xmppIntent, xmppConnection, Context.BIND_AUTO_CREATE);
         }
     }
 
@@ -123,12 +123,12 @@ public class ServiceManager {
         Context ctx = context.getApplicationContext();
         try{
             ctx.unbindService(locaConnection);
-            //ctx.unbindService(xmppConnection);
+            ctx.unbindService(xmppConnection);
 
             //停止位置服务
             ServiceLocation.stopService(ctx);
             //停止xmpp服务
-            //XMPPService.stopService(ctx);
+            XMPPService.stopService(ctx);
         }
         catch(Exception e){
             e.printStackTrace();

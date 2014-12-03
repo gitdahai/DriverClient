@@ -82,8 +82,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="volley-1.0.6" level="project" />
     <orderEntry type="library" exported="" name="gson-2.2.4" level="project" />
+    <orderEntry type="library" exported="" name="org.xbill.dns_2.1.6" level="project" />
     <orderEntry type="library" exported="" name="AMap_Services_V2.3.1" level="project" />
-    <orderEntry type="library" exported="" name="AMap_2DMap_V2.3.1" level="project" />
     <orderEntry type="library" exported="" name="asmack-4.0.2" level="project" />
     <orderEntry type="library" exported="" name="AMap_3DMap_V2.3.1" level="project" />
     <orderEntry type="library" exported="" name="Android_Location_V1.3.0" level="project" />

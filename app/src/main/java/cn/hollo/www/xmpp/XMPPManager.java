@@ -1,7 +1,10 @@
 package cn.hollo.www.xmpp;
 
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
@@ -29,6 +32,8 @@ import java.io.IOException;
 public class XMPPManager {
     private static XMPPManager instance;
     private XmppConnectManager connectManager;
+    private ChatManager        chatManager;
+    private ChatMessageListener chatMessageListener;
 
     private XMPPManager(){}
 
@@ -63,7 +68,62 @@ public class XMPPManager {
         connectManager = null;
     }
 
-    /**
+    /*************************************************************
+     * 链接创建成功
+     * @param xmppConnection
+     */
+    private void xmppConnected(XMPPConnection xmppConnection){
+
+    }
+
+    /************************************************************
+     * 链接已经断开
+     */
+    private void xmppConnectionClosed(){
+        chatManager = null;
+        chatMessageListener = null;
+    }
+
+    /**********************************************************
+     * 用户登录成功
+     * @param xmppConnection
+     */
+    private void xmppAuthenticated(XMPPConnection xmppConnection){
+        chatManager = ChatManager.getInstanceFor(xmppConnection);
+        chatMessageListener = new ChatMessageListener();
+    }
+
+    /*********************************************************
+     * 重链成功
+     */
+    private void xmppReconnectionSuccessful(){
+
+    }
+
+    /*********************************************************
+     * 重链中
+     * @param i
+     */
+    private void xmppReconnectingIn(int i){
+
+    }
+
+    /*********************************************************
+     * 重链失败
+     * @param e
+     */
+    private void xmppReconnectionFailed(Exception e){
+
+    }
+
+    /*********************************************************
+     * 链接关闭失败
+     * @param e
+     */
+    private void xmppConnectionClosedOnError(Exception e){
+    }
+
+    /********************************************************
      * 添加订阅信息，该消息随后就会通过xmpp发送出去
      * @param subscribe
      */
@@ -86,6 +146,45 @@ public class XMPPManager {
             e.printStackTrace();
         } catch (XMPPException.XMPPErrorException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**********************************************************
+     * 发送单聊消息
+     */
+    public void sendSingleChat(IChatMessage chartMessage){
+        if (chartMessage != null && chatManager != null){
+            Chat chat = getChat(chartMessage.getTo());
+
+            try {
+                if (chat != null)
+                    chat.sendMessage(chartMessage.getMessage());
+            } catch (SmackException.NotConnectedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**********************************************************
+     * 获取当前chat对象
+     * @param jid
+     * @return
+     */
+    private Chat getChat(String jid){
+        Chat chat = chatManager.getThreadChat(jid);
+
+        if (chat == null)
+            chat = chatManager.createChat(jid, jid, chatMessageListener);
+
+        return chat;
+    }
+
+    /**********************************************************
+     * 消息发送时的监听器
+     */
+    private class ChatMessageListener implements MessageListener {
+        public void processMessage(Chat chat, Message message) {
+
         }
     }
 
@@ -180,34 +279,40 @@ public class XMPPManager {
          */
         private void close(){
             if (connection != null){
-                try {
-                    connection.disconnect();
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                }
 
-                connection.removeConnectionListener(this);
-                connection.removePacketListener(pkListener);
+                //需要开启新的线程，执行断开链接操作
+                new Thread(new Runnable(){
+                    public void run() {
+                        try {
+                            connection.disconnect();
+                        } catch (SmackException.NotConnectedException e) {
+                            e.printStackTrace();
+                        }
+                        //该方法必须在关闭链接之后调用
+                        //否则有的事件无法调用
+                        connection.removeConnectionListener(XmppConnectManager.this);
+                        connection.removePacketListener(pkListener);
+                        pkListener = null;
+                        connection = null;
+                    }
+                }).start();
             }
-
-            pkListener = null;
-            connection = null;
         }
 
         @Override
-        public void connected(XMPPConnection xmppConnection) {}
+        public void connected(XMPPConnection xmppConnection) {xmppConnected(xmppConnection);}
         @Override
-        public void authenticated(XMPPConnection xmppConnection) {}
+        public void authenticated(XMPPConnection xmppConnection) {xmppAuthenticated(xmppConnection);}
         @Override
-        public void connectionClosed() {}
+        public void connectionClosed() {xmppConnectionClosed();}
         @Override
-        public void connectionClosedOnError(Exception e) {}
+        public void connectionClosedOnError(Exception e) {xmppConnectionClosedOnError(e);}
         @Override
-        public void reconnectingIn(int i) {}
+        public void reconnectingIn(int i) {xmppReconnectingIn(i);}
         @Override
-        public void reconnectionSuccessful() {}
+        public void reconnectionSuccessful() {xmppReconnectionSuccessful();}
         @Override
-        public void reconnectionFailed(Exception e) {}
+        public void reconnectionFailed(Exception e) {xmppReconnectionFailed(e);}
 
         /********************************************************
          * 获取（创建）LeafNode　对象
