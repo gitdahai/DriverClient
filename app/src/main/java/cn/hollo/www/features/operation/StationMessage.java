@@ -8,7 +8,7 @@ import cn.hollo.www.xmpp.IChatMessage;
  * 站点消息通知类
  */
 public class StationMessage implements IChatMessage {
-    private static final String message_type = "Station_Message";
+    private static final String messageType = "Notification";
     public String describe;       //站点的描述
     public String contract_id;    //合约编号
     public String vehicle_code;   //车辆编号
@@ -23,7 +23,7 @@ public class StationMessage implements IChatMessage {
         message.addBody("describe", describe);
         message.addBody("contract_id", contract_id);
         message.addBody("vehicle_code", vehicle_code);
-        message.addBody("message_type", message_type);
+        message.addBody("messageType", messageType);
         return message;
     }
 }

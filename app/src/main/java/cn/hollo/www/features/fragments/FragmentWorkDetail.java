@@ -245,8 +245,8 @@ public class FragmentWorkDetail extends FragmentBase{
                         passengerManager.addAllPassengers(getActivity(), workTaskDetails);
 
                         //发送消息给所有的乘客
-                        String vehicleCode = workTask.voiture_number;
-                        String message     = workTask.voiture_number + "车,开始发车";
+                        String vehicleCode = workTask.shuttle_name;
+                        String message     = workTask.shuttle_name + "车,开始发车";
                         passengerManager.sendMessageToPassenger(getActivity(), vehicleCode, message);
                     }
                 }
@@ -266,7 +266,7 @@ public class FragmentWorkDetail extends FragmentBase{
             PassengerManager manager = PassengerManager.getInstance();
 
             //发送消息
-            String vehicleCode = workTask.voiture_number;
+            String vehicleCode = workTask.shuttle_name;
             String message     = station.name + "站已经到达了";
             manager.sendMessageToPassenger(getActivity(), vehicleCode, message);
 
@@ -546,7 +546,7 @@ public class FragmentWorkDetail extends FragmentBase{
          */
         private void onResume(){
             workMapView.onResume();
-            ServiceManager manager = ServiceManager.getInstance();
+            ServiceManager manager = ServiceManager.getInstance(getActivity());
             manager.getLocationBinder(this);
         }
 

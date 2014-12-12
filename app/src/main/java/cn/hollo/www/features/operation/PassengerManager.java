@@ -117,7 +117,7 @@ public class PassengerManager {
         //生成发送任务,并且进行发送消息
         List<Passenger> passengers = readPassengerFromCursor(cursor);
         ChatTask task = new ChatTask(passengers, vehicleCode, message);
-        task.startTask();
+        task.startTask(context);
 
         //安全地关闭Cursor
         cursor.close();
@@ -164,15 +164,15 @@ public class PassengerManager {
         /**
          * 启动任务
          */
-        private void startTask(){
-            ServiceManager serviceManager = ServiceManager.getInstance();
+        private void startTask(final Context context){
+            ServiceManager serviceManager = ServiceManager.getInstance(context);
             serviceManager.getXmppBinder(new ServiceManager.OnXmppBinder(){
                 public void onBinder(XMPPService.XmppBinder binder) {
                     if (binder != null){
                         xmppManager = binder.getXMPPManager();
                         //当成功获取到xmppManager对象，则可以发送消息了
                         if (xmppManager != null)
-                            runTask();
+                            runTask(context);
                     }
                 }
             });
@@ -181,8 +181,8 @@ public class PassengerManager {
         /**
          * 运行任务，开始实际发送消息
          */
-        private void runTask(){
-            ServiceManager manager = ServiceManager.getInstance();
+        private void runTask(Context context){
+            ServiceManager manager = ServiceManager.getInstance(context);
             ThreadPool pool = manager.getThreadPool();
 
             if (pool == null){
@@ -190,6 +190,7 @@ public class PassengerManager {
                     throw new Exception("没有可用的任务执行线程!");
                 } catch (Exception e) {
                     e.printStackTrace();
+                    return;
                 }
             }
             else

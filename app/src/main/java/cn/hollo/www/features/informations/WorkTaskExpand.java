@@ -22,11 +22,11 @@ public class WorkTaskExpand extends WorkTask {
     public ContentValues getContentValues(){
         ContentValues values = new ContentValues();
         values.put(OpenHelperWorkTask.TASK_ID,              task_id);
-        values.put(OpenHelperWorkTask.VOITURE_NUMBER,       voiture_number);
-        values.put(OpenHelperWorkTask.VOITURE_TYPE,         voiture_type);
-        values.put(OpenHelperWorkTask.DEPARTURE_STATION,    departure_station);
-        values.put(OpenHelperWorkTask.DESTINATION_STATION,  destination_station);
-        values.put(OpenHelperWorkTask.DATE_TIME,            time);
+        values.put(OpenHelperWorkTask.VOITURE_NUMBER,       shuttle_name);
+        values.put(OpenHelperWorkTask.VOITURE_TYPE,         _type);
+        values.put(OpenHelperWorkTask.DEPARTURE_STATION,    departure);
+        values.put(OpenHelperWorkTask.DESTINATION_STATION,  destination);
+        values.put(OpenHelperWorkTask.DATE_TIME,            depart_at);
         values.put(OpenHelperWorkTask.TASK_STATE,           task_state);
         values.put(OpenHelperWorkTask.EXECUTE_INDEX,        execute_index);
         return values;
@@ -40,11 +40,11 @@ public class WorkTaskExpand extends WorkTask {
     public static WorkTaskExpand createWorkTaskExpand(Cursor cursor){
         WorkTaskExpand wte = new WorkTaskExpand();
         wte.task_id = cursor.getString(OpenHelperWorkTask.COL_INDEX_TASK_ID);
-        wte.voiture_number = cursor.getString(OpenHelperWorkTask.COL_INDEX_VOITURE_NUMBER);
-        wte.voiture_type = cursor.getString(OpenHelperWorkTask.COL_INDEX_VOITURE_TYPE);
-        wte.departure_station = cursor.getString(OpenHelperWorkTask.COL_INDEX_DEPARTURE_STATION);
-        wte.destination_station = cursor.getString(OpenHelperWorkTask.COL_INDEX_DESTINATION_STATION);
-        wte.time = cursor.getLong(OpenHelperWorkTask.COL_INDEX_DATE_TIME);
+        wte.shuttle_name = cursor.getString(OpenHelperWorkTask.COL_INDEX_VOITURE_NUMBER);
+        wte._type = cursor.getString(OpenHelperWorkTask.COL_INDEX_VOITURE_TYPE);
+        wte.departure = cursor.getString(OpenHelperWorkTask.COL_INDEX_DEPARTURE_STATION);
+        wte.destination = cursor.getString(OpenHelperWorkTask.COL_INDEX_DESTINATION_STATION);
+        wte.depart_at = cursor.getLong(OpenHelperWorkTask.COL_INDEX_DATE_TIME);
         wte.task_state = cursor.getInt(OpenHelperWorkTask.COL_INDEX_TASK_STATE);
         wte.execute_index = cursor.getInt(OpenHelperWorkTask.COL_INDEX_EXECUTE_INDEX);
         return wte;

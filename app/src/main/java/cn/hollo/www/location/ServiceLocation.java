@@ -137,7 +137,7 @@ public class ServiceLocation extends Service {
             */
             mLocationManagerProxy.requestLocationData(LocationProviderProxy.AMapNetwork, 5 * 1000, 15, this);
             //进行混合定位
-            //mLocationManagerProxy.setGpsEnable(false);
+            mLocationManagerProxy.setGpsEnable(false);
 
             isUpdate = true;
         }
@@ -184,6 +184,8 @@ public class ServiceLocation extends Service {
                     l.onLocationChanged(aMapLocation);
                 }
             }
+
+
         }
 
         @Override

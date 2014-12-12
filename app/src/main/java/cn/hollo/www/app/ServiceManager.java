@@ -6,13 +6,17 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
+import com.amap.api.location.AMapLocation;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.hollo.www.UserInfo;
 import cn.hollo.www.https.HttpManager;
 import cn.hollo.www.location.ServiceLocation;
+import cn.hollo.www.location.UploadLocation;
 import cn.hollo.www.thread_pool.ThreadPool;
+import cn.hollo.www.xmpp.XMPPManager;
 import cn.hollo.www.xmpp.XMPPService;
 
 /**
@@ -21,21 +25,26 @@ import cn.hollo.www.xmpp.XMPPService;
  */
 public class ServiceManager {
     private static ServiceManager instance;
+    private Context context;
     private ThreadPool threadPool;
     private ServiceLocation.LocationBinder  locationBinder; //位置服务Binder对象
     private XMPPService.XmppBinder          xmppBinder;     //xmpp服务的Binder对象
     private List<OnLocaBinder> locaBinders;
     private List<OnXmppBinder> xmppBinders;
 
-    private ServiceManager(){
+    private ServiceManager(Context context){
         locaBinders = new ArrayList<OnLocaBinder>();
         xmppBinders = new ArrayList<OnXmppBinder>();
-
+        this.context = context.getApplicationContext();
     };
 
-    public static ServiceManager getInstance(){
+    /*******************************************
+     * 返回该类的实例对象
+     * @return
+     */
+    public static ServiceManager getInstance(Context context){
         if (instance == null)
-            instance = new ServiceManager();
+            instance = new ServiceManager(context);
 
         return instance;
     }
@@ -96,9 +105,8 @@ public class ServiceManager {
     /**
      * 启动服务
      * 目前调用的位置在：用户登录成功后
-     * @param context
      */
-    public void startService(Context context){
+    public void startService(){
         //如果线程池对象不存在，则生成一个对象
         if (threadPool == null)
             threadPool = ThreadPool.getInstance();
@@ -132,15 +140,18 @@ public class ServiceManager {
     /**
      * 停止服务:
      * 目前停止的位置在：１退出应用时，　２在退出帐号时
-     * @param context
      */
-    public void stopService(Context context){
+    public void stopService(){
         //停止线程池
         threadPool.cancel();
         threadPool = null;
 
         Context ctx = context.getApplicationContext();
         try{
+            //移除定位数据监听器
+            if (locationBinder != null)
+                locationBinder.removeLocationListener("UploadLocation");
+
             ctx.unbindService(locaConnection);
             ctx.unbindService(xmppConnection);
 
@@ -165,6 +176,9 @@ public class ServiceManager {
                 olb.onBinder(locationBinder);
 
             locaBinders.clear();
+
+            //进行自动发布位置订阅信息
+            autoSendSubscribeLocation(locationBinder);
         }
 
         public void onServiceDisconnected(ComponentName name) {
@@ -189,6 +203,23 @@ public class ServiceManager {
             xmppBinder  = null;
         }
     };
+
+    /***********************************************
+     * 自动发送司机端的位置订阅信息
+     */
+    private void autoSendSubscribeLocation(ServiceLocation.LocationBinder locationBinder){
+        locationBinder.addLoactionListener("UploadLocation",new ServiceLocation.OnLocationListener(){
+            public void onLocationChanged(AMapLocation aMapLocation) {
+                if (xmppBinder != null){
+                    UploadLocation uploadLocation = UploadLocation.getInstance();
+                    UserInfo userInfo = UserInfo.getInstance(context);
+                    XMPPManager xmppManager = xmppBinder.getXMPPManager();
+                    uploadLocation.onLocationChanged(xmppManager, aMapLocation, userInfo.getUserId());
+                }
+            }
+        } );
+    }
+
     /***********************************************
      * 获取位置服务的Binder
      */

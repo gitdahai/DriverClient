@@ -91,6 +91,8 @@ public class XMPPManager {
     private void xmppAuthenticated(XMPPConnection xmppConnection){
         chatManager = ChatManager.getInstanceFor(xmppConnection);
         chatMessageListener = new ChatMessageListener();
+
+        System.out.println("===========user logined openfire=============");
     }
 
     /*********************************************************
@@ -177,7 +179,7 @@ public class XMPPManager {
         Chat chat = chatManager.getThreadChat(jid);
 
         if (chat == null)
-            chat = chatManager.createChat(jid, jid, chatMessageListener);
+            chat = chatManager.createChat(jid + "@" + XMPPConstant.OPENFIRE_DOMAIN, jid, chatMessageListener);
 
         return chat;
     }
@@ -187,7 +189,7 @@ public class XMPPManager {
      */
     private class ChatMessageListener implements MessageListener {
         public void processMessage(Chat chat, Message message) {
-
+            System.out.println("=============发送消息事件========　" + message.toString());
         }
     }
 

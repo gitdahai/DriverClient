@@ -9,7 +9,7 @@ public class HolloApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        ServiceManager SM = ServiceManager.getInstance();
+        ServiceManager SM = ServiceManager.getInstance(this);
         SM.createHttp(this);
     }
 }

@@ -93,8 +93,8 @@ public class ActivityFeatures extends ActivityBase {
         LoginConfig.saveLoginConfig(this, config);
 
         //停止服务
-        ServiceManager SM = ServiceManager.getInstance();
-        SM.stopService(this);
+        ServiceManager SM = ServiceManager.getInstance(this);
+        SM.stopService();
 
         //重新开启登录
         Intent intent = new Intent(this, ActivityLogin.class);

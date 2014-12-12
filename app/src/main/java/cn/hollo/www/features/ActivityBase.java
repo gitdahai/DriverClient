@@ -30,8 +30,8 @@ public class ActivityBase extends Activity {
             public void onClick(DialogInterface dialog, int which) {
                 if (which == DialogInterface.BUTTON_NEGATIVE){
                     closeAllActivity();
-                    ServiceManager SM = ServiceManager.getInstance();
-                    SM.stopService(ActivityBase.this);
+                    ServiceManager SM = ServiceManager.getInstance(ActivityBase.this);
+                    SM.stopService();
                 }
             }
         });

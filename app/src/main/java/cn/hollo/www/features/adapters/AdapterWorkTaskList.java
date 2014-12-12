@@ -82,11 +82,11 @@ public class AdapterWorkTaskList extends CursorAdapter{
 
         private void showData(WorkTaskExpand data){
             this.data = data;
-            voitureNumberText.setText(data.voiture_number);
-            voitureTypeNameText.setText(data.voiture_type);
-            departureStationText.setText(data.departure_station);
-            destinationStationText.setText(data.destination_station);
-            taskDateTimeText.setText(Util.createDateTime(data.time * 1000));
+            voitureNumberText.setText(data.shuttle_name);
+            voitureTypeNameText.setText(data._type);
+            departureStationText.setText(data.departure);
+            destinationStationText.setText(data.destination);
+            taskDateTimeText.setText(Util.createDateTime(data.depart_at * 1000));
 
             if (data.task_state == 0)
                 taskStateText.setText("未开启");

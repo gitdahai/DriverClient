@@ -9,11 +9,9 @@ import cn.hollo.www.xmpp.XMPPManager;
  * 地理位置信息上报
  *
  */
-public class UploadLocation implements ServiceLocation.OnLocationListener {
+public class UploadLocation{
     private  static UploadLocation instance;
     private XMPPManager xmppManager;
-    private String  id;
-
     private UploadLocation(){};
 
     /**
@@ -27,37 +25,28 @@ public class UploadLocation implements ServiceLocation.OnLocationListener {
         return instance;
     }
 
-    /**
-     * 设置订阅消息的id
-     * @param id
-     */
-    public void setId(String id){
-        this.id = id;
-    }
-
-    /**
-     * 设置xmpp服务对象
-     * @param manager
-     */
-    public void setXMPPManager(XMPPManager manager){
-        this.xmppManager = manager;
-    }
 
     /**
      * 释放资源
      */
     public void release(){
-        xmppManager = null;
         instance    = null;
     }
 
-    @Override
-    public void onLocationChanged(AMapLocation aMapLocation) {
-        if (xmppManager == null || aMapLocation == null || id == null)
+
+    /*************************************************
+     * 发送位置订阅
+     * @param xmppManager
+     * @param aMapLocation
+     */
+    public void onLocationChanged(XMPPManager xmppManager, AMapLocation aMapLocation, String jid) {
+        if (xmppManager == null || aMapLocation == null)
             return;
 
-        Subscribe subscribe = new Subscribe(aMapLocation.getLatitude(), aMapLocation.getLongitude());
+        Subscribe subscribe = new Subscribe(aMapLocation.getLatitude(), aMapLocation.getLongitude(), jid);
         xmppManager.sendSubscribe(subscribe);
+
+        System.out.println("==============已经发送了位置订阅信息====================");
     }
 
     /**************************************************
@@ -66,14 +55,16 @@ public class UploadLocation implements ServiceLocation.OnLocationListener {
     public class Subscribe implements ISubscribe {
         private double lat;
         private double lng;
+        private String jid;
 
-        Subscribe(double lat, double lng){
+        Subscribe(double lat, double lng, String jid){
             this.lat = lat;
             this.lng = lng;
+            this.jid = jid;
         }
 
         @Override
-        public String getId() {return id;}
+        public String getId() {return jid;}
         @Override
         public String getElementName() {return "location";}
         @Override

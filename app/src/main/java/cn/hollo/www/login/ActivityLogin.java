@@ -2,7 +2,6 @@ package cn.hollo.www.login;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,7 +15,6 @@ import cn.hollo.www.LoginConfig;
 import cn.hollo.www.R;
 import cn.hollo.www.UserInfo;
 import cn.hollo.www.app.ServiceManager;
-import cn.hollo.www.features.ActivityFeatures;
 import cn.hollo.www.https.HttpManager;
 import cn.hollo.www.https.HttpStringRequest;
 import cn.hollo.www.https.OnRequestListener;
@@ -180,14 +178,17 @@ public class ActivityLogin extends Activity{
                 UserInfo userInfo = UserInfo.getInstance(ActivityLogin.this);
                 ParserJson.parserUserInfo(response, userInfo);
                 //进入任务列表
-                Intent intent = new Intent(ActivityLogin.this, ActivityFeatures.class);
+                /*Intent intent = new Intent(ActivityLogin.this, ActivityFeatures.class);
                 intent.putExtra("Features", ActivityFeatures.Features.TaskList);
                 startActivity(intent);
-                finish();
+                finish();*/
 
                 //启动服务
-                ServiceManager SM = ServiceManager.getInstance();
-                SM.startService(ActivityLogin.this);
+                ServiceManager SM = ServiceManager.getInstance(ActivityLogin.this);
+                SM.startService();
+
+                //禁用登录按钮
+                loginButton.setEnabled(false);
             }
         }
     }
