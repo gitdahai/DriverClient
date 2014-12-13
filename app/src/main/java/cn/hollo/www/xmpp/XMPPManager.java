@@ -73,7 +73,7 @@ public class XMPPManager {
      * @param xmppConnection
      */
     private void xmppConnected(XMPPConnection xmppConnection){
-
+        System.out.println("===========xmpp已经链接=========");
     }
 
     /************************************************************
@@ -99,7 +99,7 @@ public class XMPPManager {
      * 重链成功
      */
     private void xmppReconnectionSuccessful(){
-
+        System.out.println("===========xmpp　重链成功=========");
     }
 
     /*********************************************************
@@ -107,7 +107,7 @@ public class XMPPManager {
      * @param i
      */
     private void xmppReconnectingIn(int i){
-
+        System.out.println("===========xmpp　重链中=========");
     }
 
     /*********************************************************
@@ -115,7 +115,7 @@ public class XMPPManager {
      * @param e
      */
     private void xmppReconnectionFailed(Exception e){
-
+        System.out.println("===========xmpp　重链失败=========");
     }
 
     /*********************************************************
@@ -123,6 +123,8 @@ public class XMPPManager {
      * @param e
      */
     private void xmppConnectionClosedOnError(Exception e){
+        System.out.println("===========xmpp　链接关闭异常========= ");
+        e.printStackTrace();
     }
 
     /********************************************************
@@ -143,7 +145,9 @@ public class XMPPManager {
             }
 
         } catch (SmackException.NotConnectedException e) {
+            System.out.println("----------xmpp　没有链接-----------");
             e.printStackTrace();
+            connectManager.open();
         } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
         } catch (XMPPException.XMPPErrorException e) {
@@ -159,8 +163,10 @@ public class XMPPManager {
             Chat chat = getChat(chartMessage.getTo());
 
             try {
-                if (chat != null)
-                    chat.sendMessage(chartMessage.getMessage());
+                if (chat != null){
+                    Message message = chartMessage.getMessage();
+                    chat.sendMessage(message);
+                }
 
                 System.out.println("===========发送消息成功============= " + chartMessage.getTo());
             } catch (SmackException.NotConnectedException e) {

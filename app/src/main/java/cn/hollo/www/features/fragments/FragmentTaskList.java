@@ -78,6 +78,8 @@ public class FragmentTaskList extends FragmentBase {
             if (code == 200){
                ParserUtil.parserWorkTasks(getActivity(), response);
             }
+
+            System.out.println("*********任务请求码*********** " + code);
         }
 
         @Override

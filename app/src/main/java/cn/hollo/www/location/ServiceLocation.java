@@ -184,8 +184,6 @@ public class ServiceLocation extends Service {
                     l.onLocationChanged(aMapLocation);
                 }
             }
-
-
         }
 
         @Override
