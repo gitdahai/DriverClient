@@ -42,13 +42,14 @@ import cn.hollo.www.R;
 import cn.hollo.www.UserInfo;
 import cn.hollo.www.app.ServiceManager;
 import cn.hollo.www.features.ActivityFeatures;
+import cn.hollo.www.features.DriverActions;
 import cn.hollo.www.features.FragmentBase;
 import cn.hollo.www.features.OnRouteSearchListenerImp;
 import cn.hollo.www.features.adapters.AdapterWorkDetail;
-import cn.hollo.www.features.operation.PassengerManager;
 import cn.hollo.www.features.informations.ParserUtil;
 import cn.hollo.www.features.informations.WorkTaskDetail;
 import cn.hollo.www.features.informations.WorkTaskExpand;
+import cn.hollo.www.features.operation.PassengerManager;
 import cn.hollo.www.features.params.RequestWorkTaskDetailParam;
 import cn.hollo.www.https.HttpManager;
 import cn.hollo.www.https.HttpStringRequest;
@@ -244,10 +245,10 @@ public class FragmentWorkDetail extends FragmentBase{
                         PassengerManager passengerManager = PassengerManager.getInstance();
                         passengerManager.addAllPassengers(getActivity(), workTaskDetails);
 
-                        //发送消息给所有的乘客
-                        String vehicleCode = workTask.shuttle_name;
-                        String message     = workTask.shuttle_name + "车,开始发车";
-                        passengerManager.sendMessageToPassenger(getActivity(), vehicleCode, message);
+                        //向服务器端发送车辆准备动作
+                        UserInfo userinfo = UserInfo.getInstance(getActivity());
+                        DriverActions action = new DriverActions();
+                        action.startAction(userinfo.getUserId(), workTask.task_id);
                     }
                 }
             });
@@ -257,7 +258,7 @@ public class FragmentWorkDetail extends FragmentBase{
         public void onActionInit(WorkTaskDetail.Station station) {
             workDetailMap.setCurrentStation(station);
             workTask.execute_index = adapter.getExecutionIndex();
-            //跟新状态
+            //跟新数据库中的状态状态
             workTask.update(getActivity());
         }
 
@@ -265,10 +266,15 @@ public class FragmentWorkDetail extends FragmentBase{
         public void onActionArrive(WorkTaskDetail.Station station) {
             PassengerManager manager = PassengerManager.getInstance();
 
-            //发送消息
-            String vehicleCode = workTask.shuttle_name;
+            //向openfire发送消息
+            /*String vehicleCode = workTask.shuttle_name;
             String message     = station.name + "站已经到达了";
-            manager.sendMessageToPassenger(getActivity(), vehicleCode, message);
+            manager.sendMessageToPassenger(getActivity(), vehicleCode, message);*/
+
+            //向服务器发送到达站点的动作
+            UserInfo userinfo = UserInfo.getInstance(getActivity());
+            DriverActions action = new DriverActions();
+            action.arriveAction(userinfo.getUserId(), workTask.task_id, station._id);
 
             //删除已经下车的乘客信息
             manager.deletePassengers(getActivity(), station.off_users);
@@ -290,6 +296,11 @@ public class FragmentWorkDetail extends FragmentBase{
 
         @Override
         public void onActionFinish(WorkTaskDetail.Station station) {
+            //向服务器发送任务完成的动作
+            DriverActions action = new DriverActions();
+            UserInfo userinfo = UserInfo.getInstance(getActivity());
+            action.finishedAction(userinfo.getUserId(), workTask.task_id);
+
             //更新数据库中的状态
             workTask.task_state = 2;
             workTask.execute_index = adapter.getExecutionIndex();

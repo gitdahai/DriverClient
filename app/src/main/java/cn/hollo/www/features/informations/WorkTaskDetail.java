@@ -21,7 +21,7 @@ public class WorkTaskDetail {
         public Location   location  = new Location();            //站点的经纬度
         public long arrived_at;                                  //到达时间
         public String name;                                      //站点名称
-
+        public String _id;                                       //站点的id
     }
 
     /*************************************************

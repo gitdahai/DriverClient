@@ -30,6 +30,8 @@ public class ParserUtil {
      * @return
      */
     public static void parserWorkTasks(Context context, String json){
+        System.out.println("==========task json=========== " + json);
+
         Type listType = new TypeToken<ArrayList <WorkTaskExpand>>(){}.getType();
         Gson gson = new Gson();
         ArrayList<WorkTaskExpand> list = gson.fromJson(json, listType);
@@ -73,6 +75,8 @@ public class ParserUtil {
      * @return
      */
     public static WorkTaskDetail parserWorkTaskDetail(String json){
+        System.out.println("==========detail json=========== " + json);
+
         WorkTaskDetail detail = null;
         //如果没有可解析的数据，则返回
         if (json == null || "".equals(json))
@@ -109,6 +113,10 @@ public class ParserUtil {
                     //解析站点名称
                     if (jStation.has("name") && !jStation.isNull("name"))
                         station.name = jStation.getString("name");
+
+                    //解析站点的id
+                    if (jStation.has("_id") && !jStation.isNull("_id"))
+                        station._id = jStation.getString("_id");
 
                     //解析位置信息
                     if (jStation.has("location") && !jStation.isNull("location")){
