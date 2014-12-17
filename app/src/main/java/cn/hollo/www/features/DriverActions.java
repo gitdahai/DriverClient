@@ -2,7 +2,7 @@ package cn.hollo.www.features;
 
 import cn.hollo.www.features.params.ActionArriveStationParam;
 import cn.hollo.www.features.params.ActionBusReadyParam;
-import cn.hollo.www.features.params.ActionWorkTaskDeleteParam;
+import cn.hollo.www.features.params.ActionTaskFinishedParam;
 import cn.hollo.www.https.HttpManager;
 import cn.hollo.www.https.HttpRequestParams;
 import cn.hollo.www.https.HttpStringRequest;
@@ -47,7 +47,7 @@ public class DriverActions implements OnRequestListener {
      * @param taskId
      */
     public void finishedAction(String userId, String taskId){
-        ActionWorkTaskDeleteParam deleteParam = new ActionWorkTaskDeleteParam();
+        ActionTaskFinishedParam deleteParam = new ActionTaskFinishedParam();
         deleteParam.user_id = userId;
         deleteParam.task_id = taskId;
         deleteParam.listener = this;

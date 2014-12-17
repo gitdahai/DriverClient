@@ -13,7 +13,7 @@ import cn.hollo.www.UserInfo;
 import cn.hollo.www.content_provider.OpenHelperWorkTask;
 import cn.hollo.www.content_provider.ProviderWorkTask;
 import cn.hollo.www.features.informations.WorkTaskExpand;
-import cn.hollo.www.features.params.ActionWorkTaskDeleteParam;
+import cn.hollo.www.features.params.ActionTaskFinishedParam;
 import cn.hollo.www.https.HttpManager;
 import cn.hollo.www.https.HttpStringRequest;
 import cn.hollo.www.https.OnRequestListener;
@@ -92,7 +92,7 @@ public class ServiceData extends Service {
         private void doDelete(Context context){
             //准备请求参数
             UserInfo userInfo = UserInfo.getInstance(context);
-            ActionWorkTaskDeleteParam param = new ActionWorkTaskDeleteParam();
+            ActionTaskFinishedParam param = new ActionTaskFinishedParam();
             param.task_id = wte.task_id;
             param.user_id = userInfo.getUserId();
             param.listener = this;

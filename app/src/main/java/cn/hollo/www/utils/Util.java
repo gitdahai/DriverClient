@@ -119,11 +119,10 @@ public class Util {
      * @return
      */
     public static String createDateTime(long time){
-        //TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));
         Calendar c = Calendar.getInstance();
-        c.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         c.setTimeInMillis(time);
-        SimpleDateFormat sFormat = new SimpleDateFormat("MM-dd  hh:mm");
+        c.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        SimpleDateFormat sFormat = new SimpleDateFormat("MM-dd  HH:mm");
         return sFormat.format(c.getTime());
     }
 
