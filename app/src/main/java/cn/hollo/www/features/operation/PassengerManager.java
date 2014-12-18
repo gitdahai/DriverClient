@@ -10,7 +10,7 @@ import cn.hollo.www.app.ServiceManager;
 import cn.hollo.www.content_provider.OpenHelperPassenger;
 import cn.hollo.www.content_provider.ProviderPassenger;
 import cn.hollo.www.features.informations.Passenger;
-import cn.hollo.www.features.informations.WorkTaskDetail;
+import cn.hollo.www.features.informations.StationInfo;
 import cn.hollo.www.thread_pool.ThreadPool;
 import cn.hollo.www.xmpp.XMPPManager;
 import cn.hollo.www.xmpp.XMPPService;
@@ -34,11 +34,11 @@ public class PassengerManager {
      * 添加乘客到数据库中
      * @param detail
      */
-    public void addAllPassengers(Context context, WorkTaskDetail detail){
-        List<WorkTaskDetail.Station> stations = detail.stations;
+    public void addAllPassengers(Context context, StationInfo detail){
+        List<StationInfo.Station> stations = detail.stations;
         List<Passenger> users = null;
 
-        for (WorkTaskDetail.Station station : stations){
+        for (StationInfo.Station station : stations){
             users = station.on_users;
 
             for (Passenger user : users)

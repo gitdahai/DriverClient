@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="2dp"
+    android:layout_weight="0.75"
+    android:orientation="vertical">
+    <!--高德地图-->
+    <com.amap.api.maps.MapView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/workDetailMapView">
+    </com.amap.api.maps.MapView>
+
+    <!--上下车人数显示-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="bottom|right">
+        <!--上车-->
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:textSize="26dp"
+            android:gravity="center"
+            android:lineSpacingExtra="6dp"
+            android:id="@+id/onBusPopulationText"
+            android:textColor="@color/color_white"
+            android:background="@color/color_green"
+            android:text="上车10人"/>
+
+        <!--下车-->
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="1dp"
+            android:textSize="26dp"
+            android:gravity="center"
+            android:lineSpacingExtra="6dp"
+            android:id="@+id/offBusPopulationText"
+            android:textColor="@color/color_white"
+            android:background="@color/color_red"
+            android:text="下车10人"/>
+    </LinearLayout>
+
+    <!--显示当前选择的地址-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:id="@+id/showStationText"
+        android:background="@color/color_gray_half"
+        android:textColor="@color/color_white"
+        android:singleLine="true"
+        android:gravity="center"
+        android:textSize="18dp"/>
+
+</FrameLayout>

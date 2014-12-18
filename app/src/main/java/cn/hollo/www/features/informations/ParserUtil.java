@@ -32,15 +32,15 @@ public class ParserUtil {
     public static void parserWorkTasks(Context context, String json){
         System.out.println("==========task json=========== " + json);
 
-        Type listType = new TypeToken<ArrayList <WorkTaskExpand>>(){}.getType();
+        Type listType = new TypeToken<ArrayList <MissionInfo>>(){}.getType();
         Gson gson = new Gson();
-        ArrayList<WorkTaskExpand> list = gson.fromJson(json, listType);
+        ArrayList<MissionInfo> list = gson.fromJson(json, listType);
 
         //进行数据库插入
         ContentResolver resolver = context.getContentResolver();
         String selection = OpenHelperWorkTask.TASK_ID + "=?";
         String[] selectionArgs = new String[1];
-        WorkTaskExpand workTask = null;
+        MissionInfo workTask = null;
         Cursor cursor = null;
         int count = 0;
 
@@ -74,17 +74,17 @@ public class ParserUtil {
      * @param json
      * @return
      */
-    public static WorkTaskDetail parserWorkTaskDetail(String json){
+    public static StationInfo parserWorkTaskDetail(String json){
         System.out.println("==========detail json=========== " + json);
 
-        WorkTaskDetail detail = null;
+        StationInfo detail = null;
         //如果没有可解析的数据，则返回
         if (json == null || "".equals(json))
             return null;
 
         try {
             JSONObject jDetail = new JSONObject(json);
-            detail = new WorkTaskDetail();
+            detail = new StationInfo();
             //解析路线id
             if (jDetail.has("path_id") && !jDetail.isNull("path_id"))
                 detail.path_id = jDetail.getString("path_id");
@@ -98,7 +98,7 @@ public class ParserUtil {
                 JSONArray jStations = jDetail.getJSONArray("stations");
                 int size = jStations.length();
 
-                WorkTaskDetail.Station   station = null;
+                StationInfo.Station   station = null;
                 JSONObject              jStation = null;
 
                 //循环解析站点数据
@@ -152,7 +152,7 @@ public class ParserUtil {
      * @param jLocation
      * @param location
      */
-    private static void parserLocation(JSONArray jLocation, WorkTaskDetail.Location location) throws JSONException {
+    private static void parserLocation(JSONArray jLocation, StationInfo.Location location) throws JSONException {
         location.lng = jLocation.getDouble(0);
         location.lat = jLocation.getDouble(1);
     }

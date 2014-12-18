@@ -12,7 +12,7 @@ import java.util.List;
 import cn.hollo.www.UserInfo;
 import cn.hollo.www.content_provider.OpenHelperWorkTask;
 import cn.hollo.www.content_provider.ProviderWorkTask;
-import cn.hollo.www.features.informations.WorkTaskExpand;
+import cn.hollo.www.features.informations.MissionInfo;
 import cn.hollo.www.features.params.ActionTaskFinishedParam;
 import cn.hollo.www.https.HttpManager;
 import cn.hollo.www.https.HttpStringRequest;
@@ -23,12 +23,12 @@ import cn.hollo.www.https.OnRequestListener;
  * 数据维护服务
  */
 public class ServiceData extends Service {
-    private List<WorkTaskExpand> wtes;
+    private List<MissionInfo> wtes;
 
     public void onCreate() {
         super.onCreate();
 
-        wtes = new ArrayList<WorkTaskExpand>();
+        wtes = new ArrayList<MissionInfo>();
         String selection = OpenHelperWorkTask.TASK_STATE + "=?";
         String[] selectionArgs = {"2"};
 
@@ -45,10 +45,10 @@ public class ServiceData extends Service {
             return;
         }
 
-        WorkTaskExpand wte = null;
+        MissionInfo wte = null;
 
         while (cursor.moveToNext()){
-            wte = WorkTaskExpand.createWorkTaskExpand(cursor);
+            wte = MissionInfo.createWorkTaskExpand(cursor);
             wtes.add(wte);
         }
 
@@ -72,7 +72,7 @@ public class ServiceData extends Service {
      */
     private void execute(){
         if (wtes.size() > 0){
-            WorkTaskExpand wte = wtes.remove(0);
+            MissionInfo wte = wtes.remove(0);
             new Deletion(wte).doDelete(this);
         }
         else
@@ -83,9 +83,9 @@ public class ServiceData extends Service {
      * 删除数据
      */
     private class Deletion implements OnRequestListener{
-        private WorkTaskExpand wte;
+        private MissionInfo wte;
 
-        private Deletion(WorkTaskExpand wte){
+        private Deletion(MissionInfo wte){
             this.wte = wte;
         }
 

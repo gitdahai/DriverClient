@@ -1,11 +1,11 @@
 package cn.hollo.www.features.fragments;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import cn.hollo.www.features.FragmentBase;
 import cn.hollo.www.R;
 
 /**
@@ -13,7 +13,7 @@ import cn.hollo.www.R;
  * 忘记密码
  *
  */
-public class FragmentForgotPassword extends FragmentBase {
+public class FragmentForgotPassword extends Fragment {
     public static FragmentForgotPassword newInstance(){
         return new FragmentForgotPassword();
     }

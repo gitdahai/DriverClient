@@ -16,7 +16,7 @@ import cn.hollo.www.LoginConfig;
 import cn.hollo.www.R;
 import cn.hollo.www.UserInfo;
 import cn.hollo.www.app.ServiceManager;
-import cn.hollo.www.features.ActivityFeatures;
+import cn.hollo.www.features.activities.ActivityMissionList;
 import cn.hollo.www.https.HttpManager;
 import cn.hollo.www.https.HttpStringRequest;
 import cn.hollo.www.https.OnRequestListener;
@@ -179,15 +179,15 @@ public class ActivityLogin extends Activity{
                 //解析登录用户信息
                 UserInfo userInfo = UserInfo.getInstance(ActivityLogin.this);
                 ParserJson.parserUserInfo(response, userInfo);
-                //进入任务列表
-                Intent intent = new Intent(ActivityLogin.this, ActivityFeatures.class);
-                intent.putExtra("Features", ActivityFeatures.Features.TaskList);
-                startActivity(intent);
-                finish();
 
                 //启动服务
                 ServiceManager SM = ServiceManager.getInstance(ActivityLogin.this);
                 SM.startService();
+
+                //进入任务列表
+                Intent intent = new Intent(ActivityLogin.this, ActivityMissionList.class);
+                startActivity(intent);
+                finish();
             }
         }
     }

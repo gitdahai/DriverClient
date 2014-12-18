@@ -25,11 +25,17 @@
 
         <!--功能-->
         <activity
-            android:name=".features.ActivityFeatures"
+            android:name=".features.activities.ActivityMissionList"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             android:configChanges="orientation|keyboardHidden"/>
 
+        <!--站点路线信息:任务的详情-->
+        <activity
+            android:name=".features.activities.ActivityMissionExecution"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
 
         <!--删除数据服务-->
         <service

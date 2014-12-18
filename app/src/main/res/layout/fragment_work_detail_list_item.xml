@@ -2,14 +2,14 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/button_background_selector_gray">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="8dp"
         android:gravity="center_vertical"
-        android:background="@drawable/button_background_selector_gray"
         android:orientation="horizontal">
         <!--到达按钮-->
         <Button
