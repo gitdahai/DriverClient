@@ -10,15 +10,27 @@ import cn.hollo.www.features.informations.StationInfo;
  */
 public interface IDriverActions {
     /**
+     * 初始站点
+     * @param stations
+     */
+    public void onInitMission(List<StationInfo.Station> stations);
+
+    /**
      * 开始任务
      */
-    public void onStartMission(List<StationInfo.Station> stations);
+    public void onStartMission(StationInfo.Station station);
 
     /**
      * 到达站点
      * @param station
      */
     public void onArrivingStation(StationInfo.Station station);
+
+    /**
+     * 将要到达的下一个站点
+     * @param station
+     */
+    public void onNextArrivingStation(StationInfo.Station station);
 
     /**
      * 完成任务

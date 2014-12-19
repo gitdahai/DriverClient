@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
@@ -16,8 +17,12 @@ import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.maps.model.Polyline;
+import com.amap.api.maps.model.PolylineOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.hollo.www.R;
@@ -87,19 +92,59 @@ public class FragmentMissionMap extends FragmentBase {
     }
 
     @Override
-    public void onStartMission(List<StationInfo.Station>  stations) {
+    public void onInitMission(List<StationInfo.Station> stations) {
+        if (missionMap == null || stations == null || stations.size() == 0)
+            return;
 
+        //绘制站点的markers
+        missionMap.drawStationMarkers(stations);
+    }
+
+    @Override
+    public void onStartMission(StationInfo.Station  station) {
+        if (missionMap == null || station == null)
+            return;
+
+        //保存站点的位置坐标数据
+        missionMap.stationLat = station.location.lat;
+        missionMap.stationLng = station.location.lng;
+        //绘制车辆--站点连线
+        missionMap.drawDottedLine();
+
+        //显示上下车人数
+        missionMap.onBusPopulationText.setVisibility(View.VISIBLE);
+        missionMap.offBusPopulationText.setVisibility(View.VISIBLE);
+        
+        //显示上下车人数
+        missionMap.showPassengers(station.on_users.size(), station.off_users.size());
     }
 
     @Override
     public void onArrivingStation(StationInfo.Station station) {
+        if (missionMap == null || station == null)
+            return;
+    }
 
+    @Override
+    public void onNextArrivingStation(StationInfo.Station station) {
+        if (missionMap == null || station == null)
+            return;
+
+        missionMap.stationLat = station.location.lat;
+        missionMap.stationLng = station.location.lng;
+
+        //绘制车辆--站点连线
+        missionMap.drawDottedLine();
+
+        //显示上下车人数
+        missionMap.showPassengers(station.on_users.size(), station.off_users.size());
     }
 
     @Override
     public void onFinishMission() {
 
     }
+
 
     /*************************************************
      * 得到位置服务binder对象
@@ -124,7 +169,14 @@ public class FragmentMissionMap extends FragmentBase {
 
         private AMap aMap;
         private UiSettings uiSettings;
+        private Polyline   polyline;
         private LocationSource.OnLocationChangedListener onLocationChangedListener;
+
+
+        private double stationLat;  //站点当前的维度
+        private double stationLng;  //站点当前的经度
+        private double vehicleLat;  //车辆的当前维度
+        private double vehicleLng;  //车辆的当前经度
 
         /*********************************************
          *
@@ -211,6 +263,13 @@ public class FragmentMissionMap extends FragmentBase {
                 //更新自己的位置
                 if (onLocationChangedListener != null)
                     onLocationChangedListener.onLocationChanged(aMapLocation);
+
+                //保存当前的经纬度
+                vehicleLat = aMapLocation.getLatitude();
+                vehicleLng = aMapLocation.getLongitude();
+
+                //绘制车辆和站点位置之间的虚线
+                drawDottedLine();
             }
         };
 
@@ -222,13 +281,76 @@ public class FragmentMissionMap extends FragmentBase {
             public void deactivate() {}
         };
 
+        /*********************************************
+         * 显示上下车人数
+         * @param on    ：上车人数
+         * @param off   ：下车人数
+         */
+        private void showPassengers(int on, int off){
+            onBusPopulationText.setText("上车\n" + on + "人");
+            offBusPopulationText.setText("下车\n" + off + "人");
+        }
 
-
-        /******************************************************
+        /****************************************************
          * 绘制动态的车辆和选中站点之间的线段
          */
-        private void drawTrendsVehicleToStationLine(LatLng latlng){
+        private void drawDottedLine(){
+            if (vehicleLat < 1 || vehicleLng < 1 || stationLat < 1 || stationLng < 1)
+                return;
 
+            LatLng stationLatLng = new LatLng(stationLat, stationLng);
+            LatLng vehicleLatLng = new LatLng(vehicleLat, vehicleLng);
+
+            //如果连线对象不为null，则需要移除上一次的绘制结果
+            if (polyline != null)
+                polyline.remove();
+
+            PolylineOptions pOption = new PolylineOptions();
+            pOption.add(vehicleLatLng, stationLatLng);
+            pOption.width(5.0f);
+            //pOption.color(resources.getColor(R.color.color_red));
+            pOption.setDottedLine(true);
+            pOption.geodesic(true);
+            pOption.visible(true);
+
+            polyline = aMap.addPolyline(pOption);
+
+            //缩放图层
+            List<LatLng> latLngs = new ArrayList<LatLng>();
+            latLngs.add(vehicleLatLng);
+            latLngs.add(stationLatLng);
+            zoomLatpngBounds(latLngs);
+        }
+
+
+        /****************************************************
+         * 绘制站点marker标记
+         * @param stations
+         */
+        private void drawStationMarkers(List<StationInfo.Station> stations){
+            int size = stations.size();
+            ArrayList<MarkerOptions> options = new ArrayList<MarkerOptions>();
+            StationInfo.Station station = null;
+            MarkerOptions option = null;
+            LatLng latLng = null;
+
+            for (int i=0; i<size; i++){
+                station = stations.get(i);
+                latLng = new LatLng(station.location.lat, station.location.lng);
+                //绘制起点站点marker
+                if (i == 0)
+                    option = createMarkerOptions(R.drawable.ic_station_start, station.name, latLng);
+                //绘制终点站点marker
+                else if (i == size-1)
+                    option = createMarkerOptions(R.drawable.ic_station_end, station.name, latLng);
+                //绘制途径站点merker
+                else
+                    option = createMarkerOptions(R.drawable.ic_station_other, station.name, latLng);
+
+                options.add(option);
+            }
+
+            aMap.addMarkers(options, true);
         }
 
         /****************************************************
@@ -245,6 +367,41 @@ public class FragmentMissionMap extends FragmentBase {
             LatLngBounds bounds = builder.build();
 
             return bounds;
+        }
+
+        /*****************************************************
+         * 生成一个MarkerOptions对象
+         * @param icon
+         * @return
+         */
+        private MarkerOptions createMarkerOptions(int icon, String title, LatLng latlng){
+            MarkerOptions options = new MarkerOptions();
+            //定义marker 图标的锚点为中心点
+            options.anchor(0.5f, 1.0f);
+            //设置标记是禁止拖动
+            options.draggable(false);
+            //添加该marker的icon
+            options.icon(BitmapDescriptorFactory.fromResource(icon));
+            //当用户点击标记，在信息窗口上显示的字符串
+            options.title(title);
+            //首先禁止显示
+            options.visible(true);
+            //设置位置参数
+            options.position(latlng);
+            //设置标记的近大远小效果，在marker初始化时使用。
+            // 当地图倾斜时，远方的标记变小，附近的标记变大
+            options.perspective(true);
+            return options;
+        }
+
+        /****************************************************
+         * 缩放当前的图层
+         * @param latLngs
+         */
+        private void zoomLatpngBounds(List<LatLng> latLngs){
+            LatLngBounds bounds = getLatLngBounds(latLngs);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 100);
+            aMap.moveCamera(cameraUpdate);
         }
     }
 }

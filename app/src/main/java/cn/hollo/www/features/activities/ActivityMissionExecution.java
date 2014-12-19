@@ -35,15 +35,17 @@ public class ActivityMissionExecution extends ActivityBase {
         Bundle mBundle = intent.getExtras();
 
         fragmentMissionDetail = new FragmentMission();
+        fragmentMissionWindow = new FragmentMissionWindow();
         fragmentMissionDetail.setArguments(mBundle);
+
+        //关联动作
+        fragmentMissionDetail.setIDriverActions(fragmentMissionWindow);
 
         //添加任务的站点列表
         FragmentTransaction ft = this.getFragmentManager().beginTransaction();
         ft.replace(R.id.stations, fragmentMissionDetail);
 
         //添加任务操作窗口
-        //ft = this.getFragmentManager().beginTransaction();
-        fragmentMissionWindow = new FragmentMissionWindow();
         ft.replace(R.id.missionWindow, fragmentMissionWindow).commit();
     }
 

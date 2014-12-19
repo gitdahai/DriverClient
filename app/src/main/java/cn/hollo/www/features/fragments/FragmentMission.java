@@ -117,14 +117,20 @@ public class FragmentMission extends Fragment {
                 if (stationInfo != null && stationInfo.stations.size() > 0){
                     //刷新任务列表
                     this.flushListView(stationInfo);
+                    //初始站点
+                    actions.onInitMission(stationInfo.stations);
 
                     //如果状态是一个“新任务”则开启“开始任务”按钮
                     if (missionInfo.task_state == 0)
                         startMission.setEnabled(true);
 
                     //如果是已经执行过的任务，则进行状态的设定
-                    else if (missionInfo.task_state == 1)
+                    else if (missionInfo.task_state == 1){
                         adapter.setStartStation(missionInfo.execute_index);
+                        //设置从那个站点开始
+                        StationInfo.Station station = stationInfo.stations.get(missionInfo.execute_index);
+                        actions.onStartMission(station);
+                    }
                 }
             }
         }
@@ -170,7 +176,7 @@ public class FragmentMission extends Fragment {
 
             //发送“开始任务”的动作
             if (actions != null)
-                actions.onStartMission(stationInfo.stations);
+                actions.onStartMission(stationInfo.stations.get(0));
         }
 
         /************************************************
@@ -179,8 +185,13 @@ public class FragmentMission extends Fragment {
          */
         private void onStationArrived(int position, StationInfo.Station station){
             //发送“到达动作”事件
-            if (actions != null)
+            if (actions != null){
                 actions.onArrivingStation(station);
+
+                //触发下一个站点的动作
+                if (position + 1 < stationInfo.stations.size())
+                    actions.onNextArrivingStation(stationInfo.stations.get(position + 1));
+            }
 
             //任务完成
             if (position == stationInfo.stations.size() - 1){

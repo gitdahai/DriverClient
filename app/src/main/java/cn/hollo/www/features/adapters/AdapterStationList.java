@@ -140,6 +140,11 @@ public class AdapterStationList extends BaseAdapter {
      * 到达按钮产生的事件
      */
     public interface OnActionArriveListener{
+        /**
+         * 到达的站点动作
+         * @param pos
+         * @param station
+         */
         public void onActionArrive(int pos, StationInfo.Station station);
     }
 }

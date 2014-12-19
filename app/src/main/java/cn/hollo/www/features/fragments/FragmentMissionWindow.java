@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 import cn.hollo.www.R;
 import cn.hollo.www.custom_view.PagerSlidingTabStrip;
 import cn.hollo.www.features.FragmentBase;
@@ -35,10 +37,18 @@ public class FragmentMissionWindow extends FragmentBase {
     }
 
     @Override
-    public void onStartMission() {
+    public void onInitMission(List<StationInfo.Station> stations) {
         if (missionWindow != null){
-            missionWindow.fragments[0].onStartMission();
-            missionWindow.fragments[1].onStartMission();
+            missionWindow.fragments[0].onInitMission(stations);
+            missionWindow.fragments[1].onInitMission(stations);
+        }
+    }
+
+    @Override
+    public void onStartMission(StationInfo.Station station) {
+        if (missionWindow != null){
+            missionWindow.fragments[0].onStartMission(station);
+            missionWindow.fragments[1].onStartMission(station);
         }
     }
 
@@ -47,6 +57,14 @@ public class FragmentMissionWindow extends FragmentBase {
         if (missionWindow != null){
             missionWindow.fragments[0].onArrivingStation(station);
             missionWindow.fragments[1].onArrivingStation(station);
+        }
+    }
+
+    @Override
+    public void onNextArrivingStation(StationInfo.Station station) {
+        if (missionWindow != null){
+            missionWindow.fragments[0].onNextArrivingStation(station);
+            missionWindow.fragments[1].onNextArrivingStation(station);
         }
     }
 

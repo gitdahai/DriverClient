@@ -11,13 +11,24 @@ import cn.hollo.www.features.informations.StationInfo;
  * Created by orson on 14-11-24.
  */
 public class FragmentBase extends Fragment implements IDriverActions {
+
     @Override
-    public void onStartMission(List<StationInfo.Station> stations) {
+    public void onInitMission(List<StationInfo.Station> stations) {
+
+    }
+
+    @Override
+    public void onStartMission(StationInfo.Station station) {
 
     }
 
     @Override
     public void onArrivingStation(StationInfo.Station station) {
+
+    }
+
+    @Override
+    public void onNextArrivingStation(StationInfo.Station station) {
 
     }
 
