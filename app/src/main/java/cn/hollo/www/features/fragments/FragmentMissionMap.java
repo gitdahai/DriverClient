@@ -114,7 +114,7 @@ public class FragmentMissionMap extends FragmentBase {
         //显示上下车人数
         missionMap.onBusPopulationText.setVisibility(View.VISIBLE);
         missionMap.offBusPopulationText.setVisibility(View.VISIBLE);
-        
+
         //显示上下车人数
         missionMap.showPassengers(station.on_users.size(), station.off_users.size());
     }
