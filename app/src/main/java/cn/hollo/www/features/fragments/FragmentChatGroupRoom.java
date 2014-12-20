@@ -13,6 +13,7 @@ import android.widget.ImageView;
 
 import cn.hollo.www.R;
 import cn.hollo.www.features.FragmentBase;
+import cn.hollo.www.features.activities.MessageExportHelper;
 import cn.hollo.www.utils.Util;
 import cn.hollo.www.voice.SpeechVoiceDialog;
 import cn.hollo.www.voice.SpeechVoiceRecorder;
@@ -22,7 +23,15 @@ import cn.hollo.www.voice.SpeechVoiceRecorder;
  * 群组聊天页面
  */
 public class FragmentChatGroupRoom extends FragmentBase {
-    /**
+    private MessageExportHelper exportHelper;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        exportHelper = new MessageExportHelper(getActivity(), "roomId");
+    }
+
+    /***************************************************************
      *
      * @param inflater
      * @param container
@@ -35,6 +44,11 @@ public class FragmentChatGroupRoom extends FragmentBase {
         return view;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        exportHelper.release();
+    }
 
     /*****************************************************************
      * 聊天信息输入模式控制者
@@ -133,6 +147,7 @@ public class FragmentChatGroupRoom extends FragmentBase {
          */
         private void onSendMessage(){
             String text = messageInput.getText().toString();
+            exportHelper.exportText(text);
         }
 
         /**============================================
