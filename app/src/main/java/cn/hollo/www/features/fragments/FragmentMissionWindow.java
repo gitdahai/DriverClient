@@ -81,7 +81,7 @@ public class FragmentMissionWindow extends FragmentBase {
      */
     private class MissionWindow{
         private final String[] titles = {"群聊", "地图"};
-        private final FragmentBase[] fragments = {new FragmentGroupChat(), new FragmentMissionMap()};
+        private final FragmentBase[] fragments = {new FragmentChatGroupRoom(), new FragmentMissionMap()};
         private ViewPager fragmentViewpager;
         private PagerSlidingTabStrip pagerSliding;
         private FragmentStatePagerAdapter viewPagerAdapter;

@@ -46,7 +46,7 @@ public class UploadLocation{
         Subscribe subscribe = new Subscribe(aMapLocation.getLatitude(), aMapLocation.getLongitude(), jid);
         xmppManager.sendSubscribe(subscribe);
 
-        System.out.println("==============已经发送了位置订阅信息====================");
+        //System.out.println("==============已经发送了位置订阅信息====================");
     }
 
     /**************************************************

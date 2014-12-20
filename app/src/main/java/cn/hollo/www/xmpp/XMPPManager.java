@@ -1,5 +1,7 @@
 package cn.hollo.www.xmpp;
 
+import android.util.Log;
+
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
@@ -14,6 +16,8 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
+import org.jivesoftware.smackx.muc.InvitationListener;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.pubsub.AccessModel;
 import org.jivesoftware.smackx.pubsub.ConfigureForm;
 import org.jivesoftware.smackx.pubsub.FormType;
@@ -66,6 +70,30 @@ public class XMPPManager {
             connectManager.close();
 
         connectManager = null;
+    }
+
+    /*************************************************************
+     * 来自某个聊天室的邀请事件
+     * @param conn
+     * @param room
+     * @param inviter
+     * @param reason
+     * @param password
+     * @param message
+     */
+    private void xmppInvitationReceived(XMPPConnection conn, String room, String inviter, String reason, String password, Message message){
+        MultiUserChat muc = new MultiUserChat(conn, room);
+
+        try {
+            muc.join(connectManager.openfirLogianName);
+            System.out.println("===========xmpp 邀请加入聊天室=========");
+        } catch (SmackException.NoResponseException e) {
+            Log.w("HL-DEBUG", e);
+        } catch (XMPPException.XMPPErrorException e) {
+            Log.w("HL-DEBUG",e);
+        } catch (SmackException.NotConnectedException e) {
+            Log.w("HL-DEBUG",e);
+        }
     }
 
     /*************************************************************
@@ -195,7 +223,7 @@ public class XMPPManager {
      */
     private class ChatMessageListener implements MessageListener {
         public void processMessage(Chat chat, Message message) {
-            System.out.println("=============发送消息事件========　" + message.toString());
+            //System.out.println("=============发送消息事件========　" + message.toString());
         }
     }
 
@@ -218,7 +246,7 @@ public class XMPPManager {
     /***********************************************************
      * xmpp链接管理类
      */
-    private class XmppConnectManager extends Thread implements ConnectionListener {
+    private class XmppConnectManager extends Thread implements ConnectionListener, InvitationListener{
         private String openfirLogianName;
         private String openfirLoginPassword;
         private XMPPConnection connection;
@@ -249,6 +277,7 @@ public class XMPPManager {
             connection.addPacketListener(pkListener, new MessageTypeFilter(Message.Type.groupchat));
             connection.addPacketListener(pkListener, new MessageTypeFilter(Message.Type.error));
             connection.addPacketListener(pkListener, new MessageTypeFilter(Message.Type.headline));
+            MultiUserChat.addInvitationListener(connection, this);
         }
 
         /**
@@ -324,6 +353,10 @@ public class XMPPManager {
         public void reconnectionSuccessful() {xmppReconnectionSuccessful();}
         @Override
         public void reconnectionFailed(Exception e) {xmppReconnectionFailed(e);}
+        @Override
+        public void invitationReceived(XMPPConnection xmppConnection, String room, String inviter, String reason, String password, Message message) {
+            xmppInvitationReceived(xmppConnection, room, inviter, reason, password, message);
+        }
 
         /********************************************************
          * 获取（创建）LeafNode　对象
@@ -356,5 +389,7 @@ public class XMPPManager {
 
             return pubNode;
         }
+
+
     }
 }

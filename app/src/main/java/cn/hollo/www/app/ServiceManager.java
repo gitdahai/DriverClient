@@ -144,7 +144,7 @@ public class ServiceManager {
     public void stopService(){
         //停止线程池
         threadPool.cancel();
-        threadPool = null;
+        //threadPool = null;
 
         Context ctx = context.getApplicationContext();
         try{
