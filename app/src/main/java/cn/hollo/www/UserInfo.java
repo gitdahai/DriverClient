@@ -11,6 +11,7 @@ public class UserInfo {
     private static UserInfo instance;
     private String userId;
     private String userPassword;
+    private String userName;
 
     private SharedPreferences spf;
 
@@ -29,19 +30,36 @@ public class UserInfo {
 
     public String getUserId() {return userId;}
     public String getUserPassword(){return userPassword;}
+    public String getUserName(){return userName;}
 
-
+    /*****************************************************
+     * 保存用户的id
+     * @param userId
+     */
     public void setUserId(String userId) {
         this.userId = userId;
         saveField("UserId", userId);
     }
 
+    /*****************************************************
+     * 保存密码
+     * @param password
+     */
     public void setUserPassword(String password){
         this.userPassword = password;
         saveField("UserPassword", password);
     }
 
-    /**
+    /******************************************************
+     * 保存名称
+     * @param userName
+     */
+    public void setUserName(String userName){
+        this.userName = userName;
+        saveField("UserName", userName);
+    }
+
+    /**====================================================
      * 保存字段
      * @param key
      * @param value

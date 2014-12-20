@@ -29,6 +29,9 @@ public class ParserJson {
             if (jObj.has("openfire_key") && !jObj.isNull("openfire_key"))
                 userInfo.setUserPassword(jObj.getString("openfire_key"));
 
+            //用户的昵称
+            if (jObj.has("name") && !jObj.isNull("name"))
+                userInfo.setUserName(jObj.getString("name"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -37,6 +37,7 @@ public class XMPPManager {
     private static XMPPManager instance;
     private XmppConnectManager connectManager;
     private ChatManager        chatManager;
+    private MultiUserChatManager multiUserChatManager;
     private ChatMessageListener chatMessageListener;
 
     private XMPPManager(){}
@@ -108,7 +109,12 @@ public class XMPPManager {
      * 链接已经断开
      */
     private void xmppConnectionClosed(){
+        //清空群组聊天管理对象
+        if (multiUserChatManager != null)
+            multiUserChatManager.clear();
+
         chatManager = null;
+        multiUserChatManager = null;
         chatMessageListener = null;
     }
 
@@ -118,6 +124,7 @@ public class XMPPManager {
      */
     private void xmppAuthenticated(XMPPConnection xmppConnection){
         chatManager = ChatManager.getInstanceFor(xmppConnection);
+        multiUserChatManager = new MultiUserChatManager();
         chatMessageListener = new ChatMessageListener();
 
         System.out.println("===========user logined openfire=============");
@@ -205,6 +212,25 @@ public class XMPPManager {
     }
 
     /**********************************************************
+     * 发送群组聊天信息
+     * @param chartMessage
+     */
+    public void sendMultiUserChat(IChatMessage chartMessage){
+        String to = chartMessage.getTo();
+        String userId = chartMessage.getMessage().getSubject("userId");
+        MultiUserChat muc = getMultiUserChat(to, userId);
+
+        try {
+            if (muc != null)
+                muc.sendMessage(chartMessage.getMessage());
+        } catch (XMPPException e) {
+            e.printStackTrace();
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**********************************************************
      * 获取当前chat对象
      * @param jid
      * @return
@@ -216,6 +242,20 @@ public class XMPPManager {
             chat = chatManager.createChat(jid + "@" + XMPPConstant.OPENFIRE_DOMAIN, jid, chatMessageListener);
 
         return chat;
+    }
+
+    /***********************************************************
+     * 获取群组聊天对象
+     * @param roomJid
+     * @return
+     */
+    private MultiUserChat getMultiUserChat(String roomJid, String userId){
+        MultiUserChat muc = multiUserChatManager.getMultiUserChat(roomJid);
+
+        if (muc == null)
+            muc = multiUserChatManager.createMultiUserChat(connectManager.connection, roomJid, userId);
+
+        return muc;
     }
 
     /**********************************************************

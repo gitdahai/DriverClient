@@ -132,7 +132,7 @@ public class FragmentChatGroupRoom extends FragmentBase {
          * 发送文本信息
          */
         private void onSendMessage(){
-
+            String text = messageInput.getText().toString();
         }
 
         /**============================================
