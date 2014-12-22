@@ -22,11 +22,10 @@ public class MessageVoice extends MessageContent implements IChatMessage {
     public Message getMessage() {
         Message message = new Message(to + "@" + XMPPConstant.OPENFIRE_DOMAIN, Message.Type.groupchat);
         DefaultPacketExtension messageParams = new DefaultPacketExtension(ELEMENT_MESSAGE_PARAMS, NS_MESSAGE_PARAMS);
-
+        messageParams.setValue("sendFromSpecialUser", SEND_FROM_SPECIAL_USER);
         messageParams.setValue("messageType", AUDIO_MESSAGE);
         messageParams.setValue("speaker", speaker);
         messageParams.setValue("timestamp", timestamp);
-        messageParams.setValue("sendFromSpecialUser", sendFromSpecialUser);
         messageParams.setValue("userId", userId);
         message.addExtension(messageParams);
         message.setBody(body);

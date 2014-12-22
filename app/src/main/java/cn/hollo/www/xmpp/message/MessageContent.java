@@ -5,7 +5,6 @@ package cn.hollo.www.xmpp.message;
  * 消息内容体
  */
 public abstract class MessageContent {
-    public String sendFromSpecialUser = "Driver";
     public String gender;
     public String messageid;
     public String avatar;
@@ -13,7 +12,7 @@ public abstract class MessageContent {
     public String messageType;
     public String speaker;
     public String userId;
-    public String GroupRoomType;
     public String body;
     public String timestamp;            //生成的时间
+    public String GroupRoomType;
 }

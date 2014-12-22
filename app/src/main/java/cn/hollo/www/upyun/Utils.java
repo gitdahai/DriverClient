@@ -43,7 +43,7 @@ public class Utils {
     private static String extractFileName(String filePathName){
         String result = null;
         int index = filePathName.lastIndexOf('/');
-        result = filePathName.substring(index);
+        result = filePathName.substring(index + 1);
         return result;
     }
 }

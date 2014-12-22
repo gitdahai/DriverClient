@@ -14,6 +14,7 @@ public interface IChatMessage {
      static final String EMOTION_MESSAGE = "EmotionMessage";
      static final String AUDIO_MESSAGE = "AudioMessage";
      static final String PLAIN_MESSAGE = "Message";
+     static final String SEND_FROM_SPECIAL_USER = "Driver";
 
     /**
      * 接收者的jid

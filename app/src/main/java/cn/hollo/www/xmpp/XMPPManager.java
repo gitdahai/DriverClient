@@ -194,14 +194,12 @@ public class XMPPManager {
                 SimplePayload spl = new SimplePayload(subscribe.getElementName(), subscribe.getNamespace(), subscribe.getXmlPayload());
                 PayloadItem item = new PayloadItem(spl);
                 leafNode.send(item);
-
-                System.out.println("=================发送订阅消息===============");
             }
 
         } catch (SmackException.NotConnectedException e) {
             System.out.println("----------xmpp　没有链接-----------");
             e.printStackTrace();
-            new XmppNoConnectionHandle(connectManager);
+            connectManager.open();
         } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
         } catch (XMPPException.XMPPErrorException e) {
@@ -224,7 +222,6 @@ public class XMPPManager {
 
             } catch (SmackException.NotConnectedException e) {
                 e.printStackTrace();
-                new XmppNoConnectionHandle(connectManager);
             }
         }
     }
@@ -248,7 +245,6 @@ public class XMPPManager {
             e.printStackTrace();
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
-            new XmppNoConnectionHandle(connectManager);
         }
     }
 
