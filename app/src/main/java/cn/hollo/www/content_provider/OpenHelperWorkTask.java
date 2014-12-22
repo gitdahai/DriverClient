@@ -30,33 +30,28 @@ public class OpenHelperWorkTask extends SQLiteOpenHelper {
     //列索引
     public static final int COL_INDEX_ID                  = 0;
     public static final int COL_INDEX_TASK_ID             = 1;
-    public static final int COL_INDEX_VOITURE_NUMBER      = 2;
-    public static final int COL_INDEX_VOITURE_TYPE        = 3;
-    public static final int COL_INDEX_DEPARTURE_STATION   = 4;
-    public static final int COL_INDEX_DESTINATION_STATION = 5;
-    public static final int COL_INDEX_DATE_TIME           = 6;
-    public static final int COL_INDEX_TASK_STATE          = 7;
-    public static final int COL_INDEX_EXECUTE_INDEX       = 8;
-     static final int COL_INDEX_DATA_8 = 9;
-     static final int COL_INDEX_DATA_9 = 10;
-     static final int COL_INDEX_DATA_10 = 11;
-     static final int COL_INDEX_DATA_11 = 12;
-     static final int COL_INDEX_DATA_12 = 13;
-     static final int COL_INDEX_DATA_13 = 14;
-     static final int COL_INDEX_DATA_14 = 15;
-     static final int COL_INDEX_DATA_15 = 16;
+    public static final int COL_INDEX_ROOM_ID             = 2;
+    public static final int COL_INDEX_VOITURE_NUMBER      = 3;
+    public static final int COL_INDEX_VOITURE_TYPE        = 4;
+    public static final int COL_INDEX_DEPARTURE_STATION   = 5;
+    public static final int COL_INDEX_DESTINATION_STATION = 6;
+    public static final int COL_INDEX_DATE_TIME           = 7;
+    public static final int COL_INDEX_TASK_STATE          = 8;
+    public static final int COL_INDEX_EXECUTE_INDEX       = 9;
 
     //列名称
     public static final String TABLE_NAME = "WorkTaskTable";
     public static final String ID = "_id";                          //主键索引
     public static final String TASK_ID              = DATA_0;       //任务的id
-    public static final String VOITURE_NUMBER       = DATA_1;       //车辆编号
-    public static final String VOITURE_TYPE         = DATA_2;       //车辆类型
-    public static final String DEPARTURE_STATION    = DATA_3;       //起点站名称
-    public static final String DESTINATION_STATION  = DATA_4;       //到达站点名称
-    public static final String DATE_TIME            = DATA_5;       //日期和时间
-    public static final String TASK_STATE           = DATA_6;       //任务的状态
-    public static final String EXECUTE_INDEX        = DATA_7;       //任务的执行索引
+    public static final String ROOM_ID              = DATA_1;       //聊天室的id
+    public static final String VOITURE_NUMBER       = DATA_2;       //车辆编号
+    public static final String VOITURE_TYPE         = DATA_3;       //车辆类型
+    public static final String DEPARTURE_STATION    = DATA_4;       //起点站名称
+    public static final String DESTINATION_STATION  = DATA_5;       //到达站点名称
+    public static final String DATE_TIME            = DATA_6;       //日期和时间
+    public static final String TASK_STATE           = DATA_7;       //任务的状态
+    public static final String EXECUTE_INDEX        = DATA_8;       //任务的执行索引
+
 
     /**********************************************************
      * 在该构造方法中需要创建数据库

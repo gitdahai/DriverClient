@@ -20,13 +20,7 @@ public class MissionInfo extends Mission {
      * @return
      */
     public ContentValues getContentValues(){
-        ContentValues values = new ContentValues();
-        values.put(OpenHelperWorkTask.TASK_ID,              task_id);
-        values.put(OpenHelperWorkTask.VOITURE_NUMBER,       shuttle_name);
-        values.put(OpenHelperWorkTask.VOITURE_TYPE,         _type);
-        values.put(OpenHelperWorkTask.DEPARTURE_STATION,    departure);
-        values.put(OpenHelperWorkTask.DESTINATION_STATION,  destination);
-        values.put(OpenHelperWorkTask.DATE_TIME,            depart_at);
+        ContentValues values = super.getContentValues();
         values.put(OpenHelperWorkTask.TASK_STATE,           task_state);
         values.put(OpenHelperWorkTask.EXECUTE_INDEX,        execute_index);
         return values;
@@ -40,6 +34,7 @@ public class MissionInfo extends Mission {
     public static MissionInfo createWorkTaskExpand(Cursor cursor){
         MissionInfo wte = new MissionInfo();
         wte.task_id = cursor.getString(OpenHelperWorkTask.COL_INDEX_TASK_ID);
+        wte.room_id = cursor.getString(OpenHelperWorkTask.COL_INDEX_ROOM_ID);
         wte.shuttle_name = cursor.getString(OpenHelperWorkTask.COL_INDEX_VOITURE_NUMBER);
         wte._type = cursor.getString(OpenHelperWorkTask.COL_INDEX_VOITURE_TYPE);
         wte.departure = cursor.getString(OpenHelperWorkTask.COL_INDEX_DEPARTURE_STATION);

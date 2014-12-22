@@ -28,6 +28,9 @@ import org.jivesoftware.smackx.pubsub.PublishModel;
 import org.jivesoftware.smackx.pubsub.SimplePayload;
 
 import java.io.IOException;
+import java.util.List;
+
+import cn.hollo.www.xmpp.message.XmppNoConnectionHandle;
 
 /**
  * Created by orson on 14-11-12.
@@ -61,6 +64,9 @@ public class XMPPManager {
         connectManager = new XmppConnectManager(openfirLogianName, openfirLoginPassword);
         connectManager.init();
         connectManager.open();
+
+        multiUserChatManager = new MultiUserChatManager();
+        chatMessageListener   = new ChatMessageListener();
     }
 
     /**
@@ -71,6 +77,9 @@ public class XMPPManager {
             connectManager.close();
 
         connectManager = null;
+        multiUserChatManager.clear();
+        multiUserChatManager = null;
+        chatMessageListener = null;
     }
 
     /*************************************************************
@@ -94,6 +103,7 @@ public class XMPPManager {
             Log.w("HL-DEBUG",e);
         } catch (SmackException.NotConnectedException e) {
             Log.w("HL-DEBUG",e);
+            new XmppNoConnectionHandle(connectManager);
         }
     }
 
@@ -124,8 +134,7 @@ public class XMPPManager {
      */
     private void xmppAuthenticated(XMPPConnection xmppConnection){
         chatManager = ChatManager.getInstanceFor(xmppConnection);
-        multiUserChatManager = new MultiUserChatManager();
-        chatMessageListener = new ChatMessageListener();
+        multiUserChatManager.setXmppConnection(xmppConnection);
 
         System.out.println("===========user logined openfire=============");
     }
@@ -162,6 +171,14 @@ public class XMPPManager {
         e.printStackTrace();
     }
 
+    /*********************************************************
+     * 加入群组聊天室
+     * @param roomIds
+     */
+    public void jionInRooms(List<String> roomIds, String userId){
+         multiUserChatManager.createMultiUserChats(roomIds, userId);
+    }
+
     /********************************************************
      * 添加订阅信息，该消息随后就会通过xmpp发送出去
      * @param subscribe
@@ -177,12 +194,14 @@ public class XMPPManager {
                 SimplePayload spl = new SimplePayload(subscribe.getElementName(), subscribe.getNamespace(), subscribe.getXmlPayload());
                 PayloadItem item = new PayloadItem(spl);
                 leafNode.send(item);
+
+                System.out.println("=================发送订阅消息===============");
             }
 
         } catch (SmackException.NotConnectedException e) {
             System.out.println("----------xmpp　没有链接-----------");
             e.printStackTrace();
-            connectManager.open();
+            new XmppNoConnectionHandle(connectManager);
         } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
         } catch (XMPPException.XMPPErrorException e) {
@@ -203,10 +222,9 @@ public class XMPPManager {
                     chat.sendMessage(message);
                 }
 
-                System.out.println("===========发送消息成功============= " + chartMessage.getTo());
             } catch (SmackException.NotConnectedException e) {
                 e.printStackTrace();
-                System.out.println("===========发送消息失败============= " + chartMessage.getTo());
+                new XmppNoConnectionHandle(connectManager);
             }
         }
     }
@@ -217,16 +235,20 @@ public class XMPPManager {
      */
     public void sendMultiUserChat(IChatMessage chartMessage){
         String to = chartMessage.getTo();
-        String userId = chartMessage.getMessage().getSubject("userId");
+        String userId = chartMessage.getMessage().getBody("userId");
         MultiUserChat muc = getMultiUserChat(to, userId);
 
         try {
-            if (muc != null)
-                muc.sendMessage(chartMessage.getMessage());
+            if (muc != null){
+                Message message = chartMessage.getMessage();
+                muc.sendMessage(message);
+            }
+
         } catch (XMPPException e) {
             e.printStackTrace();
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
+            new XmppNoConnectionHandle(connectManager);
         }
     }
 
@@ -253,7 +275,7 @@ public class XMPPManager {
         MultiUserChat muc = multiUserChatManager.getMultiUserChat(roomJid);
 
         if (muc == null)
-            muc = multiUserChatManager.createMultiUserChat(connectManager.connection, roomJid, userId);
+             multiUserChatManager.createMultiUserChat(roomJid, userId);
 
         return muc;
     }
@@ -286,12 +308,11 @@ public class XMPPManager {
     /***********************************************************
      * xmpp链接管理类
      */
-    private class XmppConnectManager extends Thread implements ConnectionListener, InvitationListener{
+    public class XmppConnectManager extends Thread implements ConnectionListener, InvitationListener{
         private String openfirLogianName;
         private String openfirLoginPassword;
         private XMPPConnection connection;
         private PackageListener pkListener;
-        private boolean isConnect;
 
         private XmppConnectManager(String openfirLogianName, String openfirLoginPassword){
             this.openfirLogianName    = openfirLogianName;
@@ -310,6 +331,7 @@ public class XMPPManager {
             config.setCompressionEnabled(false);
             config.setSendPresence(true);
             config.setDebuggerEnabled(true);
+
             connection = new XMPPTCPConnection(config);
             connection.addConnectionListener(this);
             connection.addPacketListener(pkListener, new MessageTypeFilter(Message.Type.chat));
@@ -323,19 +345,20 @@ public class XMPPManager {
         /**
          * 进行链接
          */
-        private void open(){
-            this.start();
+        public void open(){
+            if (!connection.isConnected())
+                this.start();
         }
 
         /**
          * 进行xmpp的链接
          */
         public void run(){
-            while (!isConnect){
+            while (true){
                 try {
                     connection.connect();
                     connection.login(openfirLogianName, openfirLoginPassword);
-                    isConnect = true;
+                    break;
                 } catch (SmackException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import cn.hollo.www.R;
 import cn.hollo.www.features.FragmentBase;
 import cn.hollo.www.features.activities.MessageExportHelper;
+import cn.hollo.www.features.informations.MissionInfo;
 import cn.hollo.www.utils.Util;
 import cn.hollo.www.voice.SpeechVoiceDialog;
 import cn.hollo.www.voice.SpeechVoiceRecorder;
@@ -25,12 +26,6 @@ import cn.hollo.www.voice.SpeechVoiceRecorder;
 public class FragmentChatGroupRoom extends FragmentBase {
     private MessageExportHelper exportHelper;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        exportHelper = new MessageExportHelper(getActivity(), "roomId");
-    }
-
     /***************************************************************
      *
      * @param inflater
@@ -40,6 +35,14 @@ public class FragmentChatGroupRoom extends FragmentBase {
      */
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_group_chat, null);
+        Bundle mBundle = getArguments();
+        //取得参数
+        if (mBundle != null){
+            MissionInfo missionInfo =  (MissionInfo)mBundle.getSerializable("MissionInfo");
+            if (missionInfo != null)
+                exportHelper = new MessageExportHelper(getActivity(), missionInfo.room_id);
+        }
+
         ModeControler controler = new ModeControler(view);
         return view;
     }
@@ -167,9 +170,9 @@ public class FragmentChatGroupRoom extends FragmentBase {
                         return;
                     }
 
-
+                    //输出语音
+                    exportHelper.exportVoice(voicePathName);
                 }
-
             }
         };
 

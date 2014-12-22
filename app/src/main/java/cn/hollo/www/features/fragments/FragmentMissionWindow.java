@@ -33,7 +33,17 @@ public class FragmentMissionWindow extends FragmentBase {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_mission_window, container, false);
         missionWindow = new MissionWindow(view);
+        //传递任务数据参数
+        Bundle mBundle = this.getArguments();
+        missionWindow.fragments[0].setArguments(mBundle);
+        missionWindow.fragments[1].setArguments(mBundle);
         return view;
+    }
+
+    @Override
+    public void onPutData(Object data) {
+        missionWindow.fragments[0].onPutData(data);
+        missionWindow.fragments[1].onPutData(data);
     }
 
     @Override

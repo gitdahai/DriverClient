@@ -10,6 +10,12 @@ import cn.hollo.www.features.informations.StationInfo;
  */
 public interface IDriverActions {
     /**
+     * 传入数据
+     * @param data
+     */
+    public void onPutData(Object data);
+
+    /**
      * 初始站点
      * @param stations
      */

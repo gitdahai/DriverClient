@@ -113,6 +113,9 @@ public class FragmentMission extends Fragment {
             if (code == 200){
                 stationInfo = ParserUtil.parserWorkTaskDetail(response);
 
+                //传入数据
+                actions.onPutData(stationInfo);
+
                 //刷新页面数据
                 if (stationInfo != null && stationInfo.stations.size() > 0){
                     //刷新任务列表

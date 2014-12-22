@@ -44,6 +44,13 @@
             android:exported="true" >
         </service>
 
+        <!--==================加入聊天室服务====================-->
+        <service
+            android:name=".services.ServiceJionRoom"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
+
         <!-- ==============定位服务============================ -->
         <service
             android:name=".location.ServiceLocation"

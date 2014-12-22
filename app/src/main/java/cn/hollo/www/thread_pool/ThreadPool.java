@@ -58,7 +58,11 @@ public class ThreadPool {
      * @param task
      */
     public void addTask(Runnable task){
-        if (task != null)
+        if (task != null){
+            if (executor == null)
+                executor = new ThreadPoolExecutor(3, 10, 5, TimeUnit.MINUTES, queue);
+
             executor.execute(task);
+        }
     }
 }

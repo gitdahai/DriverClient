@@ -10,6 +10,7 @@ import java.util.List;
 public class StationInfo {
     public String path_id;
     public String task_id;      //唯一的任务id
+    public String name;         //
     public List<Station>  stations = new ArrayList<Station>();
 
     /**************************************************

@@ -37,6 +37,7 @@ public class ActivityMissionExecution extends ActivityBase {
         fragmentMissionDetail = new FragmentMission();
         fragmentMissionWindow = new FragmentMissionWindow();
         fragmentMissionDetail.setArguments(mBundle);
+        fragmentMissionWindow.setArguments(mBundle);
 
         //关联动作
         fragmentMissionDetail.setIDriverActions(fragmentMissionWindow);

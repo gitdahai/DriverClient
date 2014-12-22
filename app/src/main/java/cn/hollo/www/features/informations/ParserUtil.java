@@ -2,6 +2,7 @@ package cn.hollo.www.features.informations;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 
 import com.google.gson.Gson;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import cn.hollo.www.content_provider.OpenHelperWorkTask;
 import cn.hollo.www.content_provider.ProviderWorkTask;
+import cn.hollo.www.services.ServiceJionRoom;
 
 /**
  * Created by orson on 14-11-25.
@@ -35,6 +37,9 @@ public class ParserUtil {
         Type listType = new TypeToken<ArrayList <MissionInfo>>(){}.getType();
         Gson gson = new Gson();
         ArrayList<MissionInfo> list = gson.fromJson(json, listType);
+
+        //保存room房间id
+        ArrayList<String> roomIds = new ArrayList<String>();
 
         //进行数据库插入
         ContentResolver resolver = context.getContentResolver();
@@ -65,6 +70,17 @@ public class ParserUtil {
                     resolver.insert(ProviderWorkTask.CONTENT_URI, workTask.getContentValues());
                     resolver.notifyChange(ProviderWorkTask.CONTENT_URI, null);
                 }
+
+                //保留房间的id
+                if (workTask.room_id != null)
+                    roomIds.add(workTask.room_id);
+            }
+
+            //开启加入聊天室服务
+            if (roomIds.size() > 0){
+                Intent intent = new Intent(context.getApplicationContext(), ServiceJionRoom.class);
+                intent.putStringArrayListExtra("RoomId", roomIds);
+                context.startService(intent);
             }
         }
     }
@@ -92,6 +108,10 @@ public class ParserUtil {
             //任务id
             if (jDetail.has("task_id") && !jDetail.isNull("task_id"))
                 detail.task_id = jDetail.getString("task_id");
+
+            //解析name
+            if (jDetail.has("name") && !jDetail.isNull("name"))
+                detail.name = jDetail.getString("name");
 
             //解析站点名称
             if (jDetail.has("stations") && !jDetail.isNull("stations")){

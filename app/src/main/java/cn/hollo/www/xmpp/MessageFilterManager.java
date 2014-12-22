@@ -40,7 +40,7 @@ public class MessageFilterManager {
      * @param message
      */
     void filterMessage(Message message){
-
+        System.out.println("====message====" + message.toXML());
     }
 
     /**

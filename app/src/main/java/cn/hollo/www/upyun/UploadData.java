@@ -119,14 +119,14 @@ public abstract class UploadData extends UpYunBaseClass {
 				
 				//回调通知
 				if (finishListener != null)
-					finishListener.onUploadFinish(code, resultStr, attach);
+					finishListener.onUploadFinish(code, resultStr, uriName, attach);
 				
 			} catch (FileNotFoundException e) {
                 if (finishListener != null)
-                    finishListener.onUploadFinish(-1, "", attach);
+                    finishListener.onUploadFinish(-1, "", uriName, attach);
 			} catch (IOException e) {
                 if (finishListener != null)
-                    finishListener.onUploadFinish(-1, "", attach);
+                    finishListener.onUploadFinish(-1, "", uriName, attach);
 
             }
 		}		
@@ -138,6 +138,6 @@ public abstract class UploadData extends UpYunBaseClass {
 	 *
 	 */
 	public abstract static class OnUploadFinishListener{
-		public abstract void onUploadFinish(int code, String resultString, Object attach);
+		public abstract void onUploadFinish(int code, String resultString, String uriName, Object attach);
 	}
 }

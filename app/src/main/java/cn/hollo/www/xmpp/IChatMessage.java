@@ -7,6 +7,14 @@ import org.jivesoftware.smack.packet.Message;
  * 消息接口
  */
 public interface IChatMessage {
+     static final String ELEMENT_MESSAGE_PARAMS = "params";
+     static final String NS_MESSAGE_PARAMS = "http://hollo.cn/xmpp/message/params";
+     static final String LOCATION_MESSAGE = "LocationMessage";
+     static final String IMAGE_MESSAGE = "ImageMessage";
+     static final String EMOTION_MESSAGE = "EmotionMessage";
+     static final String AUDIO_MESSAGE = "AudioMessage";
+     static final String PLAIN_MESSAGE = "Message";
+
     /**
      * 接收者的jid
      * @return
