@@ -67,7 +67,7 @@ public class XMPPService extends Service {
                 return START_NOT_STICKY;
             }
 
-            xmppManager   = XMPPManager.getInstance();
+            xmppManager   = XMPPManager.getInstance(this);
             xmppManager.create(xmppLoginName, xmppLoginPassword);
         }
 
@@ -87,10 +87,6 @@ public class XMPPService extends Service {
         //销毁xmpp链接
         if (xmppManager != null)
             xmppManager.destroy();
-
-        //销毁过滤器
-        if (filterManager != null)
-            filterManager.destroy();
 
         xmppManager   = null;
         filterManager = null;

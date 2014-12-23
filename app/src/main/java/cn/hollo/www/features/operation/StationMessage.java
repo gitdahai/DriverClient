@@ -12,21 +12,26 @@ public class StationMessage implements IChatMessage {
     public String describe;       //站点的描述
     public String contract_id;    //合约编号
     public String vehicle_code;   //车辆编号
-    public String to;                  //应该是用户的id
+    public String to;             //应该是用户的id
 
     @Override
-    public String getTo() {
-        return to;
+    public String getUserId() {
+        return null;
     }
 
+    @Override
+    public String getRoomId() {
+        return to;
+    }
 
     @Override
     public Message getMessage() {
         Message message = new Message();
         message.addBody("describe", describe);
-       // message.addBody("contract_id", contract_id);
+        // message.addBody("contract_id", contract_id);
         message.addBody("vehicle_code", vehicle_code);
         message.addBody("messageType", messageType);
+
         return message;
     }
 }

@@ -1,5 +1,6 @@
 package cn.hollo.www.xmpp;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.jivesoftware.smack.Chat;
@@ -36,21 +37,33 @@ import java.util.List;
  */
 public class XMPPManager {
     private static XMPPManager instance;
+    private Context context;
     private XmppConnectManager connectManager;
     private ChatManager        chatManager;
     private MultiUserChatManager multiUserChatManager;
     private ChatMessageListener chatMessageListener;
 
-    private XMPPManager(){}
+    /************************************************
+     *
+     * @param context
+     */
+    private XMPPManager(Context context){
+        this.context = context.getApplicationContext();
+    }
 
-    static XMPPManager getInstance(){
+    /************************************************
+     *
+     * @param context
+     * @return
+     */
+    static XMPPManager getInstance(Context context){
         if (instance == null)
-            instance = new XMPPManager();
+            instance = new XMPPManager(context);
 
         return instance;
     }
 
-    /**
+    /************************************************
      *
      * @param openfirLogianName
      * @param openfirLoginPassword
@@ -67,7 +80,7 @@ public class XMPPManager {
         chatMessageListener   = new ChatMessageListener();
     }
 
-    /**
+    /*************************************************
      * 销毁当前的资源
      */
     void destroy(){
@@ -78,6 +91,7 @@ public class XMPPManager {
         multiUserChatManager.clear();
         multiUserChatManager = null;
         chatMessageListener = null;
+        context = null;
     }
 
     /*************************************************************
@@ -191,6 +205,7 @@ public class XMPPManager {
                 SimplePayload spl = new SimplePayload(subscribe.getElementName(), subscribe.getNamespace(), subscribe.getXmlPayload());
                 PayloadItem item = new PayloadItem(spl);
                 leafNode.send(item);
+                System.out.println("===============发送了订阅信息==================");
             }
 
         } catch (SmackException.NotConnectedException e) {
@@ -229,7 +244,7 @@ public class XMPPManager {
      */
     public void sendMultiUserChat(IChatMessage chartMessage){
         String to = chartMessage.getRoomId();
-        String userId = chartMessage.getMessage().getBody("userId");
+        String userId = chartMessage.getUserId();
         MultiUserChat muc = getMultiUserChat(to, userId);
 
         try {
@@ -285,13 +300,49 @@ public class XMPPManager {
     /**********************************************************
      * 接受数据包监听器
      */
-    private class PackageListener implements PacketListener {
+    private class PackageListener extends MessageTypeFilter implements PacketListener{
+        private Message.Type type;
+
+        /**===================================================
+         *
+         * @param type
+         */
+        public PackageListener(Message.Type type) {
+            super(type);
+            this.type = type;
+        }
+
+        /**===================================================
+         * 过滤Packet是否需要处理的
+         * @param packet
+         * @return
+         */
+        public boolean accept(Packet packet) {
+            boolean result = false;
+
+            //过滤群组消息
+            if (packet instanceof Message){
+                Message message = (Message)packet;
+
+                if (type == message.getType())
+                    result = true;
+
+                else if (type == message.getType())
+                    result = true;
+            }
+
+            return result;
+        }
+
+        /**===================================================
+         * 已知的子类和间接子类:(Presence, IQ, Registration, RosterPacket, Session, Bind)
+         * @param packet
+         */
         public void processPacket(Packet packet) {
             try{
                 Message message = (Message)packet;
                 MessageFilterManager filterManager = MessageFilterManager.getInstance();
-                filterManager.filterMessage(message);
-
+                filterManager.filterMessage(context, message);
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -305,12 +356,21 @@ public class XMPPManager {
         private String openfirLogianName;
         private String openfirLoginPassword;
         private XMPPConnection connection;
-        private PackageListener pkListener;
+        private PackageListener pkListenerGroupChat;
+        private PackageListener pkListenerChat;
+        private PackageListener pkListenerNormal;
+        private PackageListener pkListenerError;
+        private PackageListener pkListenerHeadline;
 
         private XmppConnectManager(String openfirLogianName, String openfirLoginPassword){
             this.openfirLogianName    = openfirLogianName;
             this.openfirLoginPassword = openfirLoginPassword;
-            this.pkListener = new PackageListener();
+
+            this.pkListenerGroupChat = new PackageListener(Message.Type.groupchat);
+            this.pkListenerChat      = new PackageListener(Message.Type.chat);
+            this.pkListenerNormal    = new PackageListener(Message.Type.normal);
+            this.pkListenerError     = new PackageListener(Message.Type.error);
+            this.pkListenerHeadline  = new PackageListener(Message.Type.headline);
         }
 
         /**
@@ -327,11 +387,11 @@ public class XMPPManager {
 
             connection = new XMPPTCPConnection(config);
             connection.addConnectionListener(this);
-            connection.addPacketListener(pkListener, new MessageTypeFilter(Message.Type.chat));
-            connection.addPacketListener(pkListener, new MessageTypeFilter(Message.Type.normal));
-            connection.addPacketListener(pkListener, new MessageTypeFilter(Message.Type.groupchat));
-            connection.addPacketListener(pkListener, new MessageTypeFilter(Message.Type.error));
-            connection.addPacketListener(pkListener, new MessageTypeFilter(Message.Type.headline));
+            connection.addPacketListener(pkListenerGroupChat, pkListenerGroupChat);
+            connection.addPacketListener(pkListenerChat, pkListenerChat);
+            connection.addPacketListener(pkListenerNormal, pkListenerNormal);
+            connection.addPacketListener(pkListenerError, pkListenerError);
+            connection.addPacketListener(pkListenerHeadline, pkListenerHeadline);
             MultiUserChat.addInvitationListener(connection, this);
         }
 
@@ -387,8 +447,11 @@ public class XMPPManager {
                         //该方法必须在关闭链接之后调用
                         //否则有的事件无法调用
                         connection.removeConnectionListener(XmppConnectManager.this);
-                        connection.removePacketListener(pkListener);
-                        pkListener = null;
+                        connection.removePacketListener(pkListenerGroupChat);
+                        connection.removePacketListener(pkListenerChat);
+                        connection.removePacketListener(pkListenerNormal);
+                        connection.removePacketListener(pkListenerError);
+                        connection.removePacketListener(pkListenerHeadline);
                         connection = null;
                     }
                 }).start();
@@ -430,10 +493,9 @@ public class XMPPManager {
             PubSubManager mgr = new PubSubManager(connection);
             LeafNode pubNode = null;
 
-            try{
+            try {
                 pubNode = mgr.getNode(id);
-            }
-            catch (XMPPException.XMPPErrorException ex){
+            } catch (XMPPException.XMPPErrorException ex) {
                 ConfigureForm form = new ConfigureForm(FormType.submit);
                 form.setAccessModel(AccessModel.open);
                 form.setDeliverPayloads(true);
@@ -445,7 +507,5 @@ public class XMPPManager {
 
             return pubNode;
         }
-
-
     }
 }

@@ -102,7 +102,7 @@ public class FragmentMissionWindow extends FragmentBase {
          */
         private MissionWindow(View view){
             fragmentViewpager = (ViewPager)view.findViewById(R.id.fragmentViewpager);
-            FragmentManager fm = FragmentMissionWindow.this.getChildFragmentManager();
+            FragmentManager fm = getFragmentManager();
             viewPagerAdapter = new AdapterViewPager(fm, fragments, titles);
             fragmentViewpager.setAdapter(viewPagerAdapter);
 

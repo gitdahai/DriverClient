@@ -117,4 +117,26 @@ public class ModelChatMessage {
         message.gender = gender;
         return message;
     };
+
+    /**************************************************
+     * 输出信息
+     */
+    public void print(){
+        System.out.println("==============================");
+        System.out.println("gender=" + gender);
+        System.out.println("timestamp=" + timestamp);
+        System.out.println("user_id=" + user_id);
+        System.out.println("room_id=" + room_id);
+        System.out.println("speeker=" + speeker);
+        System.out.println("nickname=" + nickname);
+        System.out.println("avatar=" + avatar);
+        System.out.println("content=" + content);
+        System.out.println("message_type=" + message_type);
+
+        System.out.println("is_read=" + is_read);
+        System.out.println("is_issue=" + is_issue);
+        System.out.println("message_status=" + message_status);
+        System.out.println("==============================");
+    }
+
 }

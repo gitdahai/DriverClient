@@ -17,6 +17,12 @@ public interface IChatMessage {
      static final String SEND_FROM_SPECIAL_USER = "Driver";
 
     /**
+     *
+     * @return
+     */
+    public String getUserId();
+
+    /**
      * 接收者的jid
      * @return
      */
