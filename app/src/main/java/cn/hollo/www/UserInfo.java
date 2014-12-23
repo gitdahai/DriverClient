@@ -11,7 +11,7 @@ public class UserInfo {
     private static UserInfo instance;
     private String userId;
     private String userPassword;
-    private String userName;
+    private String userName = "";
 
     private SharedPreferences spf;
 

@@ -83,6 +83,13 @@
             android:authorities="cn.hollo.www.content_provider.Passenger"
             android:multiprocess="false">
         </provider>
+
+        <!--聊天数据-->
+        <provider
+            android:name=".content_provider.ProviderChatMessage"
+            android:authorities="cn.hollo.www.content_provider.chat_message"
+            android:multiprocess="false">
+        </provider>
     </application>
 
     <!-- 定位需要的权限 -->

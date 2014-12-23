@@ -30,8 +30,6 @@ import org.jivesoftware.smackx.pubsub.SimplePayload;
 import java.io.IOException;
 import java.util.List;
 
-import cn.hollo.www.xmpp.message.XmppNoConnectionHandle;
-
 /**
  * Created by orson on 14-11-12.
  * xmpp服务的管理类
@@ -103,7 +101,6 @@ public class XMPPManager {
             Log.w("HL-DEBUG",e);
         } catch (SmackException.NotConnectedException e) {
             Log.w("HL-DEBUG",e);
-            new XmppNoConnectionHandle(connectManager);
         }
     }
 
@@ -212,7 +209,7 @@ public class XMPPManager {
      */
     public void sendSingleChat(IChatMessage chartMessage){
         if (chartMessage != null && chatManager != null){
-            Chat chat = getChat(chartMessage.getTo());
+            Chat chat = getChat(chartMessage.getRoomId());
 
             try {
                 if (chat != null){
@@ -231,7 +228,7 @@ public class XMPPManager {
      * @param chartMessage
      */
     public void sendMultiUserChat(IChatMessage chartMessage){
-        String to = chartMessage.getTo();
+        String to = chartMessage.getRoomId();
         String userId = chartMessage.getMessage().getBody("userId");
         MultiUserChat muc = getMultiUserChat(to, userId);
 

@@ -27,15 +27,18 @@ public class OpenHelperChatMessage extends SQLiteOpenHelper {
     private static final String DATA_15 = "data_15";
 
     public static final String ID = "_id";              //主键索引id
-    public static final String USER_ID = DATA_0;
-    public static final String ROOM_ID = DATA_1;
-    public static final String SPEEKER = DATA_2;
-    public static final String GENDER  = DATA_3;
-    public static final String NICKNAME = DATA_4;
-    public static final String AVATAR   = DATA_5;
-    public static final String BODY     = DATA_6;
-    public static final String MESSAGE_TYPE = DATA_7;
-    public static final String TIMES_STAMP  = DATA_8;
+    public static final String USER_ID = DATA_0;        //用户的id
+    public static final String ROOM_ID = DATA_1;        //房间的id
+    public static final String SPEEKER = DATA_2;        //消息的发送者的id
+    public static final String GENDER  = DATA_3;        //性别
+    public static final String NICKNAME = DATA_4;       //昵称
+    public static final String AVATAR   = DATA_5;       //头像地址
+    public static final String CONTENT        = DATA_6;  //消息的内容
+    public static final String MESSAGE_TYPE   = DATA_7;  //消息的类型
+    public static final String TIME_STAMP     = DATA_8;  //消息产生或者接收的时间(Long型数据)
+    public static final String MESSAGE_STATUS = DATA_9;  //消息的发送／接收状态（0=接收中，1=接收成功，2=接收失败）
+    public static final String IS_READ  = DATA_10;       //消息的状态（true=已读，false=未读）
+    public static final String IS_ISSUE = DATA_11;       //消息是自己发送的，还是接收的(true=发送，false=接收的)
 
     public static final int INDEX_ID = 0;
     public static final int INDEX_USER_ID = 1;
@@ -44,9 +47,12 @@ public class OpenHelperChatMessage extends SQLiteOpenHelper {
     public static final int INDEX_GENDER  = 4;
     public static final int INDEX_NICKNAME = 5;
     public static final int INDEX_AVATAR   = 6;
-    public static final int INDEX_BODY     = 7;
+    public static final int INDEX_CONTENT     = 7;
     public static final int INDEX_MESSAGE_TYPE = 8;
-    public static final int INDEX_TIMES_STAMP  = 9;
+    public static final int INDEX_TIME_STAMP  = 9;
+    public static final int INDEX_MESSAGE_STATUS = 10;
+    public static final int INDEX_IS_READ  = 11;
+    public static final int INDEX_IS_ISSUE = 12;
 
     static final String TABLE_NAME = "ChatMessage";
 

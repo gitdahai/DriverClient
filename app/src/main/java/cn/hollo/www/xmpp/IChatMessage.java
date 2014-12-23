@@ -20,7 +20,7 @@ public interface IChatMessage {
      * 接收者的jid
      * @return
      */
-    public String  getTo();
+    public String  getRoomId();
 
     /**
      * 发送的消息体
