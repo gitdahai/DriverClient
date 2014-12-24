@@ -47,7 +47,6 @@ public class MessageContent implements IChatMessage {
     public Message getMessage() {
         Message message = new Message(roomId + "@conference." + XMPPConstant.OPENFIRE_DOMAIN, Message.Type.groupchat);
         DefaultPacketExtension messageParams = new DefaultPacketExtension(ELEMENT_MESSAGE_PARAMS, NS_MESSAGE_PARAMS);
-
         messageParams.setValue("sendFromSpecialUser", SEND_FROM_SPECIAL_USER);
         messageParams.setValue("messageType", messageType);
         messageParams.setValue("speaker", speaker);

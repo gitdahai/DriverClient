@@ -191,4 +191,5 @@
         <attr name="progressBackgroundColor" format="color"/>
         <attr name="strokeSize" format="dimension"/>
     </declare-styleable>
+
 </resources>

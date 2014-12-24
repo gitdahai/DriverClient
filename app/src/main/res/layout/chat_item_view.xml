@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--聊天会话显示内容布局-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/chatContainer"
+    android:orientation="horizontal">
+    <!--消息的内容-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/contentContainer"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:layout_weight="1"
+        android:gravity="right"
+        android:orientation="horizontal">
+        <!--消息实体当前的状态-->
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/contentStatus"/>
+        <!--消息的实体内容-->
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/contentEntities"
+            >
+            <!--文本-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:id="@+id/contentTextView"
+                android:background="@drawable/message_r"
+                android:textColor="@color/color_white"
+                android:textSize="16dp"
+                android:drawablePadding="8dp"
+                android:text="哈哈哈哈是方式哈"/>
+            <!--图片，动画等-->
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/contentImgView"
+                android:maxWidth="150dp"
+                android:scaleType="centerCrop"/>
+        </FrameLayout>
+    </LinearLayout>
+
+    <!--用户的头像-->
+    <cn.hollo.www.custom_view.RoundedImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="8dp"
+        android:scaleType="centerCrop"
+        android:id="@+id/userAvatar"
+        app:corner_radius="8dip"
+        app:border_width="0dip"
+        app:round_background="true"
+        android:src="@drawable/banche">
+    </cn.hollo.www.custom_view.RoundedImageView>
+</LinearLayout>

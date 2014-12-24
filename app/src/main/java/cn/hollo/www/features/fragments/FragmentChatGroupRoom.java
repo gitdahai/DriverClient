@@ -1,5 +1,6 @@
 package cn.hollo.www.features.fragments;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -7,13 +8,19 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import cn.hollo.www.R;
+import cn.hollo.www.UserInfo;
+import cn.hollo.www.content_provider.OpenHelperChatMessage;
+import cn.hollo.www.content_provider.ProviderChatMessage;
 import cn.hollo.www.features.FragmentBase;
 import cn.hollo.www.features.activities.MessageExportHelper;
+import cn.hollo.www.features.adapters.AdapterChatCursor;
 import cn.hollo.www.features.informations.MissionInfo;
 import cn.hollo.www.utils.Util;
 import cn.hollo.www.voice.SpeechVoiceDialog;
@@ -25,6 +32,8 @@ import cn.hollo.www.voice.SpeechVoiceRecorder;
  */
 public class FragmentChatGroupRoom extends FragmentBase {
     private MessageExportHelper exportHelper;
+    private ModeControler controler;
+    private ChatContentDisplay  chatDisplay;
 
     /***************************************************************
      *
@@ -35,15 +44,19 @@ public class FragmentChatGroupRoom extends FragmentBase {
      */
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_group_chat, null);
+
         Bundle mBundle = getArguments();
         //取得参数
         if (mBundle != null){
             MissionInfo missionInfo =  (MissionInfo)mBundle.getSerializable("MissionInfo");
-            if (missionInfo != null)
+
+            if (missionInfo != null){
                 exportHelper = new MessageExportHelper(getActivity(), missionInfo.room_id);
+                controler = new ModeControler(view);
+                chatDisplay = new ChatContentDisplay(view, missionInfo.room_id);
+            }
         }
 
-        ModeControler controler = new ModeControler(view);
         return view;
     }
 
@@ -190,6 +203,83 @@ public class FragmentChatGroupRoom extends FragmentBase {
          */
         private void onStopRecord(){
             voiceDialog.stopVoiceRecoder();
+        }
+    }
+
+    /****************************************************************
+    / * 显示聊天对话的消息
+    / * 加载语音，图片等资源
+    / ***************************************************************/
+    private class ChatContentDisplay{
+        private ListView chatListView;
+        private String roomId;
+        private AdapterChatCursor adapter;
+
+        /**==============================================
+         *
+         * @param view
+         * @param roomId
+         */
+        private ChatContentDisplay(View view, String roomId){
+            this.roomId  = roomId;
+            chatListView = (ListView)view.findViewById(R.id.chatListView);
+            chatListView.setOnScrollListener(scrollListener);
+
+            Cursor cursor = getCursor();
+
+            if (cursor != null){
+                adapter = new AdapterChatCursor(getActivity(), cursor);
+                chatListView.setAdapter(adapter);
+            }
+        }
+
+        /**=============================================
+         * 列表滚动事件监听器
+         */
+        private AbsListView.OnScrollListener scrollListener = new AbsListView.OnScrollListener(){
+            /**-----------------------------------------
+             *
+             * @param view
+             * @param scrollState
+             */
+            public void onScrollStateChanged(AbsListView view, int scrollState) {}
+
+            /**-----------------------------------------
+             *
+             * @param view
+             * @param firstVisibleItem
+             * @param visibleItemCount
+             * @param totalItemCount
+             */
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                //如果列表项已经在最后一条，则实现自动添加和滚动
+                if(visibleItemCount + firstVisibleItem == totalItemCount){
+                    chatListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+                }
+                //否则关闭自动滚动
+                else
+                    chatListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
+            }
+        };
+
+        /**=============================================
+         * 获取Cursor对象
+         * @return
+         */
+        private Cursor getCursor(){
+            UserInfo userInfo = UserInfo.getInstance(getActivity());
+
+            if (userInfo == null || roomId == null)
+                return null;
+
+            Cursor cursor = null;
+            //String selection = OpenHelperChatMessage.USER_ID + "=? and " + OpenHelperChatMessage.ROOM_ID + "=?";
+            //String[] selectionArgs = {userInfo.getUserId(), roomId};
+
+            String selection =  OpenHelperChatMessage.ROOM_ID + "=?";
+            String[] selectionArgs = {roomId};
+            cursor = getActivity().getContentResolver().query(ProviderChatMessage.CONTENT_URI, null, selection, selectionArgs,null);
+            return cursor;
         }
     }
 }
