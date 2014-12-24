@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import cn.hollo.www.R;
 import cn.hollo.www.UserInfo;
+import cn.hollo.www.content_provider.ModelChatMessage;
 import cn.hollo.www.content_provider.OpenHelperChatMessage;
 import cn.hollo.www.content_provider.ProviderChatMessage;
 import cn.hollo.www.features.FragmentBase;
@@ -230,6 +231,7 @@ public class FragmentChatGroupRoom extends FragmentBase {
             if (cursor != null){
                 adapter = new AdapterChatCursor(getActivity(), cursor);
                 chatListView.setAdapter(adapter);
+                adapter.setOserverUpdateCursor(observer);
             }
         }
 
@@ -259,6 +261,17 @@ public class FragmentChatGroupRoom extends FragmentBase {
                 //否则关闭自动滚动
                 else
                     chatListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
+            }
+        };
+
+        /**=============================================
+         * 添加观察者对象
+         */
+        private AdapterChatCursor.OserverUpdateCursor observer = new AdapterChatCursor.OserverUpdateCursor(){
+            public void onUpdateCursor(ModelChatMessage chatMessage) {
+                String where =  OpenHelperChatMessage.ROOM_ID + "=? and " + OpenHelperChatMessage.TIME_STAMP + "=?";
+                String[] selectionArgs = {roomId, "" + chatMessage.timestamp};
+                getActivity().getContentResolver().update(ProviderChatMessage.CONTENT_URI, chatMessage.getContentValues(), where, selectionArgs);
             }
         };
 

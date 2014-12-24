@@ -27,8 +27,8 @@
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/contentEntities"
-            >
+            android:id="@+id/contentEntities">
+
             <!--文本-->
             <TextView
                 android:layout_width="wrap_content"
@@ -44,6 +44,10 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
                 android:id="@+id/contentImgView"
                 android:maxWidth="150dp"
                 android:scaleType="centerCrop"/>

@@ -246,17 +246,25 @@ public class XMPPManager {
         String to = chartMessage.getRoomId();
         String userId = chartMessage.getUserId();
         MultiUserChat muc = getMultiUserChat(to, userId);
+        Exception exception = null;
 
         try {
             if (muc != null){
                 Message message = chartMessage.getMessage();
                 muc.sendMessage(message);
             }
-
         } catch (XMPPException e) {
             e.printStackTrace();
+            exception = e;
+
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
+            exception = e;
+
+        } finally {
+            //如果发生错误，则通知调用者
+            if (exception != null && chartMessage.getOnSendMessageListener() != null)
+                 chartMessage.getOnSendMessageListener().onSendError(exception, chartMessage);
         }
     }
 

@@ -69,23 +69,29 @@ public class MessageFilterManager {
 
         //如果是司机自己发送的消息,则需要更新
         if ("Driver".equals(content.sendFromSpecialUser)){
-            chatMessage.message_status = 1;     //已经成功接收
+            chatMessage.message_status = 1;     //已经成功发送
             chatMessage.is_read  = true;        //设置已读
             chatMessage.is_issue = true;        //标记自己发送的
 
-            String where = OpenHelperChatMessage.USER_ID + "=? and " +
-                    OpenHelperChatMessage.ROOM_ID + "=? and " +
-                    OpenHelperChatMessage.TIME_STAMP + "=?";
-
-            String[] selectionArgs = {chatMessage.user_id, chatMessage.room_id, "" + chatMessage.timestamp};
+            String where = OpenHelperChatMessage.ROOM_ID + "=? and " + OpenHelperChatMessage.TIME_STAMP + "=?";
+            String[] selectionArgs = {chatMessage.room_id, "" + chatMessage.timestamp};
             //更新数据库
             context.getContentResolver().update(ProviderChatMessage.CONTENT_URI, chatMessage.getContentValues(), where, selectionArgs);
         }
         //否则就是其他用户发送的
         else{
-            chatMessage.message_status = 1;      //已经成功接收
-            chatMessage.is_read  = false;        //设置已读
-            chatMessage.is_issue = false;        //标记自己发送的
+            //如果消息的类型是“文本信息”，则设置接收标志为成功接收
+            if (MessageContent.PLAIN_MESSAGE.equals(content.messageType))
+                chatMessage.message_status = 1;
+            //否则，其他任何消息，都设置成，还没有接收
+            else
+                chatMessage.message_status = 3;
+
+            //设置还没有读取状态
+            chatMessage.is_read  = false;
+            //标记自己发送的(false＝是接收别人发送的消息)
+            chatMessage.is_issue = false;
+            //添加接收时间戳
             chatMessage.timestamp = System.currentTimeMillis();
 
             //如果是其他用户发送的消息，则直接插入到数据库中

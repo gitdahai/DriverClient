@@ -32,6 +32,7 @@ import cn.hollo.www.xmpp.IChatMessage;
 public class AdapterChatCursor extends CursorAdapter {
     private Context context;
     private Resources resources;
+    private OserverUpdateCursor observer;
     private Map<Long, SoftReference<Bitmap>> imageCache = new HashMap<Long, SoftReference<Bitmap>>();
 
     /*******************************************
@@ -72,9 +73,23 @@ public class AdapterChatCursor extends CursorAdapter {
         holder.showData(chatMessage);
     }
 
+    /*******************************************
+     * 设置更新观察者对象
+     * @param observer
+     */
+    public void setOserverUpdateCursor(OserverUpdateCursor observer){
+        this.observer = observer;
+    }
 
     /*******************************************************************
-     *
+     * 需要更新数据表监听器
+     */
+    public interface OserverUpdateCursor{
+        public void onUpdateCursor(ModelChatMessage chatMessage);
+    }
+
+    /*******************************************************************
+     * 缓存的试图项
      */
     private class ItemHolder implements ImageReceiver {
         private LinearLayout chatContainer;     //对话容器
@@ -105,18 +120,30 @@ public class AdapterChatCursor extends CursorAdapter {
          * @param chatMessage
          */
         private void showData(ModelChatMessage chatMessage){
+            System.out.println("==========message--status========" + chatMessage.message_status);
             //首先隐藏子试图
             hideAllChildViews();
             //显示对话者的头像
-            showAvatar(chatMessage.avatar, chatMessage.timestamp, chatMessage.is_issue);
+            showAvatar(chatMessage);
             //首先改变布局
             changeChatLyout(chatMessage.is_issue);
             //改变消息显示文本的背景
-            changeTextBg(chatMessage.message_type, chatMessage.is_issue);
+            changeTextBg(chatMessage);
             //改变当前消息的状态
             changeMessageState(chatMessage.message_status, chatMessage.is_issue);
             //显示消息的内容
-            showMessageContent(chatMessage.message_type, chatMessage.content);
+            showMessageContent(chatMessage);
+        }
+
+        /**=================================================
+         * 检查是否需要更新数据表
+         * @param chatMessage
+         */
+        private void updateCursor(ModelChatMessage chatMessage){
+            //如果是接收的数据，才需要检查是否需要更新
+            if (observer != null){
+                observer.onUpdateCursor(chatMessage);
+            }
         }
 
         /**==================================================
@@ -131,22 +158,30 @@ public class AdapterChatCursor extends CursorAdapter {
         /**==================================================
          * 显示头像
          */
-        private void showAvatar(String avatar, long bmKey, boolean is_issue){
+        private void showAvatar(ModelChatMessage chatMessage){
             //如果是自己发送的消息，则使用本地默认头像
-            if (is_issue)
+            if (chatMessage.is_issue)
                 userAvatar.setImageResource(R.drawable.banche);
             //否则加载头像
             else {
                 //从缓冲区中读取Bitma对象
-                SoftReference<Bitmap> softReference = imageCache.get(bmKey);
+                SoftReference<Bitmap> softReference = imageCache.get(chatMessage.timestamp);
 
                 //如果已经存在一个位图
                 if (softReference != null && softReference.get() != null)
                     userAvatar.setImageBitmap(softReference.get());
                 //否则去加载图片
                 else{
+                    //在图片加载完成之前，先使用一个默认的头像图片来替代
+                    //根据性别分别设置成“男／女”头像
+                    if (chatMessage.gender == 2)
+                        userAvatar.setImageResource(R.drawable.female_avatar);
+                    else
+                        userAvatar.setImageResource(R.drawable.avatar);
+
+                    //再去加载实际的头像图片
                     ImageProvider provider = ImageProvider.getInstance(context);
-                    provider.getThumbnailImage(avatar, this, bmKey);
+                    provider.getThumbnailImage(chatMessage.avatar, this, chatMessage.timestamp);
                 }
             }
         }
@@ -186,20 +221,29 @@ public class AdapterChatCursor extends CursorAdapter {
 
         /**==================================================
          * 根据消息的类型，改变试图的样式
-         * @param messageType
+         * @param chatMessage
          */
-        private void changeTextBg(String messageType, boolean is_issue){
+        private void changeTextBg(ModelChatMessage chatMessage){
             //如果是文本信息
-            if (IChatMessage.PLAIN_MESSAGE.equals(messageType)){
-                if (is_issue){
+            if (IChatMessage.PLAIN_MESSAGE.equals(chatMessage.message_type)){
+                if (chatMessage.is_issue){
                     contentTextView.setBackgroundResource(R.drawable.message_r);
-                    contentImgView.setImageResource(R.drawable.voice_play_right);
                     contentTextView.setTextColor(resources.getColor(R.color.color_white));
                 }
                 else{
                     contentTextView.setBackgroundResource(R.drawable.message_l);
-                    contentImgView.setImageResource(R.drawable.voice_play_left);
                     contentTextView.setTextColor(resources.getColor(R.color.color_black));
+                }
+            }
+            //否则设置图片显示容器
+            else {
+                if (chatMessage.is_issue){
+                    contentImgView.setBackgroundResource(R.drawable.message_r);
+                    contentImgView.setImageResource(R.drawable.voice_play_right_0);
+                }
+                else{
+                    contentImgView.setBackgroundResource(R.drawable.message_l);
+                    contentImgView.setImageResource(R.drawable.voice_play_left_0);
                 }
             }
         }
@@ -210,10 +254,8 @@ public class AdapterChatCursor extends CursorAdapter {
          * @param is_issue
          */
         private void changeMessageState(int messageStatus, boolean is_issue){
-            //如果正在发送，则显示上传动画
+            //如果正在发送/接收，则显示上传动画
             if (messageStatus == 0){
-                //显示状态试图
-                contentStatus.setVisibility(View.VISIBLE);
                 //如果是发出的，则设置“上传动态”
                 if (is_issue)
                     contentStatus.setImageResource(R.drawable.stat_sys_upload_anim);
@@ -221,33 +263,69 @@ public class AdapterChatCursor extends CursorAdapter {
                 else
                     contentStatus.setImageResource(R.drawable.stat_sys_download_anim);
 
+                //显示状态试图
+                contentStatus.setVisibility(View.VISIBLE);
+
                 //执行动画
                 AnimationDrawable animationDrawable = (AnimationDrawable) contentStatus.getDrawable();
-                animationDrawable.start();
+                //启动动画
+                if (animationDrawable != null)
+                    animationDrawable.start();
             }
 
             //如果已经上传成功，则取消任何状态的显示
-            else if (messageStatus == 1)
+            else if (messageStatus == 1){
                 contentStatus.setImageResource(0);
-                //如果上传失败，则显示叹号
-            else if (messageStatus == 2)
+            }
+
+            //如果上传失败，则显示叹号
+            else if (messageStatus == 2){
                 contentStatus.setImageResource(R.drawable.indicator_input_error);
+            }
         }
 
         /**==================================================
          * 显示消息实体的内容
          */
-        private void showMessageContent(String messageType, String messageContent){
+        private void showMessageContent(ModelChatMessage chatMessage){
             //春文本消息
-            if (IChatMessage.PLAIN_MESSAGE.equals(messageType)){
-                contentTextView.setText("");
-                contentTextView.setText(messageContent);
-                contentTextView.setVisibility(View.VISIBLE);
-            }
+            if (IChatMessage.PLAIN_MESSAGE.equals(chatMessage.message_type))
+                showTextMessage(chatMessage);
+
             //语音消息
-            else if (IChatMessage.AUDIO_MESSAGE.equals(messageType)){
-                contentImgView.setVisibility(View.VISIBLE);
+            else if (IChatMessage.AUDIO_MESSAGE.equals(chatMessage.message_type))
+                showAudioMessage(chatMessage);
+
+        }
+
+        /**==================================================
+         * 显示文本信息
+         * @param chatMessage
+         */
+        private void showTextMessage(ModelChatMessage chatMessage){
+            contentTextView.setText("");
+            contentTextView.setText(chatMessage.content);
+            contentTextView.setVisibility(View.VISIBLE);
+
+            //如果是接收其他用户发送的文本，则需要跟新数据状态
+            if (!chatMessage.is_issue){
+                if(!chatMessage.is_read && observer != null){
+                    //设置成“已读”状态
+                    chatMessage.is_read = true;
+                    //跟新到数据库
+                    observer.onUpdateCursor(chatMessage);
+                }
             }
+        }
+
+        /**==================================================
+         * 显示语音消息
+         * @param chatMessage
+         */
+        private void showAudioMessage(ModelChatMessage chatMessage){
+            contentImgView.setVisibility(View.VISIBLE);
+
+
         }
 
         /**===================================================

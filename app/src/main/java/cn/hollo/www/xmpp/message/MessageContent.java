@@ -23,6 +23,7 @@ public class MessageContent implements IChatMessage {
     public long timestamp;            //生成的时间
     public String GroupRoomType;
     public String sendFromSpecialUser;
+    public ObserverSendMessageError observer;
 
     /***********************************************
      *
@@ -57,6 +58,14 @@ public class MessageContent implements IChatMessage {
         message.setBody(body);
 
         return message;
+    }
+
+    /*************************************************
+     * 返回监听器
+     * @return
+     */
+    public ObserverSendMessageError getOnSendMessageListener() {
+        return observer;
     }
 
     /*************************************************
