@@ -82,13 +82,4 @@ public abstract class DeleteData extends UpYunBaseClass {
 				listener.onDeleteFinished(responseCode, resultString, attach);
 		}		
 	}
-	
-	/**
-	 * 事件监听器
-	 * @author orson
-	 *
-	 */
-	public abstract static class OnDeleteFinishedListener{
-		public abstract void onDeleteFinished(int code, String resultString, Object attach);
-	}
 }

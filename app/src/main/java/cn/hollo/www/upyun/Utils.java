@@ -1,5 +1,7 @@
 package cn.hollo.www.upyun;
 
+import android.content.Context;
+
 import java.util.Calendar;
 
 /**
@@ -20,6 +22,21 @@ public class Utils {
         //添加文件名
         sb.append("/" + extractFileName(filePathName));
         return sb.toString();
+    }
+
+    /*****************************************************
+     * 由服务器文件名称，转换成本地存储文件名
+     * @param context
+     * @param uriName
+     * @return
+     */
+    public static String getLocalFilePathFullName(Context context, String uriName){
+        String localFullPathName = null;
+        String shortName = extractFileName(uriName);
+        String localDir = context.getCacheDir().getAbsolutePath();
+        localFullPathName = localDir + "/" + shortName;
+
+        return localFullPathName;
     }
 
     /*****************************************************

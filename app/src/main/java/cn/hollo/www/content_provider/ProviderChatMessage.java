@@ -70,6 +70,7 @@ public class ProviderChatMessage extends ContentProvider {
 
         Uri newUri = ContentUris.withAppendedId(uri, id);
         resolver.notifyChange(uri, null);
+        System.out.println("====================想数据库中插入了数据=================");
         return newUri;
     }
 
@@ -99,6 +100,7 @@ public class ProviderChatMessage extends ContentProvider {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int count = db.update(OpenHelperChatMessage.TABLE_NAME, values, selection, selectionArgs);
         resolver.notifyChange(uri, null);
+        System.out.println("====================更新了数据库=================");
         return count;
     }
 }

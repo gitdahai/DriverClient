@@ -36,7 +36,7 @@ public class VoiceService implements VoiceRecorder.OnRecorderFinishListener {
 		this.context 	 = context;
 		
 		recorder = VoiceRecorder.getInstance();
-		voicePlay = VoicePlay.getInstance();
+		voicePlay = new VoicePlay();
 		
 		recorder.setOnRecorderDecibelListener(recorderListener);
 		recorder.setOnRecorderFinishListener(this);

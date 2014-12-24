@@ -25,7 +25,11 @@ public class ModelChatMessage {
     //本地附加的数据
     public boolean  is_read;            //消息的状态:消息的状态（true=已读，false=未读）
     public boolean  is_issue;           //消息:消息是自己发送的，还是接收的(true=发送，false=接收的)
-    public int  message_status;         //消息的发送或者接收状态:消息的发送／接收状态（0=接收/上传中，1=接收/发送成功，2=接收/发送失败, 3=未接收/上传）
+    public int  message_status;         //消息的发送或者接收状态:消息的发送／接收状态（0=接收/上传中，
+                                        // 1=接收/发送成功，
+                                        // 2=接收/发送失败,
+                                        // 3=未接收/上传
+                                        // 4=播放中）
 
     public ModelChatMessage(){}
     /**************************************************

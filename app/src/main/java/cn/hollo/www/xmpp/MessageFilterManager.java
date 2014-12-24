@@ -98,7 +98,7 @@ public class MessageFilterManager {
             context.getContentResolver().insert(ProviderChatMessage.CONTENT_URI, chatMessage.getContentValues());
         }
 
-        chatMessage.print();
+        //chatMessage.print();
     }
 
     /***********************************************

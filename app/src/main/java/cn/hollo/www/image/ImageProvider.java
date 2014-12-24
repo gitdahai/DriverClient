@@ -8,7 +8,7 @@ import android.os.Message;
 import java.io.File;
 import java.io.IOException;
 
-import cn.hollo.www.upyun.DownloadData;
+import cn.hollo.www.upyun.OnDownloadFinishListener;
 import cn.hollo.www.upyun.picture.DownloadPicture;
 
 
@@ -205,7 +205,7 @@ public class ImageProvider {
 	/**
 	 * 下载图像返回事件
 	 */
-	private DownloadData.OnDownloadFinishListener downloadListener = new DownloadData.OnDownloadFinishListener(){
+	private OnDownloadFinishListener downloadListener = new OnDownloadFinishListener(){
 		public void onDownloadFinish(int code, boolean isSave, String saveName, Object attach) {
 			Bitmap bm = ImageBitmapUtils.createBitmap(saveName);
 			Attach data = (Attach)attach;

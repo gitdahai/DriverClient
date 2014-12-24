@@ -15,17 +15,16 @@ import java.io.IOException;
  * 
  */
 public class VoicePlay {
-    private static VoicePlay instance;
     private OnPlayFinishListener onFinishListener;
     private int playId;
     private MediaPlayer mediaPlayer;
-    private boolean isPlaying;
     private String filePath;
+    private Object attach;
 
     /**
      * 构造方法
      */
-    private VoicePlay() {
+    public VoicePlay() {
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnCompletionListener(onCompletionListener);
         mediaPlayer.setOnErrorListener(onErrorListener);
@@ -35,16 +34,16 @@ public class VoicePlay {
         playId = id;
     }
 
-    /**
-     * 获取该类的实例对象
-     * 
-     * @return
-     */
-    public static VoicePlay getInstance() {
-        if (instance == null)
-            instance = new VoicePlay();
+    public Object getAttach(){
+        return attach;
+    }
 
-        return instance;
+    /**
+     * 添加一个附件
+     * @param data
+     */
+    public void setAttach(Object data){
+        this.attach = data;
     }
 
     /**
@@ -123,7 +122,6 @@ public class VoicePlay {
     		if (mediaPlayer.isPlaying()){
             	mediaPlayer.stop();
                 mediaPlayer.release();
-                instance = null;
             } 
     	}
     	catch(Exception e){

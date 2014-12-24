@@ -13,6 +13,7 @@ public class StationMessage implements IChatMessage {
     public String contract_id;    //合约编号
     public String vehicle_code;   //车辆编号
     public String to;             //应该是用户的id
+    public ObserverSendMessageError observer;
 
     @Override
     public String getUserId() {
@@ -33,5 +34,10 @@ public class StationMessage implements IChatMessage {
         message.addBody("messageType", messageType);
 
         return message;
+    }
+
+    @Override
+    public ObserverSendMessageError getOnSendMessageListener() {
+        return observer;
     }
 }

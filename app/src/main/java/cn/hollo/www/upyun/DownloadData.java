@@ -37,9 +37,9 @@ public abstract class DownloadData extends UpYunBaseClass {
 		super.uriName = uriName;
 		this.saveFile = saveFile;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param uriName	: 请求资源的名称
 	 * @param saveName	：保存下载后的文件名（含完整路径的文件名）
 	 */
@@ -48,7 +48,7 @@ public abstract class DownloadData extends UpYunBaseClass {
 		super.uriName = uriName;
 		this.saveFile = new File(saveName);
 	}
-	
+
 	/**
 	 * 设置请求参数
 	 */
@@ -148,14 +148,5 @@ public abstract class DownloadData extends UpYunBaseClass {
 			if (listener != null)
 				listener.onDownloadFinish(responseCode, isSuccess, saveFile.getAbsolutePath(), attach);
 		}	
-	}
-	
-	/**
-	 * 下载监听器
-	 * @author orson
-	 *
-	 */
-	public static abstract class OnDownloadFinishListener{
-		public abstract void onDownloadFinish(int code, boolean isSave, String saveName, Object attach);
 	}
 }
