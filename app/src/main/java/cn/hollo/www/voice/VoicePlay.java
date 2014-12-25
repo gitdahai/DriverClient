@@ -38,6 +38,14 @@ public class VoicePlay {
         return attach;
     }
 
+    /************************************************
+     * 返回当前的状态
+     * @return
+     */
+    public boolean isPlaying(){
+       return mediaPlayer.isPlaying();
+    }
+
     /**
      * 添加一个附件
      * @param data

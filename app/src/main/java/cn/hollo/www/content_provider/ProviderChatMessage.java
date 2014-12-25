@@ -70,7 +70,6 @@ public class ProviderChatMessage extends ContentProvider {
 
         Uri newUri = ContentUris.withAppendedId(uri, id);
         resolver.notifyChange(uri, null);
-        System.out.println("====================想数据库中插入了数据　" + values.toString());
         return newUri;
     }
 

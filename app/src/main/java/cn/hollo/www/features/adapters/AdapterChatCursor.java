@@ -109,19 +109,43 @@ public class AdapterChatCursor extends CursorAdapter {
      * 播放语音
      * @param
      */
-    private void playVoice(ModelChatMessage chatMessage){
+    private void playVoice(VoicePlay paly){
+        if (paly == null || paly.getAttach() == null)
+            return;
+
+        // 根据传递的参数，获取播放语音文件的本地路径
+        ModelChatMessage chatMessage = (ModelChatMessage)paly.getAttach();
         String voicePathName = chatMessage.content;
         String localFullPathname = Utils.getLocalFilePathFullName(context, voicePathName);
-        chatMessage.message_status = 4;
-        chatMessage.is_read = true;
-        updateCursor(chatMessage);
 
         //开始播放
-        paly = new VoicePlay();
-        paly.setAttach(chatMessage);
         paly.setFilePath(localFullPathname);
         paly.setOnPlayFinishListener(playVoiceListener);
         paly.play();
+    }
+
+    /**--------------------------------------------------
+     * 停止播放语音
+     * 如果当前存在语音播放对象，而且正在播放
+     * 则先停止播放，之后在释放资源；
+     *
+     * 这里还是需要修改数据的状态为默认状态，并且更新
+     * 数据库
+     */
+    protected void stopVoicePlay(VoicePlay paly){
+        //如果当前有正在播放的语音，则首先停止，并且释放资源
+        if (paly != null && paly.isPlaying()){
+            paly.stop();
+            paly.release();
+
+            //获取赞存的附件
+            ModelChatMessage chatMessage = (ModelChatMessage)paly.getAttach();
+            //如果存在该附件数据，则需要修改该信息的状态
+            if (chatMessage != null){
+                chatMessage.message_status = 1;
+                updateCursor(chatMessage);
+            }
+        }
     }
 
     /***************************************************
@@ -332,6 +356,8 @@ public class AdapterChatCursor extends CursorAdapter {
             updateCursor(chatMessage);
         }
 
+
+
         /**重新布局试图*/
         protected void reLayout(){}
         /**显示状态*/
@@ -361,7 +387,6 @@ public class AdapterChatCursor extends CursorAdapter {
      *
      *****************************************************************/
     private class ItemIssueHandler extends ItemHandler{
-
         /**----------------------------------------------------
          * 构造
          * @param item
@@ -422,6 +447,7 @@ public class AdapterChatCursor extends CursorAdapter {
             //隐藏该标志
             else if (item.chatMessage.message_status == 1){
                 item.contentStatus.setImageResource(0);
+                item.contentImgView.setImageResource(R.drawable.voice_play_right_0);
             }
             //显示上传失败的状态
             else if (item.chatMessage.message_status == 2){
@@ -463,15 +489,30 @@ public class AdapterChatCursor extends CursorAdapter {
          * 处理语音消息
          *
          * 该语音消息需要显示成“声波”样式的图片,并且也是包含在
-         * 会话“气泡”内;
+         * 会话“气泡”内;如果当前的是正在播放语音，则需要加载语音动画
+         * 文件，进行动画的播放
          * 使该试图变为可见状态;
          * 需要隐藏文本试图
          */
         protected void handleAudioMessage(){
             item.contentImgView.setBackgroundResource(R.drawable.message_r);
-            item.contentImgView.setImageResource(R.drawable.voice_play_right_0);
             item.contentImgView.setVisibility(View.VISIBLE);
             item.contentTextView.setVisibility(View.GONE);
+
+            //如果当前状态是正在播放，则直接返回
+            if (item.chatMessage.message_status == 4){
+                //设置动画文件
+                item.contentImgView.setImageResource(R.drawable.voice_play_right);
+                //执行动画
+                AnimationDrawable animationDrawable = (AnimationDrawable) item.contentImgView.getDrawable();
+                //启动动画
+                if (animationDrawable != null)
+                    animationDrawable.start();
+            }
+            //否则直接显示静止图片
+            else{
+                item.contentImgView.setImageResource(R.drawable.voice_play_right_0);
+            }
         }
 
         /**-------------------------------------------------
@@ -489,10 +530,35 @@ public class AdapterChatCursor extends CursorAdapter {
         }
 
         /**-------------------------------------------------
+         * 如果当前没有正在播放的语音，则直接进行播放
+         * 否则先停止上一个语音文件的播放流程，在开启新的
+         * 播放，同时开启动态显示正在播放的语音，同时跟新
+         * 数据库，将当前要播放的语音状态跟新为“播放中”，
+         * 同时已经停止的播放语音也要跟新数据库，跟新为“正常状态”;
          *
+         * 注意：如果当前的语音的状态是“正在播放”，则需要停止播放
          */
         protected void onActionPlayVoice(){
+            //判断，如果当前该消息正在播放，
+            // 则这次需要执行停止操作
+            //停止之后，直接退出
+            if (item.chatMessage.message_status == 4){
+                stopVoicePlay(paly);
+                return;
+            }
 
+            //如果当前有其他的语音在播放，则也是需要停止
+            if (paly != null && paly.isPlaying()){
+                stopVoicePlay(paly);
+            }
+
+            //开始一个新的播放流程
+            item.chatMessage.message_status = 4;
+            updateCursor(item.chatMessage);
+            //进行播放
+            paly = new VoicePlay();
+            paly.setAttach(item.chatMessage);
+            playVoice(paly);
         }
 
         /**------------------------------------------------
@@ -597,6 +663,7 @@ public class AdapterChatCursor extends CursorAdapter {
                 ImageProvider provider = ImageProvider.getInstance(context);
                 provider.getThumbnailImage(item.chatMessage.avatar, this, item.chatMessage.avatar);
             }
+
         }
 
         /**---------------------------------------------------
@@ -672,22 +739,34 @@ public class AdapterChatCursor extends CursorAdapter {
          */
         protected void handleAudioMessage(){
             item.contentImgView.setBackgroundResource(R.drawable.message_l);
-            item.contentImgView.setImageResource(R.drawable.voice_play_left_0);
             item.contentImgView.setVisibility(View.VISIBLE);
             item.contentTextView.setVisibility(View.GONE);
 
-            //如果资源还没有接收，则进行自动下载
-            if (item.chatMessage.message_status == 3 && item.chatMessage.content != null){
-                //修改状态为接收中
-                item.chatMessage.message_status = 0;
-                //通知跟新状态
-                updateCursor(item.chatMessage);
-                //开始下载语音资源
-                String localFullPathname = Utils.getLocalFilePathFullName(context, item.chatMessage.content);
-                DownloadVoice downloadVoice = new DownloadVoice(item.chatMessage.content, localFullPathname);
-                downloadVoice.setAttachment(item.chatMessage);
-                downloadVoice.setOnDownloadFinishListener(this);
-                downloadVoice.excuteRequest();
+
+            if (item.chatMessage.message_status == 4){
+                //设置动画文件
+                item.contentImgView.setImageResource(R.drawable.voice_play_left);
+                //执行动画
+                AnimationDrawable animationDrawable = (AnimationDrawable) item.contentImgView.getDrawable();
+                //启动动画
+                if (animationDrawable != null)
+                    animationDrawable.start();
+            }
+            else{
+                item.contentImgView.setImageResource(R.drawable.voice_play_left_0);
+                //如果资源还没有接收，则进行自动下载
+                if (item.chatMessage.message_status == 3 && item.chatMessage.content != null){
+                    //修改状态为接收中
+                    item.chatMessage.message_status = 0;
+                    //通知跟新状态
+                    updateCursor(item.chatMessage);
+                    //开始下载语音资源
+                    String localFullPathname = Utils.getLocalFilePathFullName(context, item.chatMessage.content);
+                    DownloadVoice downloadVoice = new DownloadVoice(item.chatMessage.content, localFullPathname);
+                    downloadVoice.setAttachment(item.chatMessage);
+                    downloadVoice.setOnDownloadFinishListener(this);
+                    downloadVoice.excuteRequest();
+                }
             }
         }
 
