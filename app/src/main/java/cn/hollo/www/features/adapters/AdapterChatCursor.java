@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cn.hollo.www.R;
+import cn.hollo.www.app.EmotionDiction;
 import cn.hollo.www.content_provider.ModelChatMessage;
 import cn.hollo.www.custom_view.RoundedImageView;
 import cn.hollo.www.image.ImageProvider;
@@ -76,6 +77,7 @@ public class AdapterChatCursor extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ItemHolder holder = (ItemHolder)view.getTag();
         ModelChatMessage chatMessage = new ModelChatMessage(cursor);
+        System.out.println("====status===== " + chatMessage.message_status);
         holder.flushView(chatMessage);
     }
 
@@ -134,7 +136,7 @@ public class AdapterChatCursor extends CursorAdapter {
      */
     protected void stopVoicePlay(VoicePlay paly){
         //如果当前有正在播放的语音，则首先停止，并且释放资源
-        if (paly != null && paly.isPlaying()){
+        if (paly != null){
             paly.stop();
             paly.release();
 
@@ -153,26 +155,12 @@ public class AdapterChatCursor extends CursorAdapter {
      */
     private VoicePlay.OnPlayFinishListener playVoiceListener = new VoicePlay.OnPlayFinishListener(){
         public void onPlayFinish(String filePathName, int id) {
-            changeStatus();
+            stopVoicePlay(paly);
         }
-
         public void onPlayError(String filePathName, int id) {
-            changeStatus();
+            stopVoicePlay(paly);
         }
-
-        public void onPlayStop(String filePathName, int id) {
-            changeStatus();
-
-        }
-
-        private void changeStatus(){
-            if (paly != null){
-                paly.release();
-                ModelChatMessage chatMessage = (ModelChatMessage)paly.getAttach();
-                chatMessage.message_status = 1;
-                updateCursor(chatMessage);
-            }
-        }
+        public void onPlayStop(String filePathName, int id) {stopVoicePlay(paly);}
     };
 
     /*******************************************************************
@@ -214,6 +202,7 @@ public class AdapterChatCursor extends CursorAdapter {
          */
         private void flushView(ModelChatMessage chatMessage){
             this.chatMessage = chatMessage;
+            initDataToView();
 
             //如果是自己发送的消息，则走IssueHandler处理流程
             if (chatMessage.is_issue){
@@ -225,6 +214,21 @@ public class AdapterChatCursor extends CursorAdapter {
                 contentImgView.setOnClickListener(receiverHandler);
                 receiverHandler.showItemView();
             }
+        }
+
+        /**==================================================
+         * 清除试图上的残留数据
+         */
+        private void initDataToView(){
+            contentStatus.setVisibility(View.GONE);
+            contentTextView.setVisibility(View.GONE);
+            contentImgView.setVisibility(View.GONE);
+
+            /*contentStatus.setImageResource(0);
+            contentTextView.setText("");
+            contentTextView.setBackgroundResource(0);
+            contentImgView.setImageResource(0);
+            contentImgView.setBackgroundResource(0);*/
         }
     }
 
@@ -312,8 +316,90 @@ public class AdapterChatCursor extends CursorAdapter {
          * 处理表情符号消息
          */
         private void handleEmotionMessage(){
-
+            if (item.chatMessage.content != null){
+                EmotionDiction emotionDiction = EmotionDiction.getInstance(context);
+                Integer drawableId = emotionDiction.getMotionIconResId(item.chatMessage.content);
+                //显示表情
+                if (drawableId != null){
+                    item.contentImgView.setVisibility(View.VISIBLE);
+                    item.contentImgView.setImageResource(drawableId);
+                }
+            }
         }
+
+        /**-------------------------------------------------
+         *　处理图拍消息
+         */
+        protected void handleImageMessage(){
+            item.contentImgView.setVisibility(View.VISIBLE);
+            item.contentImgView.setImageResource(R.drawable.message_tupian_default);
+            item.contentImgView.setBackgroundResource(0);
+
+            //如果图片资源的路径不存在，则直接返回
+            if (item.chatMessage.content == null || "".equals(item.chatMessage.content))
+                return;
+
+            //从头像路径中，抽取文件名称
+            String fileName = ImageUtils.extractFileName(item.chatMessage.content);
+
+            //如果该资源图片还没有加载，则需要进行加载
+            if (item.chatMessage.message_status == 3){
+                //修改状态为接收中
+                item.chatMessage.message_status = 0;
+                //通知跟新状态
+                updateCursor(item.chatMessage);
+
+                //再去加载实际的头像图片
+                ImageProvider provider = ImageProvider.getInstance(context);
+                provider.getThumbnailImage(item.chatMessage.content, imageReceiver, item.chatMessage);
+            }
+            //如果已经加载过该图片资源，则进行缩略图的显示
+            else if (item.chatMessage.message_status == 1){
+                //从缓冲区中读取Bitma对象
+                SoftReference<Bitmap> softReference = imageCache.get(fileName);
+                //如果该资源已经在缓存中存在了，则直接使用
+                if (softReference != null && softReference.get() != null)
+                    item.contentImgView.setImageBitmap(softReference.get());
+                else{
+                    //再去加载实际的头像图片
+                    ImageProvider provider = ImageProvider.getInstance(context);
+                    provider.getThumbnailImage(item.chatMessage.content, imageReceiver, item.chatMessage);
+                }
+            }
+        }
+
+        /**-------------------------------------------------
+         *　处理位置消息
+         */
+        protected void handleLocationMessage(){
+            item.contentImgView.setVisibility(View.VISIBLE);
+            item.contentImgView.setImageResource(R.drawable.location_place2x);
+            item.contentImgView.setBackgroundResource(0);
+        }
+
+        /**------------------------------------------------
+         * 加载图片返回
+         */
+        private ImageReceiver imageReceiver = new ImageReceiver(){
+            public void onImagePush(int code, Bitmap bm, Object attach) {
+                if (bm != null && attach != null){
+                    ModelChatMessage chatMessage = (ModelChatMessage)attach;
+                    String bmFileName = ImageUtils.extractFileName(chatMessage.content);
+                    SoftReference<Bitmap> softReference = new SoftReference<Bitmap>(bm);
+                    imageCache.put(bmFileName, softReference);
+                    //修改状态为成功
+                    item.chatMessage.message_status = 1;
+                    //通知跟新状态
+                    updateCursor(item.chatMessage);
+                }
+                else{
+                    //修改状态为失败
+                    item.chatMessage.message_status = 2;
+                    //通知跟新状态
+                    updateCursor(item.chatMessage);
+                }
+            }
+        };
 
         /**-------------------------------------------------
          * 点击产生的事件，可能的事件有：
@@ -356,8 +442,6 @@ public class AdapterChatCursor extends CursorAdapter {
             updateCursor(chatMessage);
         }
 
-
-
         /**重新布局试图*/
         protected void reLayout(){}
         /**显示状态*/
@@ -369,9 +453,9 @@ public class AdapterChatCursor extends CursorAdapter {
         /**处理分派的语音任务*/
         protected void handleAudioMessage(){}
         /**处理分派过来的图片任务*/
-        protected void handleImageMessage(){}
+        //protected void handleImageMessage(){}
         /**处理分派过来的位置信息*/
-        protected void handleLocationMessage(){}
+        //protected void handleLocationMessage(){}
         /***执行播放语音的动作*/
         protected void onActionPlayVoice(){}
         /**执行显示图片的动作*/
@@ -437,6 +521,7 @@ public class AdapterChatCursor extends CursorAdapter {
         protected void showMessageStatus(){
             //启用状态标志的上传动画
             if (item.chatMessage.message_status == 0){
+                item.contentStatus.setVisibility(View.VISIBLE);
                 item.contentStatus.setImageResource(R.drawable.stat_sys_upload_anim);
                 //执行动画
                 AnimationDrawable animationDrawable = (AnimationDrawable) item.contentStatus.getDrawable();
@@ -446,11 +531,11 @@ public class AdapterChatCursor extends CursorAdapter {
             }
             //隐藏该标志
             else if (item.chatMessage.message_status == 1){
-                item.contentStatus.setImageResource(0);
-                item.contentImgView.setImageResource(R.drawable.voice_play_right_0);
+
             }
             //显示上传失败的状态
             else if (item.chatMessage.message_status == 2){
+                item.contentStatus.setVisibility(View.VISIBLE);
                 item.contentStatus.setImageResource(R.drawable.indicator_input_error);
             }
             //暂时没有定义
@@ -482,7 +567,6 @@ public class AdapterChatCursor extends CursorAdapter {
             item.contentTextView.setTextColor(resources.getColor(R.color.color_white));
             item.contentTextView.setText(item.chatMessage.content);
             item.contentTextView.setVisibility(View.VISIBLE);
-            item.contentImgView.setVisibility(View.GONE);
         }
 
         /**--------------------------------------------------
@@ -497,7 +581,6 @@ public class AdapterChatCursor extends CursorAdapter {
         protected void handleAudioMessage(){
             item.contentImgView.setBackgroundResource(R.drawable.message_r);
             item.contentImgView.setVisibility(View.VISIBLE);
-            item.contentTextView.setVisibility(View.GONE);
 
             //如果当前状态是正在播放，则直接返回
             if (item.chatMessage.message_status == 4){
@@ -513,20 +596,6 @@ public class AdapterChatCursor extends CursorAdapter {
             else{
                 item.contentImgView.setImageResource(R.drawable.voice_play_right_0);
             }
-        }
-
-        /**-------------------------------------------------
-         *　处理图拍消息
-         */
-        protected void handleImageMessage(){
-
-        }
-
-        /**-------------------------------------------------
-         *　处理位置消息
-         */
-        protected void handleLocationMessage(){
-
         }
 
         /**-------------------------------------------------
@@ -559,20 +628,6 @@ public class AdapterChatCursor extends CursorAdapter {
             paly = new VoicePlay();
             paly.setAttach(item.chatMessage);
             playVoice(paly);
-        }
-
-        /**------------------------------------------------
-         *
-         */
-        protected void onActionShowImg(){
-
-        }
-
-        /**-----------------------------------------------
-         *
-         */
-        protected void onActionShowLocation(){
-
         }
     }
 
@@ -663,7 +718,6 @@ public class AdapterChatCursor extends CursorAdapter {
                 ImageProvider provider = ImageProvider.getInstance(context);
                 provider.getThumbnailImage(item.chatMessage.avatar, this, item.chatMessage.avatar);
             }
-
         }
 
         /**---------------------------------------------------
@@ -678,6 +732,7 @@ public class AdapterChatCursor extends CursorAdapter {
         protected void showMessageStatus(){
             //如果正在发送/接收，则显示上传动画
             if (item.chatMessage.message_status == 0){
+                item.contentStatus.setVisibility(View.VISIBLE);
                 item.contentStatus.setImageResource(R.drawable.stat_sys_download_anim);
 
                 //执行动画
@@ -688,10 +743,11 @@ public class AdapterChatCursor extends CursorAdapter {
             }
             //如果已经上传成功，则取消任何状态的显示
             else if (item.chatMessage.message_status == 1){
-                item.contentStatus.setImageResource(0);
+
             }
             //如果上传／下载失败，则显示叹号
             else if (item.chatMessage.message_status == 2){
+                item.contentStatus.setVisibility(View.VISIBLE);
                 item.contentStatus.setImageResource(R.drawable.indicator_input_error);
             }
             //消息还没有进行下载,自动进行下载
@@ -717,9 +773,8 @@ public class AdapterChatCursor extends CursorAdapter {
             item.contentTextView.setTextColor(resources.getColor(R.color.color_black));
             item.contentTextView.setText(item.chatMessage.content);
             item.contentTextView.setVisibility(View.VISIBLE);
-            item.contentImgView.setVisibility(View.GONE);
 
-            if(!item.chatMessage.is_read && observer != null){
+            if(!item.chatMessage.is_read){
                 //设置成“已读”状态
                 item.chatMessage.is_read = true;
                 //跟新到数据库
@@ -740,8 +795,6 @@ public class AdapterChatCursor extends CursorAdapter {
         protected void handleAudioMessage(){
             item.contentImgView.setBackgroundResource(R.drawable.message_l);
             item.contentImgView.setVisibility(View.VISIBLE);
-            item.contentTextView.setVisibility(View.GONE);
-
 
             if (item.chatMessage.message_status == 4){
                 //设置动画文件
@@ -754,6 +807,7 @@ public class AdapterChatCursor extends CursorAdapter {
             }
             else{
                 item.contentImgView.setImageResource(R.drawable.voice_play_left_0);
+
                 //如果资源还没有接收，则进行自动下载
                 if (item.chatMessage.message_status == 3 && item.chatMessage.content != null){
                     //修改状态为接收中
@@ -771,38 +825,36 @@ public class AdapterChatCursor extends CursorAdapter {
         }
 
         /**-------------------------------------------------
-         *　处理图拍消息
-         */
-        protected void handleImageMessage(){
-
-        }
-
-        /**-------------------------------------------------
-         *　处理位置消息
-         */
-        protected void handleLocationMessage(){
-
-        }
-
-        /**-------------------------------------------------
-         *
+         * 播放语音动作
          */
         protected void onActionPlayVoice(){
+            //判断，如果当前该消息正在播放，
+            // 则这次需要执行停止操作
+            //停止之后，直接退出
+            if (item.chatMessage.message_status == 4){
+                stopVoicePlay(paly);
+                return;
+            }
 
-        }
+            //如果当前有其他的语音在播放，则也是需要停止
+            if (paly != null && paly.isPlaying()){
+                stopVoicePlay(paly);
+            }
 
-        /**------------------------------------------------
-         *
-         */
-        protected void onActionShowImg(){
+            //如果该语音文件还没有接收成功，则不能进行播放
+            if (item.chatMessage.message_status != 1){
+                return;
+            }
 
-        }
+            //开始一个新的播放流程
+            item.chatMessage.message_status = 4;
+            item.chatMessage.is_read = true;
+            updateCursor(item.chatMessage);
 
-        /**-----------------------------------------------
-         *
-         */
-        protected void onActionShowLocation(){
-
+            //进行播放
+            paly = new VoicePlay();
+            paly.setAttach(item.chatMessage);
+            playVoice(paly);
         }
     }
 }

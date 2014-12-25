@@ -5,4 +5,21 @@
     <string name="title_activity_activity_bus_client">ActivityBusClient</string>
     <string name="title_activity_activity_shuttle_client">ActivityShuttleClient</string>
 
+    <string name="text_1059">[大笑]</string>
+    <string name="text_1060">[微笑]</string>
+    <string name="text_1061">[不开心]</string>
+    <string name="text_1062">[斜视]</string>
+    <string name="text_1063">[流口水]</string>
+    <string name="text_1064">[惊讶]</string>
+    <string name="text_1065">[期待]</string>
+    <string name="text_1066">[调皮]</string>
+    <string name="text_1067">[快哭了]</string>
+    <string name="text_1068">[委屈]</string>
+    <string name="text_1069">[大哭]</string>
+    <string name="text_1070">[无辜]</string>
+    <string name="text_1071">[疑问]</string>
+    <string name="text_1072">[嘚瑟]</string>
+    <string name="text_1073">[坏笑]</string>
+    <string name="text_1074">[耍酷]</string>
+    <string name="text_1075">[愤怒]</string>
 </resources>

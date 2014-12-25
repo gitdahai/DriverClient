@@ -272,7 +272,6 @@ public class FragmentChatGroupRoom extends FragmentBase {
                 String where =  OpenHelperChatMessage.ROOM_ID + "=? and " + OpenHelperChatMessage.TIME_STAMP + "=?";
                 String[] selectionArgs = {roomId, "" + chatMessage.timestamp};
                 getActivity().getContentResolver().update(ProviderChatMessage.CONTENT_URI, chatMessage.getContentValues(), where, selectionArgs);
-
             }
         };
 

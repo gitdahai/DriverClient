@@ -99,7 +99,6 @@ public class ProviderChatMessage extends ContentProvider {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int count = db.update(OpenHelperChatMessage.TABLE_NAME, values, selection, selectionArgs);
         resolver.notifyChange(uri, null);
-        //System.out.println("====================更新了数据库=================");
         return count;
     }
 }
