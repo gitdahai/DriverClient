@@ -223,12 +223,6 @@ public class AdapterChatCursor extends CursorAdapter {
             contentStatus.setVisibility(View.GONE);
             contentTextView.setVisibility(View.GONE);
             contentImgView.setVisibility(View.GONE);
-
-            /*contentStatus.setImageResource(0);
-            contentTextView.setText("");
-            contentTextView.setBackgroundResource(0);
-            contentImgView.setImageResource(0);
-            contentImgView.setBackgroundResource(0);*/
         }
     }
 
@@ -319,10 +313,12 @@ public class AdapterChatCursor extends CursorAdapter {
             if (item.chatMessage.content != null){
                 EmotionDiction emotionDiction = EmotionDiction.getInstance(context);
                 Integer drawableId = emotionDiction.getMotionIconResId(item.chatMessage.content);
+
                 //显示表情
                 if (drawableId != null){
                     item.contentImgView.setVisibility(View.VISIBLE);
                     item.contentImgView.setImageResource(drawableId);
+                    item.contentImgView.setBackgroundResource(0);
                 }
             }
         }
