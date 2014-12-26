@@ -5,8 +5,6 @@ import android.content.Context;
 import org.jivesoftware.smack.packet.Message;
 
 import cn.hollo.www.content_provider.ModelChatMessage;
-import cn.hollo.www.content_provider.OpenHelperChatMessage;
-import cn.hollo.www.content_provider.ProviderChatMessage;
 import cn.hollo.www.xmpp.message.MessageContent;
 
 /**
@@ -19,8 +17,7 @@ public class MessageFilterManager {
     /*************************************************
      *
      */
-    private MessageFilterManager(){
-    }
+    private MessageFilterManager(){}
 
     /************************************************
      *
@@ -64,41 +61,34 @@ public class MessageFilterManager {
      * @param message
      */
     private void handleGroupMessage(Context context, Message message){
-        MessageContent content = MessageContent.newMessageContent(message);
-        ModelChatMessage chatMessage = new ModelChatMessage(content);
+        ModelChatMessage chatMessage = new ModelChatMessage(message);
 
         //如果是司机自己发送的消息,则需要更新
-        if ("Driver".equals(content.sendFromSpecialUser)){
-            chatMessage.message_status = 1;     //已经成功发送
-            chatMessage.is_read  = true;        //设置已读
-            chatMessage.is_issue = true;        //标记自己发送的
-
-            String where = OpenHelperChatMessage.ROOM_ID + "=? and " + OpenHelperChatMessage.TIME_STAMP + "=?";
-            String[] selectionArgs = {chatMessage.room_id, "" + chatMessage.timestamp};
-            //更新数据库
-            context.getContentResolver().update(ProviderChatMessage.CONTENT_URI, chatMessage.getContentValues(), where, selectionArgs);
+        if ("Driver".equals(chatMessage.sendFromSpecialUser)){
+            //已经成功发送
+            chatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFER_SUCCED;
+            chatMessage.updateToDatabase(context);
         }
         //否则就是其他用户发送的
-        else{
+        else {
             //如果消息的类型是“文本信息”，则设置接收标志为成功接收
-            if (MessageContent.PLAIN_MESSAGE.equals(content.messageType))
-                chatMessage.message_status = 1;
+            if (MessageContent.PLAIN_MESSAGE.equals(chatMessage.messageType) ||
+                    MessageContent.EMOTION_MESSAGE.equals(chatMessage.messageType))
+
+                chatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFER_SUCCED;
             //否则，其他任何消息，都设置成，还没有接收
             else
-                chatMessage.message_status = 3;
+                chatMessage.messageStatus = ModelChatMessage.STATUS_NONE_TRANSFER;
 
             //设置还没有读取状态
-            chatMessage.is_read  = false;
+            chatMessage.isRead  = false;
             //标记自己发送的(false＝是接收别人发送的消息)
-            chatMessage.is_issue = false;
-            //添加接收时间戳
-            chatMessage.timestamp = System.currentTimeMillis();
-
+            chatMessage.isIssue = false;
+            //把消息的id设置成当前的时间戳
+            chatMessage.messageId = System.currentTimeMillis();
             //如果是其他用户发送的消息，则直接插入到数据库中
-            context.getContentResolver().insert(ProviderChatMessage.CONTENT_URI, chatMessage.getContentValues());
+            chatMessage.inserToDatabase(context);
         }
-
-        //chatMessage.print();
     }
 
     /***********************************************

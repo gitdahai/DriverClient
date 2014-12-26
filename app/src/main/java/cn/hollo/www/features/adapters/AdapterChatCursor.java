@@ -84,7 +84,6 @@ public class AdapterChatCursor extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ItemHolder holder = (ItemHolder)view.getTag();
         ModelChatMessage chatMessage = new ModelChatMessage(cursor);
-        System.out.println("====status===== " + chatMessage.message_status);
         holder.flushView(chatMessage);
     }
 
@@ -151,7 +150,7 @@ public class AdapterChatCursor extends CursorAdapter {
             ModelChatMessage chatMessage = (ModelChatMessage)paly.getAttach();
             //如果存在该附件数据，则需要修改该信息的状态
             if (chatMessage != null){
-                chatMessage.message_status = 1;
+                chatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFER_SUCCED;
                 updateCursor(chatMessage);
             }
         }
@@ -215,7 +214,7 @@ public class AdapterChatCursor extends CursorAdapter {
             initDataToView();
 
             //如果是自己发送的消息，则走IssueHandler处理流程
-            if (chatMessage.is_issue){
+            if (chatMessage.isIssue){
                 contentImgView.setOnClickListener(issueHandler);
                 contentTextView.setOnClickListener(issueHandler);
                 issueHandler.showItemView();
@@ -284,19 +283,19 @@ public class AdapterChatCursor extends CursorAdapter {
          */
         private void assignMessage(){
             //分派文本消息
-            if (IChatMessage.PLAIN_MESSAGE.equals(item.chatMessage.message_type))
+            if (IChatMessage.PLAIN_MESSAGE.equals(item.chatMessage.messageType))
                 handleTextMessage();
                 //分派语音消息
-            else if (IChatMessage.AUDIO_MESSAGE.equals(item.chatMessage.message_type))
+            else if (IChatMessage.AUDIO_MESSAGE.equals(item.chatMessage.messageType))
                 handleAudioMessage();
                 //分派表情消息
-            else if (IChatMessage.EMOTION_MESSAGE.equals(item.chatMessage.message_type))
+            else if (IChatMessage.EMOTION_MESSAGE.equals(item.chatMessage.messageType))
                 handleEmotionMessage();
                 //分派图片消息
-            else if (IChatMessage.IMAGE_MESSAGE.equals(item.chatMessage.message_type))
+            else if (IChatMessage.IMAGE_MESSAGE.equals(item.chatMessage.messageType))
                 handleImageMessage();
                 //分派位置消息
-            else if (IChatMessage.LOCATION_MESSAGE.equals(item.chatMessage.message_type))
+            else if (IChatMessage.LOCATION_MESSAGE.equals(item.chatMessage.messageType))
                 handleLocationMessage();
         }
 
@@ -351,9 +350,9 @@ public class AdapterChatCursor extends CursorAdapter {
             String fileName = ImageUtils.extractFileName(item.chatMessage.content);
 
             //如果该资源图片还没有加载，则需要进行加载
-            if (item.chatMessage.message_status == 3){
+            if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_NONE_TRANSFER){
                 //修改状态为接收中
-                item.chatMessage.message_status = 0;
+                item.chatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFERING;
                 //通知跟新状态
                 updateCursor(item.chatMessage);
 
@@ -362,7 +361,7 @@ public class AdapterChatCursor extends CursorAdapter {
                 provider.getThumbnailImage(item.chatMessage.content, imageReceiver, item.chatMessage);
             }
             //如果已经加载过该图片资源，则进行缩略图的显示
-            else if (item.chatMessage.message_status == 1){
+            else if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_TRANSFER_SUCCED){
                 //从缓冲区中读取Bitma对象
                 SoftReference<Bitmap> softReference = imageCache.get(fileName);
                 //如果该资源已经在缓存中存在了，则直接使用
@@ -402,13 +401,13 @@ public class AdapterChatCursor extends CursorAdapter {
                     SoftReference<Bitmap> softReference = new SoftReference<Bitmap>(bm);
                     imageCache.put(bmFileName, softReference);
                     //修改状态为成功
-                    item.chatMessage.message_status = 1;
+                    item.chatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFER_SUCCED;
                     //通知跟新状态
                     updateCursor(item.chatMessage);
                 }
                 else{
                     //修改状态为失败
-                    item.chatMessage.message_status = 2;
+                    item.chatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFER_FAIL;
                     //通知跟新状态
                     updateCursor(item.chatMessage);
                 }
@@ -438,13 +437,13 @@ public class AdapterChatCursor extends CursorAdapter {
          */
         private void onActionClickContentImageVew(){
             //分派语音消息
-            if (IChatMessage.AUDIO_MESSAGE.equals(item.chatMessage.message_type))
+            if (IChatMessage.AUDIO_MESSAGE.equals(item.chatMessage.messageType))
                 onActionPlayVoice();
                 //分派图片消息
-            else if (IChatMessage.IMAGE_MESSAGE.equals(item.chatMessage.message_type))
+            else if (IChatMessage.IMAGE_MESSAGE.equals(item.chatMessage.messageType))
                 onActionShowImg();
                 //分派位置消息
-            else if (IChatMessage.LOCATION_MESSAGE.equals(item.chatMessage.message_type))
+            else if (IChatMessage.LOCATION_MESSAGE.equals(item.chatMessage.messageType))
                 onActionShowLocation();
         }
 
@@ -455,7 +454,7 @@ public class AdapterChatCursor extends CursorAdapter {
          * 其他消息不做处理
          */
         private void onActionClickContentTextView(){
-            if (IChatMessage.LOCATION_MESSAGE.equals(item.chatMessage.message_type)){
+            if (IChatMessage.LOCATION_MESSAGE.equals(item.chatMessage.messageType)){
                 System.out.println("======位置信息===========");
             }
         }
@@ -475,9 +474,9 @@ public class AdapterChatCursor extends CursorAdapter {
 
             //下载成功
             if (code == 200)
-                chatMessage.message_status = 1;
+                chatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFER_SUCCED;
             else
-                chatMessage.message_status = 2;
+                chatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFER_FAIL;
 
             //通知跟新状态
             updateCursor(chatMessage);
@@ -562,7 +561,7 @@ public class AdapterChatCursor extends CursorAdapter {
          */
         protected void showMessageStatus(){
             //启用状态标志的上传动画
-            if (item.chatMessage.message_status == 0){
+            if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_TRANSFER_SUCCED){
                 item.contentStatus.setVisibility(View.VISIBLE);
                 item.contentStatus.setImageResource(R.drawable.stat_sys_upload_anim);
                 //执行动画
@@ -571,18 +570,10 @@ public class AdapterChatCursor extends CursorAdapter {
                 if (animationDrawable != null)
                     animationDrawable.start();
             }
-            //隐藏该标志
-            else if (item.chatMessage.message_status == 1){
-
-            }
             //显示上传失败的状态
-            else if (item.chatMessage.message_status == 2){
+            else if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_TRANSFER_FAIL){
                 item.contentStatus.setVisibility(View.VISIBLE);
                 item.contentStatus.setImageResource(R.drawable.indicator_input_error);
-            }
-            //暂时没有定义
-            else if (item.chatMessage.message_status == 3){
-
             }
         }
 
@@ -628,7 +619,7 @@ public class AdapterChatCursor extends CursorAdapter {
             item.contentImgView.setVisibility(View.VISIBLE);
 
             //如果当前状态是正在播放，则直接返回
-            if (item.chatMessage.message_status == 4){
+            if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_SOUND_PLAYING){
                 //设置动画文件
                 item.contentImgView.setImageResource(R.drawable.voice_play_right);
                 //执行动画
@@ -656,7 +647,7 @@ public class AdapterChatCursor extends CursorAdapter {
             //判断，如果当前该消息正在播放，
             // 则这次需要执行停止操作
             //停止之后，直接退出
-            if (item.chatMessage.message_status == 4){
+            if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_SOUND_PLAYING){
                 stopVoicePlay(paly);
                 return;
             }
@@ -667,7 +658,7 @@ public class AdapterChatCursor extends CursorAdapter {
             }
 
             //开始一个新的播放流程
-            item.chatMessage.message_status = 4;
+            item.chatMessage.messageStatus = ModelChatMessage.STATUS_SOUND_PLAYING;
             updateCursor(item.chatMessage);
             //进行播放
             paly = new VoicePlay();
@@ -777,7 +768,7 @@ public class AdapterChatCursor extends CursorAdapter {
          */
         protected void showMessageStatus(){
             //如果正在发送/接收，则显示上传动画
-            if (item.chatMessage.message_status == 0){
+            if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_TRANSFERING){
                 item.contentStatus.setVisibility(View.VISIBLE);
                 item.contentStatus.setImageResource(R.drawable.stat_sys_download_anim);
 
@@ -787,18 +778,10 @@ public class AdapterChatCursor extends CursorAdapter {
                 if (animationDrawable != null)
                     animationDrawable.start();
             }
-            //如果已经上传成功，则取消任何状态的显示
-            else if (item.chatMessage.message_status == 1){
-
-            }
             //如果上传／下载失败，则显示叹号
-            else if (item.chatMessage.message_status == 2){
+            else if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_TRANSFER_FAIL){
                 item.contentStatus.setVisibility(View.VISIBLE);
                 item.contentStatus.setImageResource(R.drawable.indicator_input_error);
-            }
-            //消息还没有进行下载,自动进行下载
-            else if (item.chatMessage.message_status == 3){
-
             }
         }
 
@@ -823,11 +806,11 @@ public class AdapterChatCursor extends CursorAdapter {
             item.contentTextView.setGravity(Gravity.LEFT);
             item.contentTextView.setVisibility(View.VISIBLE);
 
-            if(!item.chatMessage.is_read){
+            if(!item.chatMessage.isRead){
                 //设置成“已读”状态
-                item.chatMessage.is_read = true;
+                item.chatMessage.isRead = true;
                 //跟新到数据库
-                updateCursor(item.chatMessage);
+                item.chatMessage.updateToDatabase(context);
             }
         }
 
@@ -845,7 +828,7 @@ public class AdapterChatCursor extends CursorAdapter {
             item.contentImgView.setBackgroundResource(R.drawable.message_l);
             item.contentImgView.setVisibility(View.VISIBLE);
 
-            if (item.chatMessage.message_status == 4){
+            if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_SOUND_PLAYING){
                 //设置动画文件
                 item.contentImgView.setImageResource(R.drawable.voice_play_left);
                 //执行动画
@@ -858,9 +841,9 @@ public class AdapterChatCursor extends CursorAdapter {
                 item.contentImgView.setImageResource(R.drawable.voice_play_left_0);
 
                 //如果资源还没有接收，则进行自动下载
-                if (item.chatMessage.message_status == 3 && item.chatMessage.content != null){
+                if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_NONE_TRANSFER && item.chatMessage.content != null){
                     //修改状态为接收中
-                    item.chatMessage.message_status = 0;
+                    item.chatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFERING;
                     //通知跟新状态
                     updateCursor(item.chatMessage);
                     //开始下载语音资源
@@ -880,7 +863,7 @@ public class AdapterChatCursor extends CursorAdapter {
             //判断，如果当前该消息正在播放，
             // 则这次需要执行停止操作
             //停止之后，直接退出
-            if (item.chatMessage.message_status == 4){
+            if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_SOUND_PLAYING){
                 stopVoicePlay(paly);
                 return;
             }
@@ -891,14 +874,14 @@ public class AdapterChatCursor extends CursorAdapter {
             }
 
             //如果该语音文件还没有接收成功，则不能进行播放
-            if (item.chatMessage.message_status != 1){
+            if (item.chatMessage.messageStatus != ModelChatMessage.STATUS_TRANSFER_SUCCED){
                 return;
             }
 
             //开始一个新的播放流程
-            item.chatMessage.message_status = 4;
-            item.chatMessage.is_read = true;
-            updateCursor(item.chatMessage);
+            item.chatMessage.messageStatus = ModelChatMessage.STATUS_SOUND_PLAYING;
+            item.chatMessage.isRead = true;
+            item.chatMessage.updateToDatabase(context);
 
             //进行播放
             paly = new VoicePlay();

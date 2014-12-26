@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import cn.hollo.www.R;
-import cn.hollo.www.UserInfo;
 import cn.hollo.www.content_provider.ModelChatMessage;
 import cn.hollo.www.content_provider.OpenHelperChatMessage;
 import cn.hollo.www.content_provider.ProviderChatMessage;
@@ -178,12 +177,6 @@ public class FragmentChatGroupRoom extends FragmentBase {
          */
         private SpeechVoiceRecorder.OnRecorderListener voiceListener = new SpeechVoiceRecorder.OnRecorderListener(){
             public void onRecorderFinish(boolean isSuccess, String voicePathName, int duration) {
-                System.out.println("=============================");
-                System.out.println("isSuccess=" + isSuccess);
-                System.out.println("voicePathName=" + voicePathName);
-                System.out.println("duration=" + duration);
-                System.out.println("=============================");
-
                 if (isSuccess){
                     if (duration <= 1000){
                         Util.showMsg(getActivity(), "语音太短！");
@@ -191,7 +184,7 @@ public class FragmentChatGroupRoom extends FragmentBase {
                     }
 
                     //输出语音
-                    exportHelper.exportVoice(voicePathName);
+                    exportHelper.exportVoice(voicePathName, duration);
                 }
             }
         };
@@ -275,8 +268,8 @@ public class FragmentChatGroupRoom extends FragmentBase {
          */
         private AdapterChatCursor.OserverUpdateCursor observer = new AdapterChatCursor.OserverUpdateCursor(){
             public void onUpdateCursor(ModelChatMessage chatMessage) {
-                String where =  OpenHelperChatMessage.ROOM_ID + "=? and " + OpenHelperChatMessage.TIME_STAMP + "=?";
-                String[] selectionArgs = {roomId, "" + chatMessage.timestamp};
+                String where =  OpenHelperChatMessage.ROOM_ID + "=? and " + OpenHelperChatMessage.MESSAGE_ID + "=?";
+                String[] selectionArgs = {roomId, "" + chatMessage.messageId};
                 getActivity().getContentResolver().update(ProviderChatMessage.CONTENT_URI, chatMessage.getContentValues(), where, selectionArgs);
             }
         };
@@ -286,18 +279,14 @@ public class FragmentChatGroupRoom extends FragmentBase {
          * @return
          */
         private Cursor getCursor(){
-            UserInfo userInfo = UserInfo.getInstance(getActivity());
-
-            if (userInfo == null || roomId == null)
+            if (roomId == null)
                 return null;
 
             Cursor cursor = null;
-            //String selection = OpenHelperChatMessage.USER_ID + "=? and " + OpenHelperChatMessage.ROOM_ID + "=?";
-            //String[] selectionArgs = {userInfo.getUserId(), roomId};
 
             String selection =  OpenHelperChatMessage.ROOM_ID + "=?";
             String[] selectionArgs = {roomId};
-            cursor = getActivity().getContentResolver().query(ProviderChatMessage.CONTENT_URI, null, selection, selectionArgs,null);
+            cursor = getActivity().getContentResolver().query(ProviderChatMessage.CONTENT_URI, null, selection, selectionArgs, null);
             return cursor;
         }
 

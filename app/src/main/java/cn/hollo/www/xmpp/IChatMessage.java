@@ -20,7 +20,7 @@ public interface IChatMessage {
      *
      * @return
      */
-    public String getUserId();
+    public String getJid();
 
     /**
      * 接收者的jid
@@ -33,16 +33,4 @@ public interface IChatMessage {
      * @return
      */
     public Message getMessage();
-
-    /**
-     *
-     * @return
-     */
-    public ObserverSendMessageError getOnSendMessageListener();
-    /***********************************************
-     * 发送监听器
-     */
-    public interface ObserverSendMessageError{
-        public void onSendError(Exception exception, IChatMessage message);
-    }
 }

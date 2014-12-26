@@ -31,6 +31,8 @@ import org.jivesoftware.smackx.pubsub.SimplePayload;
 import java.io.IOException;
 import java.util.List;
 
+import cn.hollo.www.xmpp.message.ObserverSendMessageError;
+
 /**
  * Created by orson on 14-11-12.
  * xmpp服务的管理类
@@ -242,9 +244,9 @@ public class XMPPManager {
      * 发送群组聊天信息
      * @param chartMessage
      */
-    public void sendMultiUserChat(IChatMessage chartMessage){
+    public void sendMultiUserChat(IChatMessage chartMessage, ObserverSendMessageError listener){
         String to = chartMessage.getRoomId();
-        String userId = chartMessage.getUserId();
+        String userId = chartMessage.getJid();
         MultiUserChat muc = getMultiUserChat(to, userId);
         Exception exception = null;
 
@@ -263,8 +265,8 @@ public class XMPPManager {
 
         } finally {
             //如果发生错误，则通知调用者
-            if (exception != null && chartMessage.getOnSendMessageListener() != null)
-                 chartMessage.getOnSendMessageListener().onSendError(exception, chartMessage);
+            if (exception != null && listener != null)
+                listener.onSendError(exception, chartMessage);
         }
     }
 
