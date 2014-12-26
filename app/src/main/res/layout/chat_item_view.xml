@@ -30,6 +30,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/contentEntities">
+            <!--图片，动画等-->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:id="@+id/contentImgView"
+                android:maxWidth="150dp"
+                android:scaleType="centerCrop"/>
 
             <!--文本-->
             <TextView
@@ -40,19 +51,7 @@
                 android:background="@drawable/message_r"
                 android:textColor="@color/color_white"
                 android:textSize="16dp"
-                android:drawablePadding="8dp"
                 android:text="哈哈哈哈是方式哈"/>
-            <!--图片，动画等-->
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="24dp"
-                android:paddingRight="24dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:id="@+id/contentImgView"
-                android:maxWidth="150dp"
-                android:scaleType="centerCrop"/>
         </FrameLayout>
     </LinearLayout>
 

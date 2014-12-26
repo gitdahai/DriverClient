@@ -53,6 +53,13 @@ public class AdapterChatCursor extends CursorAdapter {
         resources = context.getResources();
     }
 
+    /********************************************
+     * 页面已经停止运行时，需要停止播放器的播放
+     */
+    public void onStoped(){
+        stopVoicePlay(paly);
+    }
+
     /*******************************************
      * 创建新的试图
      * @param context
@@ -167,6 +174,9 @@ public class AdapterChatCursor extends CursorAdapter {
      * 缓存的试图项
      */
     private class ItemHolder {
+        protected int textMaxSize = 16;     //文本的最大字号
+        protected int textMinSize = 12;     //文本的最小字号
+
         protected LinearLayout chatContainer;     //对话容器
         protected LinearLayout contentContainer;  //消息实体容器
         protected FrameLayout  contentEntities;   //消息实体
@@ -207,11 +217,13 @@ public class AdapterChatCursor extends CursorAdapter {
             //如果是自己发送的消息，则走IssueHandler处理流程
             if (chatMessage.is_issue){
                 contentImgView.setOnClickListener(issueHandler);
+                contentTextView.setOnClickListener(issueHandler);
                 issueHandler.showItemView();
             }
             //否则则走ReceiverHandler处理流程
             else{
                 contentImgView.setOnClickListener(receiverHandler);
+                contentTextView.setOnClickListener(receiverHandler);
                 receiverHandler.showItemView();
             }
         }
@@ -241,7 +253,7 @@ public class AdapterChatCursor extends CursorAdapter {
          * @param item
          */
         private ItemHandler(ItemHolder item){
-            this.item = item;
+         this.item = item;
         }
 
         /**---------------------------------------------------
@@ -368,9 +380,15 @@ public class AdapterChatCursor extends CursorAdapter {
          *　处理位置消息
          */
         protected void handleLocationMessage(){
-            item.contentImgView.setVisibility(View.VISIBLE);
-            item.contentImgView.setImageResource(R.drawable.location_place2x);
-            item.contentImgView.setBackgroundResource(0);
+            item.contentTextView.setVisibility(View.VISIBLE);
+            item.contentTextView.setTextColor(resources.getColor(R.color.color_black));
+
+            item.contentTextView.getLayoutParams().width = 200;
+            item.contentTextView.setGravity(Gravity.BOTTOM | Gravity.LEFT);
+            item.contentTextView.setBackgroundResource(R.drawable.location_place2x);
+            item.contentTextView.setText(item.chatMessage.content);
+            item.contentTextView.setPadding(8, 0, 8, 0);
+            item.contentTextView.setTextSize(item.textMinSize);
         }
 
         /**------------------------------------------------
@@ -404,15 +422,42 @@ public class AdapterChatCursor extends CursorAdapter {
          * @param v
          */
         public void onClick(View v) {
+            int viewId = v.getId();
+
+            //如果是在ImageView产生的事件，则需要执行处理跟图片相关的事件
+            if (viewId == item.contentImgView.getId())
+                onActionClickContentImageVew();
+
+            //否则执行跟文本相关的事件
+            else if (viewId == item.contentTextView.getId())
+                onActionClickContentTextView();
+        }
+
+        /**-------------------------------------------------
+         * 在ImageView上，产生的事件
+         */
+        private void onActionClickContentImageVew(){
             //分派语音消息
             if (IChatMessage.AUDIO_MESSAGE.equals(item.chatMessage.message_type))
                 onActionPlayVoice();
-            //分派图片消息
+                //分派图片消息
             else if (IChatMessage.IMAGE_MESSAGE.equals(item.chatMessage.message_type))
                 onActionShowImg();
-            //分派位置消息
+                //分派位置消息
             else if (IChatMessage.LOCATION_MESSAGE.equals(item.chatMessage.message_type))
                 onActionShowLocation();
+        }
+
+        /**-------------------------------------------------
+         * 在TextView上产生的事件
+         * 如果当前的消息类型是关于“位置”的，则需要处理该事件，
+         * 也就是打开地图，显示该坐标位置信息;
+         * 其他消息不做处理
+         */
+        private void onActionClickContentTextView(){
+            if (IChatMessage.LOCATION_MESSAGE.equals(item.chatMessage.message_type)){
+                System.out.println("======位置信息===========");
+            }
         }
 
         /**-------------------------------------------------
@@ -492,7 +537,8 @@ public class AdapterChatCursor extends CursorAdapter {
             item.contentContainer.removeAllViews();
             //右向对齐
             item.contentContainer.setGravity(Gravity.RIGHT);
-            //重新组装试图
+
+            //---------重新组装试图-------------------
             //添加状态试图
             item.contentContainer.addView(item.contentStatus);
             //添加显示消息内容的实体布局
@@ -559,10 +605,13 @@ public class AdapterChatCursor extends CursorAdapter {
          * 同时需要隐藏其他内容的试图对象.
          */
         protected void handleTextMessage(){
+            item.contentTextView.getLayoutParams().width = FrameLayout.LayoutParams.WRAP_CONTENT;
             item.contentTextView.setBackgroundResource(R.drawable.message_r);
             item.contentTextView.setTextColor(resources.getColor(R.color.color_white));
             item.contentTextView.setText(item.chatMessage.content);
             item.contentTextView.setVisibility(View.VISIBLE);
+            item.contentTextView.setTextSize(item.textMaxSize);
+            item.contentTextView.setGravity(Gravity.RIGHT);
         }
 
         /**--------------------------------------------------
@@ -656,7 +705,8 @@ public class AdapterChatCursor extends CursorAdapter {
             item.contentContainer.removeAllViews();
             //设置成左侧对齐
             item.contentContainer.setGravity(Gravity.LEFT);
-            //重新组装试图
+
+            //--------------重新组装试图-------------------
             //添加显示消息内容的实体布局
             item.contentContainer.addView(item.contentEntities);
             //添加状态
@@ -765,9 +815,12 @@ public class AdapterChatCursor extends CursorAdapter {
          * 需要跟行数据库，改变状态为“已读”状态
          */
         protected void handleTextMessage(){
+            item.contentTextView.getLayoutParams().width = FrameLayout.LayoutParams.WRAP_CONTENT;
             item.contentTextView.setBackgroundResource(R.drawable.message_l);
             item.contentTextView.setTextColor(resources.getColor(R.color.color_black));
             item.contentTextView.setText(item.chatMessage.content);
+            item.contentTextView.setTextSize(item.textMaxSize);
+            item.contentTextView.setGravity(Gravity.LEFT);
             item.contentTextView.setVisibility(View.VISIBLE);
 
             if(!item.chatMessage.is_read){

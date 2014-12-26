@@ -62,6 +62,12 @@ public class FragmentChatGroupRoom extends FragmentBase {
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        chatDisplay.onStop();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         exportHelper.release();
@@ -293,6 +299,14 @@ public class FragmentChatGroupRoom extends FragmentBase {
             String[] selectionArgs = {roomId};
             cursor = getActivity().getContentResolver().query(ProviderChatMessage.CONTENT_URI, null, selection, selectionArgs,null);
             return cursor;
+        }
+
+        /**=============================================
+         * 停止
+         */
+        void onStop(){
+            if (adapter != null)
+                adapter.onStoped();
         }
     }
 }
