@@ -67,6 +67,8 @@ public class MessageFilterManager {
         if ("Driver".equals(chatMessage.sendFromSpecialUser)){
             //已经成功发送
             chatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFER_SUCCED;
+            chatMessage.isIssue = true;
+            chatMessage.isRead = true;
             chatMessage.updateToDatabase(context);
         }
         //否则就是其他用户发送的

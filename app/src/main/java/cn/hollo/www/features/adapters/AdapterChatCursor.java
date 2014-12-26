@@ -561,7 +561,7 @@ public class AdapterChatCursor extends CursorAdapter {
          */
         protected void showMessageStatus(){
             //启用状态标志的上传动画
-            if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_TRANSFER_SUCCED){
+            if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_TRANSFERING){
                 item.contentStatus.setVisibility(View.VISIBLE);
                 item.contentStatus.setImageResource(R.drawable.stat_sys_upload_anim);
                 //执行动画
@@ -659,7 +659,8 @@ public class AdapterChatCursor extends CursorAdapter {
 
             //开始一个新的播放流程
             item.chatMessage.messageStatus = ModelChatMessage.STATUS_SOUND_PLAYING;
-            updateCursor(item.chatMessage);
+            item.chatMessage.updateToDatabase(context);
+
             //进行播放
             paly = new VoicePlay();
             paly.setAttach(item.chatMessage);
