@@ -7,11 +7,10 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 
-import java.io.Serializable;
-
 import cn.hollo.www.R;
 import cn.hollo.www.features.fragments.FragmentGetLocation;
 import cn.hollo.www.features.fragments.FragmentShowLocation;
+import cn.hollo.www.features.informations.LocationInfo;
 
 /********************************************************
  * Created by orson on 14-12-27.
@@ -58,20 +57,11 @@ public class ActivityLocationMap extends Activity {
 
         //传递参数
         Bundle mBundle = new Bundle();
-        mBundle.putSerializable("LocationInfo", locationInfo);
+        mBundle.putSerializable("LocationInfo",  locationInfo);
         fragment.setArguments(mBundle);
 
         //添加试图
         FragmentTransaction ft =this.getFragmentManager().beginTransaction();
         ft.replace(R.id.container, fragment).commit();
-    }
-
-    /***************************************************
-     * 位置信息类
-     */
-    public class LocationInfo implements Serializable {
-        public String description;
-        public double lat;
-        public double lng;
     }
 }

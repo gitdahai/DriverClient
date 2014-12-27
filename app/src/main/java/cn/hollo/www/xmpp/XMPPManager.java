@@ -371,6 +371,7 @@ public class XMPPManager {
         private PackageListener pkListenerNormal;
         private PackageListener pkListenerError;
         private PackageListener pkListenerHeadline;
+        private boolean isOpened;
 
         private XmppConnectManager(String openfirLogianName, String openfirLoginPassword){
             this.openfirLogianName    = openfirLogianName;
@@ -409,7 +410,7 @@ public class XMPPManager {
          * 进行链接
          */
         public void open(){
-            if (!connection.isConnected())
+            if (!isOpened && !connection.isConnected())
                 this.start();
         }
 
@@ -418,6 +419,7 @@ public class XMPPManager {
          */
         public void run(){
             while (true){
+                isOpened = true;
                 try {
                     connection.connect();
                     connection.login(openfirLogianName, openfirLoginPassword);
@@ -463,6 +465,7 @@ public class XMPPManager {
                         connection.removePacketListener(pkListenerError);
                         connection.removePacketListener(pkListenerHeadline);
                         connection = null;
+                        isOpened = false;
                     }
                 }).start();
             }

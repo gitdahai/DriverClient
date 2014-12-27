@@ -1,5 +1,7 @@
 package cn.hollo.www.features.fragments;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
@@ -19,6 +21,7 @@ import cn.hollo.www.content_provider.ModelChatMessage;
 import cn.hollo.www.content_provider.OpenHelperChatMessage;
 import cn.hollo.www.content_provider.ProviderChatMessage;
 import cn.hollo.www.features.FragmentBase;
+import cn.hollo.www.features.activities.ActivityLocationMap;
 import cn.hollo.www.features.activities.MessageExportHelper;
 import cn.hollo.www.features.adapters.AdapterChatCursor;
 import cn.hollo.www.features.informations.MissionInfo;
@@ -34,6 +37,19 @@ public class FragmentChatGroupRoom extends FragmentBase {
     private MessageExportHelper exportHelper;
     private ModeControler controler;
     private ChatContentDisplay  chatDisplay;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (controler != null)
+            controler.ononActivityResult(requestCode, resultCode, data);
+        else
+            super.onActivityResult(requestCode, resultCode, data);
+    }
 
     /***************************************************************
      *
@@ -84,6 +100,7 @@ public class FragmentChatGroupRoom extends FragmentBase {
         private ImageView sendMessageBtn;   //发送文本消息
         private Button recordingBtn;        //录音按钮
         private EditText  messageInput;     //文本输入框
+        private ImageView locationBtn;      //获取位置信息的按钮
 
         private ImageView         voiceDialogView;
         private SpeechVoiceDialog voiceDialog;
@@ -97,6 +114,7 @@ public class FragmentChatGroupRoom extends FragmentBase {
             sendMessageBtn = (ImageView)view.findViewById(R.id.sendMessageBtn);
             recordingBtn = (Button)view.findViewById(R.id.recordingBtn);
             messageInput = (EditText)view.findViewById(R.id.messageInput);
+            locationBtn = (ImageView)view.findViewById(R.id.locationBtn);
 
             sendMessageBtn.setEnabled(false);
             //文本消息监听
@@ -109,6 +127,8 @@ public class FragmentChatGroupRoom extends FragmentBase {
             messageModeBtn.setOnClickListener(this);
             //发送文本消息事件
             sendMessageBtn.setOnClickListener(this);
+            //设置“获取”位置信息事件
+            locationBtn.setOnClickListener(this);
         }
 
         /**============================================
@@ -130,6 +150,7 @@ public class FragmentChatGroupRoom extends FragmentBase {
                 case R.id.messageModeBtn:   onMessageMode();    break;
                 case R.id.voiceModeBtn:     onVoiceMode();      break;
                 case R.id.sendMessageBtn:   onSendMessage();    break;
+                case R.id.locationBtn:      onGetLoaction();    break;
             }
         }
 
@@ -173,6 +194,15 @@ public class FragmentChatGroupRoom extends FragmentBase {
         }
 
         /**============================================
+         * 获取位置信息
+         */
+        private void onGetLoaction(){
+            Intent intent = new Intent(getActivity(), ActivityLocationMap.class);
+            intent.putExtra("Type", ActivityLocationMap.TYPE_GET_LOCATION);
+            startActivityForResult(intent, 1);
+        }
+
+        /**============================================
          * 录音结果返回
          */
         private SpeechVoiceRecorder.OnRecorderListener voiceListener = new SpeechVoiceRecorder.OnRecorderListener(){
@@ -203,6 +233,22 @@ public class FragmentChatGroupRoom extends FragmentBase {
          */
         private void onStopRecord(){
             voiceDialog.stopVoiceRecoder();
+        }
+
+        /**============================================
+         * 获取位置信息返回
+         * @param requestCode
+         * @param resultCode
+         * @param data
+         */
+        private void ononActivityResult(int requestCode, int resultCode, Intent data){
+            //如果成功获取到位置信息，则发送该位置
+            if (resultCode == Activity.RESULT_OK && exportHelper != null){
+                String description = data.getStringExtra("Description");
+                double lat = data.getDoubleExtra("Lat", 0);
+                double lng = data.getDoubleExtra("Lng", 0);
+                exportHelper.exportLocation(description, lat, lng);
+            }
         }
     }
 

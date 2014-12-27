@@ -98,6 +98,37 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
         uploadVoice.excuteRequest();
     }
 
+    /*********************************************
+     *
+     * @param description
+     * @param lat
+     * @param lng
+     */
+    public void exportLocation(String description, double lat, double lng){
+        ModelChatMessage modelChatMessage = new ModelChatMessage();
+        modelChatMessage.description = description;
+        modelChatMessage.latitude = lat;
+        modelChatMessage.longitude = lng;
+        modelChatMessage.roomId = roomId;
+        modelChatMessage.messageType = IChatMessage.LOCATION_MESSAGE;
+        modelChatMessage.nickname = userInfo.getUserName();
+        modelChatMessage.speaker = userInfo.getUserId();
+        modelChatMessage.messageId = System.currentTimeMillis();
+        modelChatMessage.userJid = userInfo.getUserId();
+        modelChatMessage.isIssue = true;
+        modelChatMessage.isRead  = true;
+        modelChatMessage.content = description;       //只有上传成功后，才会被修改
+        modelChatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFERING;
+
+        //首先存入数据库
+        context.getContentResolver().insert(ProviderChatMessage.CONTENT_URI, modelChatMessage.getContentValues());
+
+        //投递到xmpp进行发送（开启新的线程）
+        ThreadPool pool = ThreadPool.getInstance();
+        SendTask task = new SendTask(modelChatMessage, sendMessageListener);
+        pool.addTask(task);
+    }
+
     /********************************************
      * 语音上传事件监听器
      */

@@ -48,74 +48,88 @@
     </FrameLayout>
 
     <!--底边文本，录音控制区-->
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:background="@color/color_gray_a2a7ae"
         android:paddingBottom="8dp"
         android:paddingTop="8dp">
-
-        <!--语音模式-->
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:id="@+id/recordingContainer"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-            <!--切换到文本模式按钮-->
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/button_background_message"
-                android:id="@+id/messageModeBtn"/>
-
-            <!--录音按钮-->
-            <Button
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <!--语音模式-->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginLeft="16dp"
-                style="@style/ButtonBlue"
-                android:text="按住说话"
-                android:id="@+id/recordingBtn"/>
-        </LinearLayout>
+                android:layout_height="match_parent"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:id="@+id/recordingContainer"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <!--切换到文本模式按钮-->
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/button_background_message"
+                    android:id="@+id/messageModeBtn"/>
 
-        <!--文本模式-->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:id="@+id/messageContainer"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-            <!--切换到录音模式按钮-->
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/button_background_record"
-                android:id="@+id/voiceModeBtn"/>
-            <!--文本输入框-->
-            <EditText
+                <!--录音按钮-->
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="16dp"
+                    style="@style/ButtonBlue"
+                    android:text="按住说话"
+                    android:id="@+id/recordingBtn"/>
+            </LinearLayout>
+
+            <!--文本模式-->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:singleLine="true"
-                android:background="@drawable/edittext_style"
-                android:layout_marginLeft="16dp"
-                android:id="@+id/messageInput"/>
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:id="@+id/messageContainer"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <!--切换到录音模式按钮-->
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/button_background_record"
+                    android:id="@+id/voiceModeBtn"/>
+                <!--文本输入框-->
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:background="@drawable/edittext_style"
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/messageInput"/>
 
-            <!--发送文本消息按钮-->
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:src="@drawable/button_background_send"
-                android:id="@+id/sendMessageBtn"/>
-        </LinearLayout>
-    </FrameLayout>
+                <!--发送文本消息按钮-->
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_marginLeft="16dp"
+                    android:src="@drawable/button_background_send"
+                    android:id="@+id/sendMessageBtn"/>
+            </LinearLayout>
+        </FrameLayout>
+
+        <!--获取定位数据的按钮-->
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="16dp"
+            android:id="@+id/locationBtn"
+            android:src="@drawable/ic_distance_icon"/>
+    </LinearLayout>
 </LinearLayout>
 
 

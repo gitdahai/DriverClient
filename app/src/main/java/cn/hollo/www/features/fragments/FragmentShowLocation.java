@@ -27,7 +27,7 @@ import java.util.List;
 
 import cn.hollo.www.R;
 import cn.hollo.www.app.ServiceManager;
-import cn.hollo.www.features.activities.ActivityLocationMap;
+import cn.hollo.www.features.informations.LocationInfo;
 import cn.hollo.www.location.ServiceLocation;
 
 /****************************************************************
@@ -100,7 +100,7 @@ public class FragmentShowLocation extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_location_map, null);
         Bundle mBundle = getArguments();
-        ActivityLocationMap.LocationInfo locationInfo = (ActivityLocationMap.LocationInfo)mBundle.getSerializable("LocationInfo");
+        LocationInfo locationInfo = (LocationInfo)mBundle.getSerializable("LocationInfo");
         showLocation = new ShowLocation(view, locationInfo);
         showLocation.mapView.onCreate(savedInstanceState);
         return view;
@@ -114,7 +114,7 @@ public class FragmentShowLocation extends Fragment {
         private AMap aMap;
         private UiSettings uiSettings;
         private LocationSource.OnLocationChangedListener locationChangedListener;
-        private ActivityLocationMap.LocationInfo locationInfo;
+        private LocationInfo locationInfo;
 
         private Polyline polyline;
         private LatLng userLatLng;
@@ -125,7 +125,7 @@ public class FragmentShowLocation extends Fragment {
          *
          * @param view
          */
-        private ShowLocation(View view, ActivityLocationMap.LocationInfo locationInfo){
+        private ShowLocation(View view, LocationInfo locationInfo){
             this.locationInfo = locationInfo;
 
             if (locationInfo.lat > 1 && locationInfo.lng > 1)
