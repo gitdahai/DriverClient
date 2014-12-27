@@ -6,6 +6,7 @@ import cn.hollo.www.UserInfo;
 import cn.hollo.www.app.ServiceManager;
 import cn.hollo.www.content_provider.ModelChatMessage;
 import cn.hollo.www.content_provider.ProviderChatMessage;
+import cn.hollo.www.thread_pool.ThreadPool;
 import cn.hollo.www.upyun.UploadData;
 import cn.hollo.www.upyun.voice.UploadVoice;
 import cn.hollo.www.xmpp.IChatMessage;
@@ -57,7 +58,10 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
             //设置消息的状态为“正在发送中”
             modelChatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFERING;
             modelChatMessage.inserToDatabase(context);
-            xmppManager.sendMultiUserChat(modelChatMessage, sendMessageListener);
+            //用新的线程开始发送
+            ThreadPool pool = ThreadPool.getInstance();
+            SendTask task = new SendTask(modelChatMessage, sendMessageListener);
+            pool.addTask(task);
         }
         else{
             //设置该消息的类型为“失败”
@@ -106,8 +110,10 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
             //上传upYun成功
             //再发给用户端
             if (code == 200 && xmppManager != null){
-                //投递到xmpp进行发送
-                xmppManager.sendMultiUserChat(modelChatMessage, sendMessageListener);
+                //投递到xmpp进行发送（单独的线程）
+                ThreadPool pool = ThreadPool.getInstance();
+                SendTask task = new SendTask(modelChatMessage, sendMessageListener);
+                pool.addTask(task);
             }
             //上传失败（或者oepnfire有问题，则表示发送失败）
             else{
@@ -143,4 +149,26 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
             chatMessage.updateToDatabase(context);
         }
     };
+
+    /*************************************************************
+     * 发送线程
+     */
+    private class SendTask implements Runnable{
+        private ModelChatMessage chatMessage;
+        private ObserverSendMessageError sendMessageListener;
+
+        /**======================================================
+         *
+         * @param chatMessage
+         * @param sendMessageListener
+         */
+        private SendTask(ModelChatMessage chatMessage, ObserverSendMessageError sendMessageListener){
+            this.chatMessage = chatMessage;
+            this.sendMessageListener = sendMessageListener;
+        }
+
+        public void run() {
+            xmppManager.sendMultiUserChat(chatMessage, sendMessageListener);
+        }
+    }
 }

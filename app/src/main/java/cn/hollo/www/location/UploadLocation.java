@@ -1,6 +1,8 @@
 package cn.hollo.www.location;
 
 import com.amap.api.location.AMapLocation;
+
+import cn.hollo.www.thread_pool.ThreadPool;
 import cn.hollo.www.xmpp.ISubscribe;
 import cn.hollo.www.xmpp.XMPPManager;
 
@@ -43,8 +45,10 @@ public class UploadLocation{
         if (xmppManager == null || aMapLocation == null)
             return;
 
-        //Subscribe subscribe = new Subscribe(aMapLocation.getLatitude(), aMapLocation.getLongitude(), jid);
-        //xmppManager.sendSubscribe(subscribe);
+        Subscribe subscribe = new Subscribe(aMapLocation.getLatitude(), aMapLocation.getLongitude(), jid);
+        SendSubscribeTask task = new SendSubscribeTask(xmppManager, subscribe);
+        ThreadPool pool = ThreadPool.getInstance();
+        pool.addTask(task);
 
         //System.out.println("==============已经发送了位置订阅信息====================");
     }
@@ -75,6 +79,29 @@ public class UploadLocation{
                     "<longitude>" + lng + "</longitude>" +
                     "<latitude>"  + lat + "</latitude>" +
                     "</location>";
+        }
+    }
+
+    /**************************************************
+     * 发送订阅任务
+     */
+    private class SendSubscribeTask implements Runnable{
+        private XMPPManager xmppManager;
+        private Subscribe subscribe;
+
+        /**============================================
+         *
+         * @param subscribe
+         */
+        private SendSubscribeTask(XMPPManager xmppManager, Subscribe subscribe){
+            this.xmppManager = xmppManager;
+            this.subscribe = subscribe;
+        }
+
+        @Override
+        public void run() {
+            xmppManager.sendSubscribe(subscribe);
+            xmppManager = null;
         }
     }
 }

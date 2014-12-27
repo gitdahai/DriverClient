@@ -60,7 +60,10 @@ public class VoicePlay {
      * @param path
      */
     public void setFilePath(String path) {
+
         this.filePath = path;
+
+        System.out.println("=========path=== " + path);
     }
 
     /**

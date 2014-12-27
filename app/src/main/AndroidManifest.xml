@@ -37,6 +37,13 @@
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             android:configChanges="orientation|keyboardHidden"/>
 
+        <!--显示位置信息和获取位置信息-->
+        <activity
+            android:name=".features.activities.ActivityLocationMap"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
+
         <!--删除数据服务-->
         <service
             android:name=".features.ServiceData"

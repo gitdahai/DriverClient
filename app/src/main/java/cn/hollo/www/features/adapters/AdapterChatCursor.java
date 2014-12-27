@@ -1,6 +1,7 @@
 package cn.hollo.www.features.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -22,6 +23,7 @@ import cn.hollo.www.R;
 import cn.hollo.www.app.EmotionDiction;
 import cn.hollo.www.content_provider.ModelChatMessage;
 import cn.hollo.www.custom_view.RoundedImageView;
+import cn.hollo.www.features.activities.ActivityLocationMap;
 import cn.hollo.www.image.ImageProvider;
 import cn.hollo.www.image.ImageReceiver;
 import cn.hollo.www.image.ImageUtils;
@@ -60,6 +62,22 @@ public class AdapterChatCursor extends CursorAdapter {
         stopVoicePlay(paly);
     }
 
+    /********************************************
+     * 显示位置信息（需要跳转到一个新的页面）
+     * @param description
+     * @param lat
+     * @param lng
+     */
+    public void showLocation(String description, double lat, double lng){
+        Intent intent = new Intent(context, ActivityLocationMap.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("Type", ActivityLocationMap.TYPE_SHOW_LOCATION);
+        intent.putExtra("Description", description);
+        intent.putExtra("Lat", lat);
+        intent.putExtra("Lng", lng);
+        context.startActivity(intent);
+    }
+
     /*******************************************
      * 创建新的试图
      * @param context
@@ -74,6 +92,7 @@ public class AdapterChatCursor extends CursorAdapter {
 
         return view;
     }
+
 
     /*******************************************
      * 数据绑定
@@ -442,9 +461,6 @@ public class AdapterChatCursor extends CursorAdapter {
                 //分派图片消息
             else if (IChatMessage.IMAGE_MESSAGE.equals(item.chatMessage.messageType))
                 onActionShowImg();
-                //分派位置消息
-            else if (IChatMessage.LOCATION_MESSAGE.equals(item.chatMessage.messageType))
-                onActionShowLocation();
         }
 
         /**-------------------------------------------------
@@ -454,9 +470,17 @@ public class AdapterChatCursor extends CursorAdapter {
          * 其他消息不做处理
          */
         private void onActionClickContentTextView(){
+            //如果是位置信息
             if (IChatMessage.LOCATION_MESSAGE.equals(item.chatMessage.messageType)){
-                System.out.println("======位置信息===========");
+                onActionShowLocation();
             }
+        }
+
+        /**------------------------------------------------
+         * 执行显示位置信息的动作
+         */
+        private void onActionShowLocation(){
+            showLocation(item.chatMessage.description, item.chatMessage.latitude, item.chatMessage.longitude);
         }
 
         /**-------------------------------------------------
@@ -500,8 +524,7 @@ public class AdapterChatCursor extends CursorAdapter {
         protected void onActionPlayVoice(){}
         /**执行显示图片的动作*/
         protected void onActionShowImg(){}
-        /**执行显示位置信息的动作*/
-        protected void onActionShowLocation(){}
+
     }
 
     /*****************************************************************

@@ -72,7 +72,7 @@ public class MessageFilterManager {
             chatMessage.updateToDatabase(context);
         }
         //否则就是其他用户发送的
-        else {
+        else if ("User".equals(chatMessage.sendFromSpecialUser)){
             //如果消息的类型是“文本信息”，则设置接收标志为成功接收
             if (MessageContent.PLAIN_MESSAGE.equals(chatMessage.messageType) ||
                     MessageContent.EMOTION_MESSAGE.equals(chatMessage.messageType))
