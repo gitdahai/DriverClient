@@ -223,7 +223,7 @@ public class FragmentGetLocation extends Fragment {
         private AMap.OnMapLoadedListener onMapLoadListener = new AMap.OnMapLoadedListener(){
             public void onMapLoaded() {
                 if (aMap != null){
-                    aMap.moveCamera(CameraUpdateFactory.zoomBy(aMap.getMaxZoomLevel() * 0.8f));
+                    aMap.moveCamera(CameraUpdateFactory.zoomBy(aMap.getMaxZoomLevel() / 3));
                 }
             }
         };
@@ -293,21 +293,16 @@ public class FragmentGetLocation extends Fragment {
          */
         private GeocodeSearch.OnGeocodeSearchListener geocodeSearchListener = new GeocodeSearch.OnGeocodeSearchListener(){
             public void onRegeocodeSearched(RegeocodeResult result, int rCode) {
-                String title = "正在获取位置";
-
                 if(rCode == 0){
                     if(result != null && result.getRegeocodeAddress() != null
                             && result.getRegeocodeAddress().getFormatAddress() != null){
                         String addressName = result.getRegeocodeAddress().getFormatAddress();
 
-                        title = addressName;
                         locationInfo.description = addressName;
+                        selfMarker.setTitle(addressName);
+                        selfMarker.showInfoWindow();
                     }
                 }
-
-                selfMarker.showInfoWindow();
-                //selfMarker.setSnippet(snippet);
-                selfMarker.setTitle(title);
             }
 
             public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {}

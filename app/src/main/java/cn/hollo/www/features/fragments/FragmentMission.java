@@ -11,6 +11,7 @@ import android.widget.ListView;
 
 import cn.hollo.www.R;
 import cn.hollo.www.UserInfo;
+import cn.hollo.www.features.activities.MessageExportHelper;
 import cn.hollo.www.features.adapters.AdapterStationList;
 import cn.hollo.www.features.informations.MissionInfo;
 import cn.hollo.www.features.informations.ParserUtil;
@@ -27,6 +28,7 @@ import cn.hollo.www.utils.Util;
  */
 public class FragmentMission extends Fragment {
     private IDriverActions actions;
+    private MessageExportHelper helper;
 
     /****************************************************
      *
@@ -39,6 +41,7 @@ public class FragmentMission extends Fragment {
         View view = inflater.inflate(R.layout.fragment_stations, null);
         Bundle mBundle = this.getArguments();
         MissionInfo missionInfo = (MissionInfo)mBundle.getSerializable("MissionInfo");
+        helper = new MessageExportHelper(getActivity(), missionInfo.room_id);
         new Stations(view, missionInfo);
         return view;
     }
@@ -178,8 +181,15 @@ public class FragmentMission extends Fragment {
             missionInfo.update(getActivity());
 
             //发送“开始任务”的动作
-            if (actions != null)
-                actions.onStartMission(stationInfo.stations.get(0));
+            if (actions != null){
+                StationInfo.Station station = stationInfo.stations.get(0);
+                actions.onStartMission(station);
+
+                //发送信息到群组中
+                String time = Util.getTimeString(station.arrived_at);
+                String chatString = "本次班车将于" + time + "到达始发站" + station.name + ",请上车的小伙伴不要迟到哟!";
+                helper.exportText(chatString);
+            }
         }
 
         /************************************************
@@ -187,6 +197,11 @@ public class FragmentMission extends Fragment {
          * @param position
          */
         private void onStationArrived(int position, StationInfo.Station station){
+            //发送信息到群组中
+            String time = Util.getTimeString(station.arrived_at);
+            String chatString = "本次班车已到达" + station.name + "站";
+            helper.exportText(chatString);
+
             //发送“到达动作”事件
             if (actions != null){
                 actions.onArrivingStation(station);

@@ -50,8 +50,9 @@
                 android:id="@+id/contentTextView"
                 android:background="@drawable/message_r"
                 android:textColor="@color/color_white"
+                android:gravity="left"
                 android:textSize="16dp"
-                android:text="哈哈哈哈是方式哈"/>
+                android:text=""/>
         </FrameLayout>
     </LinearLayout>
 

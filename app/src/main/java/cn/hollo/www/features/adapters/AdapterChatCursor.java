@@ -625,7 +625,7 @@ public class AdapterChatCursor extends CursorAdapter {
             item.contentTextView.setText(item.chatMessage.content);
             item.contentTextView.setVisibility(View.VISIBLE);
             item.contentTextView.setTextSize(item.textMaxSize);
-            item.contentTextView.setGravity(Gravity.RIGHT);
+            item.contentTextView.setGravity(Gravity.LEFT);
         }
 
         /**--------------------------------------------------
