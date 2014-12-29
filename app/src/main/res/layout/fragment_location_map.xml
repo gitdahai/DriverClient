@@ -8,4 +8,21 @@
         android:layout_height="match_parent"
         android:id="@+id/locationMapView">
     </com.amap.api.maps.MapView>
+
+    <!--其他试图层-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <!--选择定位的按钮-->
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:id="@+id/locationSelectedBtn"
+            android:src="@drawable/button_selected_location"
+            android:visibility="gone"
+            android:layout_gravity="right"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"/>
+    </LinearLayout>
 </FrameLayout>

@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import cn.hollo.www.R;
 import cn.hollo.www.features.fragments.FragmentGetLocation;
@@ -63,5 +64,21 @@ public class ActivityLocationMap extends Activity {
         //添加试图
         FragmentTransaction ft =this.getFragmentManager().beginTransaction();
         ft.replace(R.id.container, fragment).commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        this.setResult(Activity.RESULT_CANCELED);
+        this.finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home){
+            this.setResult(Activity.RESULT_CANCELED);
+            this.finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

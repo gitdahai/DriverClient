@@ -24,6 +24,7 @@ import cn.hollo.www.features.FragmentBase;
 import cn.hollo.www.features.activities.ActivityLocationMap;
 import cn.hollo.www.features.activities.MessageExportHelper;
 import cn.hollo.www.features.adapters.AdapterChatCursor;
+import cn.hollo.www.features.informations.LocationInfo;
 import cn.hollo.www.features.informations.MissionInfo;
 import cn.hollo.www.utils.Util;
 import cn.hollo.www.voice.SpeechVoiceDialog;
@@ -244,10 +245,14 @@ public class FragmentChatGroupRoom extends FragmentBase {
         private void ononActivityResult(int requestCode, int resultCode, Intent data){
             //如果成功获取到位置信息，则发送该位置
             if (resultCode == Activity.RESULT_OK && exportHelper != null){
-                String description = data.getStringExtra("Description");
+                Bundle mBundle = data.getExtras();
+                LocationInfo locationInfo = (LocationInfo)mBundle.getSerializable("LocationInfo");
+
+                /*String description = data.getStringExtra("Description");
                 double lat = data.getDoubleExtra("Lat", 0);
-                double lng = data.getDoubleExtra("Lng", 0);
-                exportHelper.exportLocation(description, lat, lng);
+                double lng = data.getDoubleExtra("Lng", 0);*/
+                if (locationInfo != null)
+                    exportHelper.exportLocation(locationInfo.description, locationInfo.lat, locationInfo.lng);
             }
         }
     }

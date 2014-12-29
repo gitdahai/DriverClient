@@ -1,10 +1,16 @@
 package cn.hollo.www.features.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.maps.AMap;
@@ -44,6 +50,8 @@ public class FragmentGetLocation extends Fragment {
         super.onDestroy();
     }
 
+
+
     public void onSaveInstanceState(Bundle bundle){
         if (choiceLocation != null)
             choiceLocation.mapView.onSaveInstanceState(bundle);
@@ -74,6 +82,27 @@ public class FragmentGetLocation extends Fragment {
 
         if (locationBinder != null)
             locationBinder.removeLocationListener("FragmentGetLocation");
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.confirm, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.confirm){
+            if (choiceLocation != null)
+                choiceLocation.onConfirm();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setHasOptionsMenu(true);
     }
 
     /************************************************************
@@ -109,6 +138,7 @@ public class FragmentGetLocation extends Fragment {
      */
     private class ChoiceLocation{
         private MapView mapView;
+        private ImageView locationSelectedBtn;
         private AMap aMap;
         private UiSettings uiSettings;
         private LocationSource.OnLocationChangedListener locationChangedListener;
@@ -130,6 +160,11 @@ public class FragmentGetLocation extends Fragment {
                 this.locationInfo = new LocationInfo();
 
             mapView = (MapView)view.findViewById(R.id.locationMapView);
+            locationSelectedBtn = (ImageView)view.findViewById(R.id.locationSelectedBtn);
+            locationSelectedBtn.setVisibility(View.VISIBLE);
+            locationSelectedBtn.setEnabled(false);
+            locationSelectedBtn.setOnClickListener(locationSelectedClick);
+
             aMap = mapView.getMap();
             uiSettings = aMap.getUiSettings();
 
@@ -137,10 +172,6 @@ public class FragmentGetLocation extends Fragment {
             aMap.setOnMapLoadedListener(onMapLoadListener);
             //添加镜头移动监听器
             aMap.setOnCameraChangeListener(cameraChangeListener);
-            //设置定位层是否显示。
-            //aMap.setMyLocationEnabled(true);
-            //启用定位按钮
-            //uiSettings.setMyLocationButtonEnabled(true);
             //隐藏放大缩小按钮
             uiSettings.setZoomControlsEnabled(true);
             //启用地图指南针
@@ -154,14 +185,36 @@ public class FragmentGetLocation extends Fragment {
             initSelfMarker();
         }
 
+        /**=================================================
+         * 定位按钮事件
+         */
+        private View.OnClickListener locationSelectedClick = new View.OnClickListener(){
+            public void onClick(View v) {
+                LatLng latLng = new LatLng(selfLat, delfLng);
+                aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, aMap.getMaxZoomLevel() * 0.8f));
+            }
+        };
+
+        /**==================================================
+         * 确认选择当前的位置
+         */
+        public void onConfirm(){
+            Intent intent = new Intent();
+            Bundle mBundle = new Bundle();
+            mBundle.putSerializable("LocationInfo", locationInfo);
+            intent.putExtras(mBundle);
+            getActivity().setResult(Activity.RESULT_OK, intent);
+            getActivity().finish();
+        }
+
         /**==================================================
          * 初始化当前的marker
          */
         private void initSelfMarker(){
-            MarkerOptions options = createMarkerOptions(R.drawable.marker_icon, "", "", aMap.getCameraPosition().target);
+            MarkerOptions options = createMarkerOptions(R.drawable.marker_icon, "正在获取位置", "", aMap.getCameraPosition().target);
             selfMarker = aMap.addMarker(options);
             selfMarker.setVisible(true);
-            selfMarker.showInfoWindow();
+            //selfMarker.showInfoWindow();
         }
 
         /*********************************************
@@ -169,8 +222,9 @@ public class FragmentGetLocation extends Fragment {
          */
         private AMap.OnMapLoadedListener onMapLoadListener = new AMap.OnMapLoadedListener(){
             public void onMapLoaded() {
-                if (aMap != null)
-                    aMap.moveCamera(CameraUpdateFactory.zoomBy(aMap.getMaxZoomLevel() / 3));
+                if (aMap != null){
+                    aMap.moveCamera(CameraUpdateFactory.zoomBy(aMap.getMaxZoomLevel() * 0.8f));
+                }
             }
         };
 
@@ -187,12 +241,16 @@ public class FragmentGetLocation extends Fragment {
                     isLocationed = true;
                     LatLng latLng = new LatLng(selfLat, delfLng);
                     aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, aMap.getMaxZoomLevel() * 0.8f));
+                    geocoderSearch(latLng);
+                    //启用定位按钮
+                    locationSelectedBtn.setEnabled(true);
                 }
             }
         };
 
         /*****************************************************
          * 当地图移动时的监听器对象
+         * 只有手动移动地图时才会触发该事件
          */
         private AMap.OnCameraChangeListener cameraChangeListener = new AMap.OnCameraChangeListener(){
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -203,6 +261,7 @@ public class FragmentGetLocation extends Fragment {
             public void onCameraChangeFinish(CameraPosition cameraPosition) {
                 locationInfo.lat = cameraPosition.target.latitude;
                 locationInfo.lng = cameraPosition.target.longitude;
+                selfMarker.setPosition(cameraPosition.target);
                 geocoderSearch(cameraPosition.target);
             }
         };
@@ -234,16 +293,21 @@ public class FragmentGetLocation extends Fragment {
          */
         private GeocodeSearch.OnGeocodeSearchListener geocodeSearchListener = new GeocodeSearch.OnGeocodeSearchListener(){
             public void onRegeocodeSearched(RegeocodeResult result, int rCode) {
+                String title = "正在获取位置";
+
                 if(rCode == 0){
                     if(result != null && result.getRegeocodeAddress() != null
                             && result.getRegeocodeAddress().getFormatAddress() != null){
                         String addressName = result.getRegeocodeAddress().getFormatAddress();
 
-                        selfMarker.showInfoWindow();
-                        selfMarker.setSnippet(addressName);
+                        title = addressName;
                         locationInfo.description = addressName;
                     }
                 }
+
+                selfMarker.showInfoWindow();
+                //selfMarker.setSnippet(snippet);
+                selfMarker.setTitle(title);
             }
 
             public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {}
@@ -265,7 +329,7 @@ public class FragmentGetLocation extends Fragment {
             //当用户点击标记，在信息窗口上显示的字符串
             options.title(title);
             //描述片段
-            options.snippet(snippet);
+            //options.snippet(snippet);
             //首先禁止显示
             options.visible(true);
             //设置位置参数
