@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -16,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import com.amap.api.location.AMapLocation;
@@ -115,6 +115,12 @@ public class FragmentGetLocation extends Fragment {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (searchAddress != null)
+            searchAddress.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setHasOptionsMenu(true);
@@ -163,7 +169,8 @@ public class FragmentGetLocation extends Fragment {
      * 搜索
      */
     private class SearchAddress{
-        private Button   actionbarButton;
+        protected static final int RESULT_SPEECH = 1;
+        private ImageView   voiceInput;
         private AutoCompleteTextView searchText;
         private List<String> listString;
         private ArrayAdapter aAdapter;
@@ -175,8 +182,9 @@ public class FragmentGetLocation extends Fragment {
          */
         private SearchAddress(View view){
             //初始化Actionbar试图
-            actionbarButton   = (Button)view.findViewById(R.id.voiceInput);
-            actionbarButton.setEnabled(false);
+            voiceInput   = (ImageView)view.findViewById(R.id.voiceInput);
+            voiceInput.setEnabled(false);
+            voiceInput.setOnClickListener(clickListener);
 
             //文本搜索
             searchText = (AutoCompleteTextView)view.findViewById(R.id.searchText);
@@ -193,7 +201,7 @@ public class FragmentGetLocation extends Fragment {
          *
          */
         private void enable(){
-            actionbarButton.setEnabled(true);
+            voiceInput.setEnabled(true);
             searchText.setEnabled(true);
         }
 
@@ -253,6 +261,31 @@ public class FragmentGetLocation extends Fragment {
                 geocoderSearch.getFromLocationNameAsyn(query);
             }
         };
+
+        /**=====================================================
+         * 语音输入按钮
+         */
+        private View.OnClickListener clickListener = new View.OnClickListener(){
+            public void onClick(View v) {
+
+            }
+        };
+
+        /**=================================================
+         *
+         * @param requestCode
+         * @param resultCode
+         * @param data
+         */
+        private void onActivityResult(int requestCode, int resultCode, Intent data){
+            if (resultCode == Activity.RESULT_OK && null != data) {
+
+                ArrayList<String> text = data
+                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+
+                searchText.setText(text.get(0));
+            }
+        }
     }
 
     /************************************************************
@@ -337,7 +370,6 @@ public class FragmentGetLocation extends Fragment {
             MarkerOptions options = createMarkerOptions(R.drawable.marker_icon, "正在获取位置", "", aMap.getCameraPosition().target);
             selfMarker = aMap.addMarker(options);
             selfMarker.setVisible(true);
-            //selfMarker.showInfoWindow();
         }
 
         /*********************************************
@@ -345,9 +377,9 @@ public class FragmentGetLocation extends Fragment {
          */
         private AMap.OnMapLoadedListener onMapLoadListener = new AMap.OnMapLoadedListener(){
             public void onMapLoaded() {
-                if (aMap != null){
-                    aMap.moveCamera(CameraUpdateFactory.zoomBy(aMap.getMaxZoomLevel() / 3));
-                }
+            if (aMap != null){
+                aMap.moveCamera(CameraUpdateFactory.zoomBy(aMap.getMaxZoomLevel() / 3));
+            }
             }
         };
 
@@ -458,12 +490,17 @@ public class FragmentGetLocation extends Fragment {
                 if (rCode != 0 || geocodeResult == null || geocodeResult.getGeocodeAddressList() == null)
                     return;
 
+                String locationName = null;
+                GeocodeQuery geocodeQuery = geocodeResult.getGeocodeQuery();
+                //获取查询时的（关键字）
+                if (geocodeQuery != null)
+                    locationName = geocodeQuery.getLocationName();
+
+                //获取查询到的地址列表
                 List<GeocodeAddress> addresses = geocodeResult.getGeocodeAddressList();
 
                 if (addresses.size() > 0){
                     GeocodeAddress address = addresses.get(0);
-
-                    //获取经纬度
                     LatLonPoint latLonPoint = address.getLatLonPoint();
                     locationInfo.lat = latLonPoint.getLatitude();
                     locationInfo.lng = latLonPoint.getLongitude();
@@ -473,15 +510,14 @@ public class FragmentGetLocation extends Fragment {
                     aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, aMap.getMaxZoomLevel() * 0.8f));
 
                     //取出地址信息
-                    String addressName = address.getFormatAddress();
-
-                    //显示地址信息
-                    if (addressName != null){
-                        locationInfo.description = addressName;
-                        selfMarker.setTitle(addressName);
-                        selfMarker.showInfoWindow();
-                    }
+                    if (locationName == null)
+                        locationName = address.getFormatAddress();
                 }
+
+                //保存名称，以及显示新的title
+                locationInfo.description = locationName;
+                selfMarker.setTitle(locationName);
+                selfMarker.showInfoWindow();
             }
         };
 

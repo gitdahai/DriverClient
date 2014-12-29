@@ -5,15 +5,6 @@
     android:orientation="horizontal"
     android:gravity="center_vertical">
     <!--文本输入-->
-    <!--<EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="@drawable/edittext_style"
-        android:layout_marginLeft="16dp"
-        android:hint="地址搜索"
-        android:id="@+id/editInput"/>-->
-
     <AutoCompleteTextView
         android:id="@+id/searchText"
         android:layout_width="300dp"
@@ -32,8 +23,19 @@
         android:singleLine="true"
         android:textColor="@color/color_white"
         android:textSize="20dp" />
+
+    <!--语音输入-->
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|center_vertical"
+        android:layout_marginLeft="1dp"
+        android:id="@+id/voiceInput"
+        android:visibility="gone"
+        android:src="@drawable/button_background_record"
+        />
     <!--按钮-->
-    <Button
+    <!--<Button
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -41,5 +43,5 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:id="@+id/voiceInput"
-        android:text="按住语音搜索"/>
+        android:text="按住语音搜索"/>-->
 </LinearLayout>
