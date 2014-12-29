@@ -1,15 +1,22 @@
 package cn.hollo.www.features.fragments;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.amap.api.location.AMapLocation;
@@ -24,10 +31,18 @@ import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.services.core.LatLonPoint;
+import com.amap.api.services.geocoder.GeocodeAddress;
+import com.amap.api.services.geocoder.GeocodeQuery;
 import com.amap.api.services.geocoder.GeocodeResult;
 import com.amap.api.services.geocoder.GeocodeSearch;
+import com.amap.api.services.geocoder.RegeocodeAddress;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
+import com.amap.api.services.help.Inputtips;
+import com.amap.api.services.help.Tip;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.hollo.www.R;
 import cn.hollo.www.app.ServiceManager;
@@ -40,6 +55,7 @@ import cn.hollo.www.location.ServiceLocation;
  */
 public class FragmentGetLocation extends Fragment {
     private ChoiceLocation choiceLocation;
+    private SearchAddress searchAddress;
     private ServiceLocation.LocationBinder locationBinder;
 
     public void onDestroy(){
@@ -49,8 +65,6 @@ public class FragmentGetLocation extends Fragment {
         locationBinder = null;
         super.onDestroy();
     }
-
-
 
     public void onSaveInstanceState(Bundle bundle){
         if (choiceLocation != null)
@@ -87,6 +101,7 @@ public class FragmentGetLocation extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.confirm, menu);
+
     }
 
     @Override
@@ -103,6 +118,8 @@ public class FragmentGetLocation extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setHasOptionsMenu(true);
+
+
     }
 
     /************************************************************
@@ -125,6 +142,15 @@ public class FragmentGetLocation extends Fragment {
      * @return
      */
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        //在actionbar上，增加自定义试图
+        ActionBar actionBar = getActivity().getActionBar();
+        View actionbarView = View.inflate(getActivity(), R.layout.actionbar_input, null);
+        actionBar.setCustomView(actionbarView);
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        searchAddress = new SearchAddress(actionbarView);
+
+        //主体试图
         View view = inflater.inflate(R.layout.fragment_location_map, null);
         Bundle mBundle = getArguments();
         LocationInfo locationInfo = (LocationInfo)mBundle.getSerializable("LocationInfo");
@@ -134,9 +160,105 @@ public class FragmentGetLocation extends Fragment {
     }
 
     /************************************************************
+     * 搜索
+     */
+    private class SearchAddress{
+        private Button   actionbarButton;
+        private AutoCompleteTextView searchText;
+        private List<String> listString;
+        private ArrayAdapter aAdapter;
+        private Inputtips inputTips;
+
+        /**===================================================
+         * 构造
+         * @param view
+         */
+        private SearchAddress(View view){
+            //初始化Actionbar试图
+            actionbarButton   = (Button)view.findViewById(R.id.voiceInput);
+            actionbarButton.setEnabled(false);
+
+            //文本搜索
+            searchText = (AutoCompleteTextView)view.findViewById(R.id.searchText);
+            searchText.addTextChangedListener(textWatcher);
+            searchText.setVisibility(View.VISIBLE);
+            searchText.setOnItemClickListener(itemClickListener);
+            searchText.setEnabled(false);
+
+            // 输入信息的回调方法
+            inputTips = new Inputtips(getActivity(), inputtipsListener);
+        }
+
+        /**===================================================
+         *
+         */
+        private void enable(){
+            actionbarButton.setEnabled(true);
+            searchText.setEnabled(true);
+        }
+
+        /**===================================================
+         *
+         */
+        private TextWatcher textWatcher = new TextWatcher(){
+            public void afterTextChanged(Editable s) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                try {
+                    String newText = s.toString();
+
+                    // 发送输入提示请求
+                    // 第一个参数表示提示关键字，
+                    // 第二个参数默认代表全国，也可以为城市区号
+                    inputTips.requestInputtips(newText, choiceLocation.cityCode);
+                    // 第一个参数表示提示关键字，第二个参数默认代表全国，也可以为城市区号
+                    //inputTips.requestInputtips(newText, editCity.getText().toString());
+                } catch (com.amap.api.services.core.AMapException e) {
+                    e.printStackTrace();
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        /**======================================================
+         *
+         */
+        private Inputtips.InputtipsListener inputtipsListener = new Inputtips.InputtipsListener(){
+            public void onGetInputtips(List<Tip> tips, int rCode) {
+                listString = new ArrayList<String>();
+
+                for (Tip tip : tips)
+                    listString.add(tip.getName());
+
+                aAdapter = new ArrayAdapter(getActivity(), R.layout.route_inputs, listString);
+                searchText.setAdapter(aAdapter);
+                aAdapter.notifyDataSetChanged();
+            }
+        };
+
+        /**=====================================================
+         * 关键字选择事件
+         */
+        private AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener(){
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (listString == null || listString.size() <= position)
+                    return;
+
+                GeocodeSearch geocoderSearch = new GeocodeSearch(getActivity());
+                geocoderSearch.setOnGeocodeSearchListener(choiceLocation.geocodeSearchListener);
+                // 第一个参数表示地址，
+                // 第二个参数表示查询城市，中文或者中文全拼，citycode、adcode
+                GeocodeQuery query = new GeocodeQuery(listString.get(position), choiceLocation.cityCode);
+                geocoderSearch.getFromLocationNameAsyn(query);
+            }
+        };
+    }
+
+    /************************************************************
      * 选择位置坐标
      */
-    private class ChoiceLocation{
+    private class ChoiceLocation {
         private MapView mapView;
         private ImageView locationSelectedBtn;
         private AMap aMap;
@@ -144,6 +266,7 @@ public class FragmentGetLocation extends Fragment {
         private LocationSource.OnLocationChangedListener locationChangedListener;
         private LocationInfo locationInfo;
 
+        private String cityCode = "";  //搜索关键字
         private Marker selfMarker;
         private double selfLat;
         private double delfLng;
@@ -190,8 +313,8 @@ public class FragmentGetLocation extends Fragment {
          */
         private View.OnClickListener locationSelectedClick = new View.OnClickListener(){
             public void onClick(View v) {
-                LatLng latLng = new LatLng(selfLat, delfLng);
-                aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, aMap.getMaxZoomLevel() * 0.8f));
+            LatLng latLng = new LatLng(selfLat, delfLng);
+            aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, aMap.getMaxZoomLevel() * 0.8f));
             }
         };
 
@@ -233,6 +356,8 @@ public class FragmentGetLocation extends Fragment {
          */
         private ServiceLocation.OnLocationListener locationListener = new ServiceLocation.OnLocationListener(){
             public void onLocationChanged(AMapLocation aMapLocation) {
+                cityCode = aMapLocation.getCityCode();
+
                 //保存当前的位置
                 selfLat = aMapLocation.getLatitude();
                 delfLng = aMapLocation.getLongitude();
@@ -244,6 +369,8 @@ public class FragmentGetLocation extends Fragment {
                     geocoderSearch(latLng);
                     //启用定位按钮
                     locationSelectedBtn.setEnabled(true);
+                    //启用anctionbar功能
+                    searchAddress.enable();
                 }
             }
         };
@@ -292,20 +419,70 @@ public class FragmentGetLocation extends Fragment {
          * 查询到的位置信息，在这里返回
          */
         private GeocodeSearch.OnGeocodeSearchListener geocodeSearchListener = new GeocodeSearch.OnGeocodeSearchListener(){
+            /**-----------------------------------------------
+             *
+             * @param result
+             * @param rCode
+             */
             public void onRegeocodeSearched(RegeocodeResult result, int rCode) {
                 if(rCode == 0){
-                    if(result != null && result.getRegeocodeAddress() != null
-                            && result.getRegeocodeAddress().getFormatAddress() != null){
-                        String addressName = result.getRegeocodeAddress().getFormatAddress();
+                    if(result != null && result.getRegeocodeAddress() != null){
+                        RegeocodeAddress ra = result.getRegeocodeAddress();
+                        /*System.out.println("CityCode===" + ra.getCityCode());
+                        System.out.println("Province===" + ra.getProvince());
+                        System.out.println("City===" + ra.getCity());
+                        System.out.println("AdCode===" + ra.getAdCode());
+                        System.out.println("Building===" + ra.getBuilding());
+                        System.out.println("District===" + ra.getDistrict());
+                        System.out.println("FormatAddress===" + ra.getFormatAddress());
+                        System.out.println("Neighborhood===" + ra.getNeighborhood());
+                        System.out.println("Township===" + ra.getTownship());*/
 
+                        if (ra.getFormatAddress() != null){
+                            String addressName = result.getRegeocodeAddress().getFormatAddress();
+
+                            locationInfo.description = addressName;
+                            selfMarker.setTitle(addressName);
+                            selfMarker.showInfoWindow();
+                        }
+                    }
+                }
+            }
+
+            /**=---------------------------------------------
+             *
+             * @param geocodeResult
+             * @param rCode
+             */
+            public void onGeocodeSearched(GeocodeResult geocodeResult, int rCode) {
+                if (rCode != 0 || geocodeResult == null || geocodeResult.getGeocodeAddressList() == null)
+                    return;
+
+                List<GeocodeAddress> addresses = geocodeResult.getGeocodeAddressList();
+
+                if (addresses.size() > 0){
+                    GeocodeAddress address = addresses.get(0);
+
+                    //获取经纬度
+                    LatLonPoint latLonPoint = address.getLatLonPoint();
+                    locationInfo.lat = latLonPoint.getLatitude();
+                    locationInfo.lng = latLonPoint.getLongitude();
+
+                    //移动camera到选择的位置上
+                    LatLng latLng = new LatLng(latLonPoint.getLatitude(), latLonPoint.getLongitude());
+                    aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, aMap.getMaxZoomLevel() * 0.8f));
+
+                    //取出地址信息
+                    String addressName = address.getFormatAddress();
+
+                    //显示地址信息
+                    if (addressName != null){
                         locationInfo.description = addressName;
                         selfMarker.setTitle(addressName);
                         selfMarker.showInfoWindow();
                     }
                 }
             }
-
-            public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {}
         };
 
         /*****************************************************

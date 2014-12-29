@@ -199,7 +199,7 @@ public class FragmentMission extends Fragment {
         private void onStationArrived(int position, StationInfo.Station station){
             //发送信息到群组中
             String time = Util.getTimeString(station.arrived_at);
-            String chatString = "本次班车已到达" + station.name + "站";
+            String chatString = "本次班车已到达" + station.name;
             helper.exportText(chatString);
 
             //发送“到达动作”事件
