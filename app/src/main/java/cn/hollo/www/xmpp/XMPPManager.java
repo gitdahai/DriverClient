@@ -47,11 +47,8 @@ public class XMPPManager {
 
     /************************************************
      *
-     * @param context
      */
-    private XMPPManager(Context context){
-        this.context = context.getApplicationContext();
-    }
+    private XMPPManager(Context context){ this.context = context.getApplicationContext();}
 
     /************************************************
      *
@@ -94,6 +91,7 @@ public class XMPPManager {
         multiUserChatManager = null;
         chatMessageListener = null;
         context = null;
+        instance = null;
     }
 
     /*************************************************************

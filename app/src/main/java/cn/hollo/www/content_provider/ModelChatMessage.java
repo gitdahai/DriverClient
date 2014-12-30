@@ -145,6 +145,7 @@ public class ModelChatMessage extends MessageContent{
      * @param context
      */
     public void inserToDatabase(Context context){
+        //当用户重新启动的时候，该对象会空掉
         if (context != null){
             context.getContentResolver().insert(ProviderChatMessage.CONTENT_URI, getContentValues());
         }

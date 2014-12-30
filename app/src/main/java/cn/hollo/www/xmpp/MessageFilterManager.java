@@ -90,8 +90,6 @@ public class MessageFilterManager {
             chatMessage.messageId = System.currentTimeMillis();
             //如果是其他用户发送的消息，则直接插入到数据库中
             chatMessage.inserToDatabase(context);
-
-            //System.out.println("=========接受到来自openfire的消息==========");
         }
     }
 
@@ -119,7 +117,7 @@ public class MessageFilterManager {
      * @param message
      */
     private void handleErrorMessage(Context context, Message message){
-
+        System.out.println("==error message== " + message.toXML());
     }
 
     /**********************************************

@@ -70,6 +70,8 @@ public class ProviderChatMessage extends ContentProvider {
 
         Uri newUri = ContentUris.withAppendedId(uri, id);
         resolver.notifyChange(uri, null);
+
+        System.out.println("=222222==========有数据插入=============1111111");
         return newUri;
     }
 
