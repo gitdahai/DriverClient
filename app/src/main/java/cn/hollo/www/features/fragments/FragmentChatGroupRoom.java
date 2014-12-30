@@ -216,7 +216,7 @@ public class FragmentChatGroupRoom extends FragmentBase {
                     }
 
                     //输出语音
-                    exportHelper.exportVoice(voicePathName, duration);
+                    exportHelper.exportVoice(voicePathName, duration / 1000);
                 }
             }
         };

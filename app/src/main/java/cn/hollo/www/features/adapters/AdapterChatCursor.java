@@ -24,6 +24,7 @@ import cn.hollo.www.app.EmotionDiction;
 import cn.hollo.www.content_provider.ModelChatMessage;
 import cn.hollo.www.custom_view.RoundedImageView;
 import cn.hollo.www.features.activities.ActivityLocationMap;
+import cn.hollo.www.features.activities.MessageExportHelper;
 import cn.hollo.www.image.ImageProvider;
 import cn.hollo.www.image.ImageReceiver;
 import cn.hollo.www.image.ImageUtils;
@@ -234,12 +235,14 @@ public class AdapterChatCursor extends CursorAdapter {
 
             //如果是自己发送的消息，则走IssueHandler处理流程
             if (chatMessage.isIssue){
+                contentStatus.setOnClickListener(issueHandler);
                 contentImgView.setOnClickListener(issueHandler);
                 contentTextView.setOnClickListener(issueHandler);
                 issueHandler.showItemView();
             }
             //否则则走ReceiverHandler处理流程
             else{
+                contentStatus.setOnClickListener(receiverHandler);
                 contentImgView.setOnClickListener(receiverHandler);
                 contentTextView.setOnClickListener(receiverHandler);
                 receiverHandler.showItemView();
@@ -449,6 +452,10 @@ public class AdapterChatCursor extends CursorAdapter {
             //否则执行跟文本相关的事件
             else if (viewId == item.contentTextView.getId())
                 onActionClickContentTextView();
+
+            //状态点击事件
+            else if (viewId == item.contentStatus.getId() && item.chatMessage.messageStatus == ModelChatMessage.STATUS_TRANSFER_FAIL)
+                onRepeatTransfer();
         }
 
         /**-------------------------------------------------
@@ -524,7 +531,13 @@ public class AdapterChatCursor extends CursorAdapter {
         protected void onActionPlayVoice(){}
         /**执行显示图片的动作*/
         protected void onActionShowImg(){}
-
+        /**
+         * 重新传输数据
+         * 当消息的状态被点击后，需要分发到
+         * “接收”或者“发送”端，进行测试，
+         * 如果当前的状态是“传输失败”的，则该事件需要传新传输
+         */
+        protected void onRepeatTransfer(){}
     }
 
     /*****************************************************************
@@ -688,6 +701,24 @@ public class AdapterChatCursor extends CursorAdapter {
             paly = new VoicePlay();
             paly.setAttach(item.chatMessage);
             playVoice(paly);
+        }
+
+        /**-------------------------------------------------
+         * 检查是否需要重新发送数据
+         */
+        protected  void onRepeatTransfer(){
+            ModelChatMessage chatMessage = item.chatMessage;
+            MessageExportHelper helper = new MessageExportHelper(context, chatMessage.roomId);
+
+            //是否是文本消息
+            if (ModelChatMessage.PLAIN_MESSAGE.equals(chatMessage.messageType))
+                helper.reExportText(chatMessage);
+            //是否是位置信息
+            else if (ModelChatMessage.LOCATION_MESSAGE.equals(chatMessage.messageType))
+                helper.reExportLocation(chatMessage);
+            //是否语音信息
+            else if (ModelChatMessage.AUDIO_MESSAGE.equals(chatMessage.messageType))
+                helper.reExportVoice(chatMessage);
         }
     }
 
@@ -911,6 +942,20 @@ public class AdapterChatCursor extends CursorAdapter {
             paly = new VoicePlay();
             paly.setAttach(item.chatMessage);
             playVoice(paly);
+        }
+
+        /**-------------------------------------------------
+         * 检查是否需要重新发送数据
+         */
+        protected  void onRepeatTransfer(){
+            ModelChatMessage chatMessage = item.chatMessage;
+
+            if (ModelChatMessage.AUDIO_MESSAGE.equals(chatMessage.messageType) ||
+                    ModelChatMessage.IMAGE_MESSAGE.equals(chatMessage.messageType)){
+
+                chatMessage.messageStatus = ModelChatMessage.STATUS_NONE_TRANSFER;
+                chatMessage.updateToDatabase(context);
+            }
         }
     }
 }

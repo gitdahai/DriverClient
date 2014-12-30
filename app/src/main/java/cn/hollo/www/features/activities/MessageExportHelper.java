@@ -8,6 +8,7 @@ import cn.hollo.www.content_provider.ModelChatMessage;
 import cn.hollo.www.content_provider.ProviderChatMessage;
 import cn.hollo.www.thread_pool.ThreadPool;
 import cn.hollo.www.upyun.UploadData;
+import cn.hollo.www.upyun.Utils;
 import cn.hollo.www.upyun.voice.UploadVoice;
 import cn.hollo.www.xmpp.IChatMessage;
 import cn.hollo.www.xmpp.XMPPManager;
@@ -70,6 +71,29 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
         }
     }
 
+    /**================================================
+     *
+     */
+    public void reExportText(ModelChatMessage modelChatMessage){
+        modelChatMessage.userJid = userInfo.getUserId();
+
+        //投递到xmpp进行发送
+        if (xmppManager != null){
+            //设置消息的状态为“正在发送中”
+            modelChatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFERING;
+            modelChatMessage.updateToDatabase(context);
+            //用新的线程开始发送
+            ThreadPool pool = ThreadPool.getInstance();
+            SendTask task = new SendTask(modelChatMessage, sendMessageListener);
+            pool.addTask(task);
+        }
+        else{
+            //设置该消息的类型为“失败”
+            modelChatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFER_FAIL;
+            modelChatMessage.updateToDatabase(context);
+        }
+    }
+
     /*********************************************
      * 输出语音消息
      * @param voicePathName : 语音保存的路径和名称
@@ -84,8 +108,8 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
         modelChatMessage.userJid = userInfo.getUserId();
         modelChatMessage.isIssue = true;
         modelChatMessage.isRead  = true;
-        modelChatMessage.content = voicePathName;       //只有上传成功后，才会被修改
-        modelChatMessage.duration = duration / 1000;    //把毫秒转换成秒
+        modelChatMessage.content = Utils.getLocalFilePathFullName(context, voicePathName);
+        modelChatMessage.duration = duration;
         modelChatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFERING;
 
         //首先存入数据库
@@ -97,6 +121,25 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
         uploadVoice.setOnUploadFinishListener(uploadListener);
         uploadVoice.excuteRequest();
     }
+
+    /**============================================
+     * 重新发送
+     */
+    public void reExportVoice(ModelChatMessage modelChatMessage){
+        modelChatMessage.content = Utils.getLocalFilePathFullName(context, modelChatMessage.content);
+        modelChatMessage.userJid = userInfo.getUserId();
+        modelChatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFERING;
+
+        //更新数据哭数据库
+        modelChatMessage.updateToDatabase(context);
+
+        //上传语音文件到upYun上
+        UploadVoice uploadVoice = new UploadVoice(userInfo.getUserId(), modelChatMessage.content);
+        uploadVoice.setAttachment(modelChatMessage);
+        uploadVoice.setOnUploadFinishListener(uploadListener);
+        uploadVoice.excuteRequest();
+    }
+
 
     /*********************************************
      *
@@ -129,6 +172,21 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
         pool.addTask(task);
     }
 
+    /**===============================================
+     *
+     */
+    public void reExportLocation(ModelChatMessage modelChatMessage){
+        modelChatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFERING;
+        modelChatMessage.userJid = userInfo.getUserId();
+
+        //首先存入数据库
+        modelChatMessage.updateToDatabase(context);
+
+        //投递到xmpp进行发送（开启新的线程）
+        ThreadPool pool = ThreadPool.getInstance();
+        SendTask task = new SendTask(modelChatMessage, sendMessageListener);
+        pool.addTask(task);
+    }
     /********************************************
      * 语音上传事件监听器
      */
