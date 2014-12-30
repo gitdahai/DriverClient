@@ -85,23 +85,26 @@ public class ActivityMissionExecution extends ActivityBase {
         if (missionInfo == null)
             return;
 
+        ContentValues values = new ContentValues();
+
         String where = OpenHelperChatMessage.ROOM_ID + "=? and " +
                 OpenHelperChatMessage.MESSAGE_STATUS + "=?";
 
         String[] selectionArgs = new String[2];
         selectionArgs[0] = missionInfo.room_id;
 
-        ContentValues values = new ContentValues();
-
         //首先修改message_status = 0 时的状态
         selectionArgs[1] = "0";
         values.put(OpenHelperChatMessage.MESSAGE_STATUS, 3);
         this.getContentResolver().update(ProviderChatMessage.CONTENT_URI, values, where, selectionArgs);
 
-        //在修改成message_status = ４的状态
-        selectionArgs[1] = "4";
+        //在修改成showState = 1的状态
+        where = OpenHelperChatMessage.ROOM_ID + "=? and " +
+                OpenHelperChatMessage.SHOW_STATE + "=?";
+
+        selectionArgs[1] = "1";
         values.clear();
-        values.put(OpenHelperChatMessage.MESSAGE_STATUS, 1);
+        values.put(OpenHelperChatMessage.SHOW_STATE, 0);
         this.getContentResolver().update(ProviderChatMessage.CONTENT_URI, values, where, selectionArgs);
     }
 }

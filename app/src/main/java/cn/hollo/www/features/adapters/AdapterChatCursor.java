@@ -169,7 +169,7 @@ public class AdapterChatCursor extends CursorAdapter {
             ModelChatMessage chatMessage = (ModelChatMessage)paly.getAttach();
             //如果存在该附件数据，则需要修改该信息的状态
             if (chatMessage != null){
-                chatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFER_SUCCED;
+                chatMessage.showState = ModelChatMessage.SHOW_STATE_NONE;
                 updateCursor(chatMessage);
             }
         }
@@ -642,7 +642,7 @@ public class AdapterChatCursor extends CursorAdapter {
             item.contentImgView.setVisibility(View.VISIBLE);
 
             //如果当前状态是正在播放，则直接返回
-            if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_SOUND_PLAYING){
+            if (item.chatMessage.showState == ModelChatMessage.SHOW_STATE_PLAYING){
                 //设置动画文件
                 item.contentImgView.setImageResource(R.drawable.voice_play_right);
                 //执行动画
@@ -670,7 +670,7 @@ public class AdapterChatCursor extends CursorAdapter {
             //判断，如果当前该消息正在播放，
             // 则这次需要执行停止操作
             //停止之后，直接退出
-            if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_SOUND_PLAYING){
+            if (item.chatMessage.showState == ModelChatMessage.SHOW_STATE_PLAYING){
                 stopVoicePlay(paly);
                 return;
             }
@@ -681,7 +681,7 @@ public class AdapterChatCursor extends CursorAdapter {
             }
 
             //开始一个新的播放流程
-            item.chatMessage.messageStatus = ModelChatMessage.STATUS_SOUND_PLAYING;
+            item.chatMessage.showState = ModelChatMessage.SHOW_STATE_PLAYING;
             item.chatMessage.updateToDatabase(context);
 
             //进行播放
@@ -852,7 +852,7 @@ public class AdapterChatCursor extends CursorAdapter {
             item.contentImgView.setBackgroundResource(R.drawable.message_l);
             item.contentImgView.setVisibility(View.VISIBLE);
 
-            if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_SOUND_PLAYING){
+            if (item.chatMessage.showState == ModelChatMessage.SHOW_STATE_PLAYING){
                 //设置动画文件
                 item.contentImgView.setImageResource(R.drawable.voice_play_left);
                 //执行动画
@@ -887,7 +887,7 @@ public class AdapterChatCursor extends CursorAdapter {
             //判断，如果当前该消息正在播放，
             // 则这次需要执行停止操作
             //停止之后，直接退出
-            if (item.chatMessage.messageStatus == ModelChatMessage.STATUS_SOUND_PLAYING){
+            if (item.chatMessage.showState == ModelChatMessage.SHOW_STATE_PLAYING){
                 stopVoicePlay(paly);
                 return;
             }
@@ -903,7 +903,7 @@ public class AdapterChatCursor extends CursorAdapter {
             }
 
             //开始一个新的播放流程
-            item.chatMessage.messageStatus = ModelChatMessage.STATUS_SOUND_PLAYING;
+            item.chatMessage.showState = ModelChatMessage.SHOW_STATE_PLAYING;
             item.chatMessage.isRead = true;
             item.chatMessage.updateToDatabase(context);
 

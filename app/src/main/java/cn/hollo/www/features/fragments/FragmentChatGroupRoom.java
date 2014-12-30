@@ -191,6 +191,7 @@ public class FragmentChatGroupRoom extends FragmentBase {
          */
         private void onSendMessage(){
             String text = messageInput.getText().toString();
+            messageInput.setText("");
             exportHelper.exportText(text);
         }
 

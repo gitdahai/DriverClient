@@ -22,7 +22,9 @@ public class ModelChatMessage extends MessageContent{
     /**没有接收（没有上传）*/
     public static final int STATUS_NONE_TRANSFER = 3;
     /**声音正在播放中*/
-    public static final int STATUS_SOUND_PLAYING = 4;
+    public static final int SHOW_STATE_PLAYING = 1;
+    /**如果当前的状态是正常的（没有播放或者显示）*/
+    public static final int SHOW_STATE_NONE = 0;
 
 
     public int      _id;            //数据表的主键索引id
@@ -39,6 +41,13 @@ public class ModelChatMessage extends MessageContent{
      // 4=播放中(语音播放中)）
      */
     public int  messageStatus;
+
+    /**
+     * 消息的显示状态：
+     * 当语音正在播放,图片显示...值为１;
+     * 否则显示为０.
+     */
+    public int showState = SHOW_STATE_NONE;
 
     public ModelChatMessage(){}
     /**************************************************
@@ -92,6 +101,7 @@ public class ModelChatMessage extends MessageContent{
         values.put(OpenHelperChatMessage.MESSAGE_STATUS,            this.messageStatus);
         values.put(OpenHelperChatMessage.IS_READ,                   this.isRead);
         values.put(OpenHelperChatMessage.IS_ISSUE,                  this.isIssue);
+        values.put(OpenHelperChatMessage.SHOW_STATE,                this.showState);
         return values;
     }
 
@@ -118,6 +128,7 @@ public class ModelChatMessage extends MessageContent{
         this.messageStatus      = cursor.getInt(OpenHelperChatMessage.INDEX_MESSAGE_STATUS);
         this.isRead             = (cursor.getInt(OpenHelperChatMessage.INDEX_IS_READ) == 0 ? false : true);
         this.isIssue            = (cursor.getInt(OpenHelperChatMessage.INDEX_IS_ISSUE) == 0 ? false : true);
+        this.showState          = cursor.getInt(OpenHelperChatMessage.INDEX_SHOW_STATE);
     }
 
     /***************************************************
@@ -127,8 +138,6 @@ public class ModelChatMessage extends MessageContent{
     public void setMessage(Message message){
         super.setMessage(message);
         this.messageId = parserLong(message.getBody("messageId"));
-
-        System.out.println("====messageId===== " + messageId);
     }
 
     /**************************************************

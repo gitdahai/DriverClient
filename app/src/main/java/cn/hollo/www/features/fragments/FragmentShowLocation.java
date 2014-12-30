@@ -157,6 +157,8 @@ public class FragmentShowLocation extends Fragment {
             MyLocationStyle myLocationStyle = new MyLocationStyle();
             // 自定义定位蓝点图标
             myLocationStyle.myLocationIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus));
+            //设置矛点
+            myLocationStyle.anchor(0.5f, 1.0f);
             // 自定义精度范围的圆形边框颜色
             //myLocationStyle.strokeColor(Color.BLACK);
             //自定义精度范围的圆形边框宽度

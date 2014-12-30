@@ -90,11 +90,14 @@ public class ActivityMissionList extends ActivityBase implements AdapterView.OnI
         //设置回调
         param.lisntener = new OnRequestListener(){
             public void onResponse(int code, String response) {
+                setProgressBarIndeterminateVisibility(false);
+
                 if (code == 200)
                     ParserUtil.parserWorkTasks(ActivityMissionList.this, response);
             }
         };
 
+        setProgressBarIndeterminateVisibility(true);
         //发送请求
         HttpStringRequest request = new HttpStringRequest(param);
         HttpManager httpManager = HttpManager.getInstance();

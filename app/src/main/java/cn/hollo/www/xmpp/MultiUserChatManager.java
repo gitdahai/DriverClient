@@ -3,8 +3,10 @@ package cn.hollo.www.xmpp;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +57,9 @@ public class MultiUserChatManager {
         try {
             //如果当前用户没有加入到聊天室，则进行加入操作
             if (!muc.isJoined()){
-                muc.join(userJid);
+                DiscussionHistory history = new DiscussionHistory();
+                history.setSince(new Date());
+                muc.join(userJid, "", history, 1000);
             }
 
             //保存该聊天室会话对象

@@ -50,6 +50,7 @@ public class OpenHelperChatMessage extends SQLiteOpenHelper {
     public static final String MESSAGE_STATUS           = DATA_14;  //消息的发送／接收状态（0=接收中，1=接收成功，2=接收失败）
     public static final String IS_READ                  = DATA_15;  //消息的状态（true=已读，false=未读）
     public static final String IS_ISSUE                 = DATA_16;  //消息是自己发送的，还是接收的(true=发送，false=接收的)
+    public static final String SHOW_STATE               = DATA_17;  //消息的显示状态（播放/停止播放）
 
     //对外公开的字段索引
     public static final int INDEX_ID                        = 0x00;
@@ -70,6 +71,7 @@ public class OpenHelperChatMessage extends SQLiteOpenHelper {
     public static final int INDEX_MESSAGE_STATUS            = 0x0f;
     public static final int INDEX_IS_READ                   = 0x10;
     public static final int INDEX_IS_ISSUE                  = 0x11;
+    public static final int INDEX_SHOW_STATE                = 0x12;
 
     static final String TABLE_NAME = "ChatMessage";
 
