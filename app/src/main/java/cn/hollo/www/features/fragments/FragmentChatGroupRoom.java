@@ -68,9 +68,9 @@ public class FragmentChatGroupRoom extends FragmentBase {
             MissionInfo missionInfo =  (MissionInfo)mBundle.getSerializable("MissionInfo");
 
             if (missionInfo != null){
-                exportHelper = new MessageExportHelper(getActivity(), missionInfo.room_id);
+                exportHelper = new MessageExportHelper(getActivity(), missionInfo.task_id);
                 controler = new ModeControler(view);
-                chatDisplay = new ChatContentDisplay(view, missionInfo.room_id);
+                chatDisplay = new ChatContentDisplay(view, missionInfo.task_id);
             }
         }
 

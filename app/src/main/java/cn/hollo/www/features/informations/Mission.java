@@ -12,7 +12,7 @@ import cn.hollo.www.content_provider.OpenHelperWorkTask;
  */
 public class Mission implements Serializable {
     public String task_id;              //任务id
-    public String room_id;              //聊天室的id
+    //public String room_id;              //聊天室的id
     public String shuttle_name;         //车辆编号
     public String _type;                //车辆类型
     public String departure;            //起点站名称
@@ -26,7 +26,7 @@ public class Mission implements Serializable {
     public ContentValues getContentValues(){
         ContentValues values = new ContentValues();
         values.put(OpenHelperWorkTask.TASK_ID,              task_id);
-        values.put(OpenHelperWorkTask.ROOM_ID,              room_id);
+        //values.put(OpenHelperWorkTask.ROOM_ID,              room_id);
         values.put(OpenHelperWorkTask.VOITURE_NUMBER,       shuttle_name);
         values.put(OpenHelperWorkTask.VOITURE_TYPE,         _type);
         values.put(OpenHelperWorkTask.DEPARTURE_STATION,    departure);

@@ -143,7 +143,8 @@ public class ServiceManager {
      */
     public void stopService(){
         //停止线程池
-        threadPool.cancel();
+        if (threadPool != null)
+            threadPool.cancel();
         //threadPool = null;
 
         Context ctx = context.getApplicationContext();

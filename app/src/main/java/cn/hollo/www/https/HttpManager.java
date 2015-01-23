@@ -26,7 +26,7 @@ public class HttpManager {
      * @param context
      */
     public void create(Context context){
-        mQueue = Volley.newRequestQueue(context);
+      mQueue = Volley.newRequestQueue(context);
     }
 
     /**

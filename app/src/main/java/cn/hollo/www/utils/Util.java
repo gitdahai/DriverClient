@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -177,5 +178,41 @@ public class Util {
         c.setTimeInMillis(time);
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
         return dateFormat.format(c.getTime());
+    }
+
+    /************************************************************
+     * 发送短信
+     * @param phoneNumber
+     * @param content
+     */
+    public static void sendSMS(String phoneNumber, String content){
+        // 获取短信管理器
+        android.telephony.SmsManager smsManager = android.telephony.SmsManager.getDefault();
+        // 拆分短信内容（手机短信长度限制）
+        List<String> divideContents = smsManager.divideMessage(content);
+        //发送消息（一条消息可能需要多次发送）
+        for (String text : divideContents)
+            smsManager.sendTextMessage(phoneNumber, null, text, null, null);
+    }
+
+    /*************************************************************
+     * 群发短信
+     * @param phoneNumbers
+     * @param content
+     */
+    public static void sendSMS(List<String> phoneNumbers, String content){
+        if (phoneNumbers == null || content == null)
+            return;
+
+        // 获取短信管理器
+        android.telephony.SmsManager smsManager = android.telephony.SmsManager.getDefault();
+        // 拆分短信内容（手机短信长度限制）
+        List<String> divideContents = smsManager.divideMessage(content);
+        //开始群发短信
+        for (String phoneNumber : phoneNumbers){
+            //一条消息可能需要多次发送
+            for (String text : divideContents)
+                smsManager.sendTextMessage(phoneNumber, null, text, null, null);
+        }
     }
 }

@@ -41,7 +41,7 @@ public class FragmentMission extends Fragment {
         View view = inflater.inflate(R.layout.fragment_stations, null);
         Bundle mBundle = this.getArguments();
         MissionInfo missionInfo = (MissionInfo)mBundle.getSerializable("MissionInfo");
-        helper = new MessageExportHelper(getActivity(), missionInfo.room_id);
+        helper = new MessageExportHelper(getActivity(), missionInfo.task_id);
         new Stations(view, missionInfo);
         return view;
     }
@@ -186,8 +186,8 @@ public class FragmentMission extends Fragment {
                 actions.onStartMission(station);
 
                 //发送信息到群组中
-                String time = Util.getTimeString(station.arrived_at);
-                String chatString = "本次班车将于" + time + "到达始发站" + station.name + ",请上车的小伙伴不要迟到哟!";
+                //String time = Util.getTimeString(station.arrived_at);
+                String chatString = "本次班车将于" + station.arrived_at + "到达始发站" + station.name + ",请上车的小伙伴不要迟到哟!";
                 helper.exportText(chatString);
             }
         }
@@ -198,7 +198,7 @@ public class FragmentMission extends Fragment {
          */
         private void onStationArrived(int position, StationInfo.Station station){
             //发送信息到群组中
-            String time = Util.getTimeString(station.arrived_at);
+            //String time = Util.getTimeString(station.arrived_at);
             String chatString = "本次班车已到达" + station.name;
             helper.exportText(chatString);
 

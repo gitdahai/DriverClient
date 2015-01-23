@@ -290,10 +290,12 @@ public class XMPPManager {
     private MultiUserChat getMultiUserChat(String roomJid, String userId){
         MultiUserChat muc = multiUserChatManager.getMultiUserChat(roomJid);
 
+        //如果不存在，就创建一个
         if (muc == null)
              multiUserChatManager.createMultiUserChat(roomJid, userId);
 
-        return muc;
+
+        return multiUserChatManager.getMultiUserChat(roomJid);
     }
 
     /**********************************************************

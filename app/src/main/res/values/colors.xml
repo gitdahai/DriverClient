@@ -18,4 +18,53 @@
     <color name="color_gray_929292">#ff929292</color>
     <color name="color_blue_197fee">#197fee</color>
 
+    <color name="red">#ffff0000</color>
+    <color name="red_light_ff6666_danger_tips">#FF6666</color>
+    <color name="borderRed">#ed7955</color>
+    <color name="green">#00ff00</color>
+    <color name="green_little_dark_55d43f">#ff55d43f</color>
+    <color name="green_deep_51ca3c_background">#51ca3c</color>
+    <color name="green_dark_12c27a_background">#12c27a</color>
+    <color name="green_blue_21ac9f">#ff21ac9f</color>
+    <color name="green_more_blue_21b6a8">#ff21b6a8</color>
+    <color name="blue">#0000ff</color>
+    <color name="blue_very_shallow_d9e7ee_tips_background">#d9e7ee</color>
+    <color name="blue_some_shallow_86afcf_progress_back">#86afcf</color>
+    <color name="blue_shallow_58abdd_bold">#58abdd</color>
+    <color name="blue_less_shallow_359fdb_text">#359fdb</color>
+    <color name="blue_few_shallow_378fbf_button_background">#378fbf</color>
+    <color name="blue_deep_0b5f9d_progress_front">#0b5f9d</color>
+    <color name="blue_light_less_deep_0b6aff_border">#0b6aff</color>
+    <color name="blue_deep_half_transparent_990b6aff_background">#990b6aff</color>
+    <color name="blue_sky_3db5e6_all_could_use_this">#3DB5E6</color>
+    <color name="blue_light_3quarter_transparent_4900c7ff_background">#4900c7ff</color>
+    <color name="blue_light">#0088ff</color>
+
+    <color name="pink">#fa43a3</color>
+    <color name="yellow">#ffff00</color>
+    <color name="yellow_quarter_transparent_c0ffff00_background">#c0ffff00</color>
+    <color name="orange">#ffff5400</color>
+    <color name="orange_less_shallow_fff36641_background">#fff36641</color>
+    <color name="orange_less_light_ff8800_tips">#ffff8800</color>
+    <color name="orange_light_ffa12f_background">#ffa12f</color>
+    <color name="white">#ffffffff</color>
+    <color name="white_10percent_transparent_f0ffffff_background">#f0ffffff</color>
+    <color name="gray_light_efefef_background">#efefef</color>
+    <color name="gray_half_dedede_background">#ffdedede</color>
+    <color name="gray">#ffc2c2c2</color>
+    <color name="gray_half_deep_b2b2b2_background">#ffb2b2b2</color>
+    <color name="gray_deep_a4a4a4_text">#ffa4a4a4</color>
+    <color name="gray_double_deep_929292_text">#929292</color>
+    <!-- transparent gray -->
+    <color name="gray_90_percent_translate_20c2c2c2_background">#20c2c2c2</color>
+    <color name="gray_half_deep_half_translate_7fb2b2b2_background">#7fb2b2b2</color>
+    <color name="gray_80_percent_translate_dac2c2c2_background">#dac2c2c2</color>
+    <color name="gray_half_deep_10percent_translate_efb2b2b2_background">#efb2b2b2</color>
+    <color name="black">#000000</color>
+    <color name="black_light_545454_front">#ff545454</color>
+    <color name="black_more_light_4d4d4d_background">#4d4d4d</color>
+    <color name="black_quarter_transparent_a0000000_background">#a0000000</color>
+    <color name="black_half_transparent">#80000000</color>
+    <color name="black_20percent_transparent_da000000_background">#da000000</color>
+
 </resources>

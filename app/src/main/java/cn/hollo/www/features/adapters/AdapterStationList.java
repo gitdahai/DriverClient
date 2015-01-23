@@ -109,8 +109,8 @@ public class AdapterStationList extends BaseAdapter {
             int onSize = station.on_users.size();
             int offSize = station.off_users.size();
             populationText.setText("上车: " + onSize + "人  下车: " + offSize + "人");
-            String timeString = Util.getTimeString(station.arrived_at);
-            arriveTime.setText(timeString);
+            //String timeString = Util.getTimeString(station.arrived_at);
+            arriveTime.setText(station.arrived_at);
 
             //当前的列表项等于需要执行的项，则进行状态修改
             if (position == executionIndex){

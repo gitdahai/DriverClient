@@ -91,7 +91,7 @@ public class ActivityMissionExecution extends ActivityBase {
                 OpenHelperChatMessage.MESSAGE_STATUS + "=?";
 
         String[] selectionArgs = new String[2];
-        selectionArgs[0] = missionInfo.room_id;
+        selectionArgs[0] = missionInfo.task_id;
 
         //首先修改message_status = 0 时的状态
         selectionArgs[1] = "0";

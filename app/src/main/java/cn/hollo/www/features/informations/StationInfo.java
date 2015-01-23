@@ -20,7 +20,7 @@ public class StationInfo {
         public List<Passenger> off_users = new ArrayList<Passenger>();     //下车用户
         public List<Passenger> on_users  = new ArrayList<Passenger>();     //上车用户
         public Location   location  = new Location();            //站点的经纬度
-        public long arrived_at;                                  //到达时间
+        public String arrived_at;                                  //到达时间
         public String name;                                      //站点名称
         public String _id;                                       //站点的id
     }

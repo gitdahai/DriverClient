@@ -34,7 +34,7 @@ public class MissionInfo extends Mission {
     public static MissionInfo createWorkTaskExpand(Cursor cursor){
         MissionInfo wte = new MissionInfo();
         wte.task_id = cursor.getString(OpenHelperWorkTask.COL_INDEX_TASK_ID);
-        wte.room_id = cursor.getString(OpenHelperWorkTask.COL_INDEX_ROOM_ID);
+        //wte.room_id = cursor.getString(OpenHelperWorkTask.COL_INDEX_ROOM_ID);
         wte.shuttle_name = cursor.getString(OpenHelperWorkTask.COL_INDEX_VOITURE_NUMBER);
         wte._type = cursor.getString(OpenHelperWorkTask.COL_INDEX_VOITURE_TYPE);
         wte.departure = cursor.getString(OpenHelperWorkTask.COL_INDEX_DEPARTURE_STATION);

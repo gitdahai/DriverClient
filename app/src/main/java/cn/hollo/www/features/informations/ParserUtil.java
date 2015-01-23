@@ -72,8 +72,8 @@ public class ParserUtil {
                 }
 
                 //保留房间的id
-                if (workTask.room_id != null)
-                    roomIds.add(workTask.room_id);
+                if (workTask.task_id != null)
+                    roomIds.add(workTask.task_id);
             }
 
             //开启加入聊天室服务
@@ -128,7 +128,7 @@ public class ParserUtil {
 
                     //解析到达时间
                     if (jStation.has("arrived_at") && !jStation.isNull("arrived_at"))
-                        station.arrived_at = jStation.getLong("arrived_at");
+                        station.arrived_at = jStation.getString("arrived_at");
 
                     //解析站点名称
                     if (jStation.has("name") && !jStation.isNull("name"))
