@@ -422,6 +422,7 @@ public class XMPPManager {
                 isOpened = true;
                 try {
                     connection.connect();
+
                     connection.login(openfirLogianName, openfirLoginPassword);
                     break;
                 } catch (SmackException e) {

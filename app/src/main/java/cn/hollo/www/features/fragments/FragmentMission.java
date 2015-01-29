@@ -21,6 +21,7 @@ import cn.hollo.www.https.HttpManager;
 import cn.hollo.www.https.HttpStringRequest;
 import cn.hollo.www.https.OnRequestListener;
 import cn.hollo.www.utils.Util;
+import cn.hollo.www.xmpp.IChatMessage;
 
 /**
  * Created by orson on 14-12-18.
@@ -188,6 +189,7 @@ public class FragmentMission extends Fragment {
                 //发送信息到群组中
                 //String time = Util.getTimeString(station.arrived_at);
                 String chatString = "本次班车将于" + station.arrived_at + "到达始发站" + station.name + ",请上车的小伙伴不要迟到哟!";
+                //开始任务的消息不需要客户端处理，因此发送一个不同消息就行
                 helper.exportText(chatString);
             }
         }
@@ -199,8 +201,7 @@ public class FragmentMission extends Fragment {
         private void onStationArrived(int position, StationInfo.Station station){
             //发送信息到群组中
             //String time = Util.getTimeString(station.arrived_at);
-            String chatString = "本次班车已到达" + station.name;
-            helper.exportText(chatString);
+
 
             //发送“到达动作”事件
             if (actions != null){
@@ -213,6 +214,13 @@ public class FragmentMission extends Fragment {
 
             //任务完成
             if (position == stationInfo.stations.size() - 1){
+
+                String chatString = "本次班车已到达终点:" + station.name;
+                //到达终点，需要客户端单独处理，因此需要设置消息的类型为:ActionDestination
+                //helper.actionText(chatString, IChatMessage.ACTION_DESTINATION_MESSAGE);
+                //改成只发送站点的名称
+                helper.actionText(station.name, IChatMessage.ACTION_DESTINATION_MESSAGE);
+
                 //发送“完成”动作
                 if (actions != null)
                     actions.onFinishMission();
@@ -221,6 +229,12 @@ public class FragmentMission extends Fragment {
                 getActivity().finish();
             }
             else{
+                String chatString = "本次班车已到达终点:" + station.name;
+                //到达中途站点，需要客户端单独处理，因此需要设置消息的类型为:ActionStation
+                //helper.actionText(chatString, IChatMessage.ACTION_STATION_MESSAGE);
+                //改成只发送站点的名称
+                helper.actionText(station.name, IChatMessage.ACTION_STATION_MESSAGE);
+
                 //更新任务的状态
                 missionInfo.execute_index = position + 1;
                 missionInfo.update(getActivity());

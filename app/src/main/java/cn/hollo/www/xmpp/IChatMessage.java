@@ -15,6 +15,8 @@ public interface IChatMessage {
      static final String AUDIO_MESSAGE = "AudioMessage";
      static final String PLAIN_MESSAGE = "Message";
      static final String SEND_FROM_SPECIAL_USER = "Driver";
+     static final String ACTION_STATION_MESSAGE = "ActionStation";          //到达某站
+     static final String ACTION_DESTINATION_MESSAGE = "ActionDestination";   //到达终点
 
     /**
      *

@@ -8,8 +8,8 @@ public class XMPPConstant {
     public static String TAG = "client";
 
     //开发时的服务器地址
-    /*public static final String OPENFIRE_DOMAIN = "211.151.0.150";
-    public static final int    OPENFIRE_PORT = 5222;*/
+    //public static final String OPENFIRE_DOMAIN = "211.151.0.150";
+    //public static final int    OPENFIRE_PORT = 5222;
 
     //测试服务器地址
     public static final String OPENFIRE_DOMAIN = "211.151.0.139";

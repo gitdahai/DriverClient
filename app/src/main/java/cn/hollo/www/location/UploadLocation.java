@@ -50,7 +50,7 @@ public class UploadLocation{
         ThreadPool pool = ThreadPool.getInstance();
         pool.addTask(task);
 
-        //System.out.println("==============已经发送了位置订阅信息====================");
+        System.out.println("==============已经发送了位置订阅信息====================");
     }
 
     /**************************************************

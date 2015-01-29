@@ -304,8 +304,13 @@ public class AdapterChatCursor extends CursorAdapter {
          *
          */
         private void assignMessage(){
+            String type = item.chatMessage.messageType;
+
             //分派文本消息
-            if (IChatMessage.PLAIN_MESSAGE.equals(item.chatMessage.messageType))
+            if (IChatMessage.PLAIN_MESSAGE.equals(type)
+                    || IChatMessage.ACTION_DESTINATION_MESSAGE.equals(type)
+                    || IChatMessage.ACTION_STATION_MESSAGE.equals(type))
+
                 handleTextMessage();
                 //分派语音消息
             else if (IChatMessage.AUDIO_MESSAGE.equals(item.chatMessage.messageType))
@@ -711,7 +716,10 @@ public class AdapterChatCursor extends CursorAdapter {
             MessageExportHelper helper = new MessageExportHelper(context, chatMessage.roomId);
 
             //是否是文本消息
-            if (ModelChatMessage.PLAIN_MESSAGE.equals(chatMessage.messageType))
+            if (ModelChatMessage.PLAIN_MESSAGE.equals(chatMessage.messageType)
+                    || ModelChatMessage.ACTION_DESTINATION_MESSAGE.equals(chatMessage.messageType)
+                    || ModelChatMessage.ACTION_STATION_MESSAGE.equals(chatMessage.messageType))
+
                 helper.reExportText(chatMessage);
             //是否是位置信息
             else if (ModelChatMessage.LOCATION_MESSAGE.equals(chatMessage.messageType))

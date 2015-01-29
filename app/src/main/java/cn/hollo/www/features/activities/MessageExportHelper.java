@@ -71,6 +71,39 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
         }
     }
 
+    /**===========================================
+     * 动作消息
+     * @param text
+     */
+    public void actionText(String text, String action){
+        //构造一个消息模型
+        ModelChatMessage modelChatMessage = new ModelChatMessage();
+        modelChatMessage.roomId = roomId;
+        modelChatMessage.messageType = action;
+        modelChatMessage.nickname = userInfo.getUserName();
+        modelChatMessage.speaker = userInfo.getUserId();
+        modelChatMessage.messageId = System.currentTimeMillis();
+        modelChatMessage.isIssue = true;
+        modelChatMessage.isRead  = true;
+        modelChatMessage.content = text;
+        modelChatMessage.userJid = userInfo.getUserId();
+
+        //投递到xmpp进行发送
+        if (xmppManager != null){
+            //设置消息的状态为“正在发送中”
+            modelChatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFERING;
+            modelChatMessage.inserToDatabase(context);
+            //用新的线程开始发送
+            ThreadPool pool = ThreadPool.getInstance();
+            SendTask task = new SendTask(modelChatMessage, sendMessageListener);
+            pool.addTask(task);
+        }
+        else{
+            //设置该消息的类型为“失败”
+            modelChatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFER_FAIL;
+            modelChatMessage.inserToDatabase(context);
+        }
+    }
     /**================================================
      *
      */
