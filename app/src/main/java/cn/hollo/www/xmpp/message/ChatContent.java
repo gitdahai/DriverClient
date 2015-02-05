@@ -57,7 +57,7 @@ public class ChatContent implements IChatMessage {
         messageParams.setValue("latitude", "" + latitude);
 
         if (groupRoomType != null)
-            messageParams.setValue("groupRoomType", groupRoomType);
+            messageParams.setValue("GroupRoomType", groupRoomType);
 
         if (nickname != null)
             messageParams.setValue("nickname", nickname);

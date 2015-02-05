@@ -24,6 +24,8 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
     private String roomId;
     private XMPPManager xmppManager;
     private UserInfo userInfo;
+    private static final String groupRoomType = "Contract";     //聊天的房间类型
+
     /**********************************************
      * 构造方法中，需要拿到
      * @param context
@@ -53,6 +55,7 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
         modelChatMessage.isRead  = true;
         modelChatMessage.content = text;
         modelChatMessage.userJid = userInfo.getUserId();
+        modelChatMessage.groupRoomType = groupRoomType;
 
         //投递到xmpp进行发送
         if (xmppManager != null){
@@ -87,6 +90,7 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
         modelChatMessage.isRead  = true;
         modelChatMessage.content = text;
         modelChatMessage.userJid = userInfo.getUserId();
+        modelChatMessage.groupRoomType = groupRoomType;
 
         //投递到xmpp进行发送
         if (xmppManager != null){
@@ -109,6 +113,7 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
      */
     public void reExportText(ModelChatMessage modelChatMessage){
         modelChatMessage.userJid = userInfo.getUserId();
+        modelChatMessage.groupRoomType = groupRoomType;
 
         //投递到xmpp进行发送
         if (xmppManager != null){
@@ -144,6 +149,7 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
         modelChatMessage.content = Utils.getLocalFilePathFullName(context, voicePathName);
         modelChatMessage.duration = duration;
         modelChatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFERING;
+        modelChatMessage.groupRoomType = groupRoomType;
 
         //首先存入数据库
         context.getContentResolver().insert(ProviderChatMessage.CONTENT_URI, modelChatMessage.getContentValues());
@@ -162,6 +168,7 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
         modelChatMessage.content = Utils.getLocalFilePathFullName(context, modelChatMessage.content);
         modelChatMessage.userJid = userInfo.getUserId();
         modelChatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFERING;
+        modelChatMessage.groupRoomType = groupRoomType;
 
         //更新数据哭数据库
         modelChatMessage.updateToDatabase(context);
@@ -195,6 +202,7 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
         modelChatMessage.isRead  = true;
         modelChatMessage.content = description;       //只有上传成功后，才会被修改
         modelChatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFERING;
+        modelChatMessage.groupRoomType = groupRoomType;
 
         //首先存入数据库
         context.getContentResolver().insert(ProviderChatMessage.CONTENT_URI, modelChatMessage.getContentValues());
@@ -211,6 +219,7 @@ public class MessageExportHelper implements ServiceManager.OnXmppBinder {
     public void reExportLocation(ModelChatMessage modelChatMessage){
         modelChatMessage.messageStatus = ModelChatMessage.STATUS_TRANSFERING;
         modelChatMessage.userJid = userInfo.getUserId();
+        modelChatMessage.groupRoomType = groupRoomType;
 
         //首先存入数据库
         modelChatMessage.updateToDatabase(context);
