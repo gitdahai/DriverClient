@@ -31,6 +31,7 @@ public class MessageContent extends ChatContent {
             this.messageType         = messageParams.getValue("messageType");
             this.description         = messageParams.getValue("description");
             this.sendFromSpecialUser = messageParams.getValue("sendFromSpecialUser");
+            this.messageId           = parserLong(messageParams.getValue("messageId"));
         }
 
         //抽取roomId

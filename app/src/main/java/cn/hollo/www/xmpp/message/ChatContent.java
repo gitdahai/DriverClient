@@ -23,6 +23,7 @@ public class ChatContent implements IChatMessage {
     public String messageType;
     public String description;          //位置信息的描述
     public String sendFromSpecialUser;
+    public long     messageId;          //发送的消息才会有该id，用于查询条件(该数据由时间戳生成)
 
     public String roomId;               //该数据不传递
     public String userJid;              //该数据不传递
@@ -55,6 +56,7 @@ public class ChatContent implements IChatMessage {
         messageParams.setValue("duration", "" + duration);
         messageParams.setValue("longitude", "" + longitude);
         messageParams.setValue("latitude", "" + latitude);
+        messageParams.setValue("messageId", "" + messageId);
 
         if (groupRoomType != null)
             messageParams.setValue("GroupRoomType", groupRoomType);
@@ -73,6 +75,7 @@ public class ChatContent implements IChatMessage {
 
         if (description != null)
             messageParams.setValue("description", description);
+
 
         message.addExtension(messageParams);
         return message;

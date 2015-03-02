@@ -28,7 +28,6 @@ public class ModelChatMessage extends MessageContent{
 
 
     public int      _id;            //数据表的主键索引id
-    public long     messageId;      //发送的消息才会有该id，用于查询条件(该数据由时间戳生成)
     public boolean  isRead;         //消息的状态:消息的状态（true=已读，false=未读）
     public boolean  isIssue;        //消息:消息是自己发送的，还是接收的(true=发送，false=接收的)
 
@@ -70,9 +69,6 @@ public class ModelChatMessage extends MessageContent{
      */
     public Message getMessage(){
         Message message = super.getMessage();
-
-        if(message != null)
-            message.addBody("messageId", "" + messageId);
 
         return message;
     }
@@ -137,7 +133,6 @@ public class ModelChatMessage extends MessageContent{
      */
     public void setMessage(Message message){
         super.setMessage(message);
-        this.messageId = parserLong(message.getBody("messageId"));
     }
 
     /**************************************************
